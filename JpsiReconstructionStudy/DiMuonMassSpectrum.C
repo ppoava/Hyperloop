@@ -54,8 +54,8 @@ void drawHist(TH2F* hMass_Pt_PM, TH2F* hMass_Pt_PP, TH2F* hMass_Pt_MM)
  {
     TH1D *hDiMuonMass_PM, *hDiMuonMass_PP, *hDiMuonMass_MM;
     hDiMuonMass_PM = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
-    hDiMuonMass_PP = hMass_Pt_PM->ProjectionX("hDiMuonMass_PP");
-    hDiMuonMass_MM = hMass_Pt_PM->ProjectionX("hDiMuonMass_MM");
+    hDiMuonMass_PP = hMass_Pt_PP->ProjectionX("hDiMuonMass_PP");
+    hDiMuonMass_MM = hMass_Pt_MM->ProjectionX("hDiMuonMass_MM");
     // hMass_Pt_PM->Scale(1/(hGlobalMuonMass->Integral()));   
 
     // Now subtract background by using the mu+mu+ and mu-mu- pairs
@@ -68,13 +68,14 @@ void drawHist(TH2F* hMass_Pt_PM, TH2F* hMass_Pt_PP, TH2F* hMass_Pt_MM)
 
     // Plot the results
     TCanvas* c = new TCanvas("c", "Signal Extraction", 800, 600);
-    hDiMuonMass_PM->SetLineColor(kBlue);  
-    hBackground->SetLineColor(kRed);      
-    hSignal->SetLineColor(kGreen);        
+    hDiMuonMass_PM->SetLineColor(kBlack);  
+    hDiMuonMass_PM->SetLineStyle(2);
+    hBackground->SetLineColor(kBlack);      
+    hSignal->SetLineColor(kRed);        
 
-    hDiMuonMass_PM->Draw("same hist");         
+    hDiMuonMass_PM->Draw("hist");         
     hBackground->Draw("same hist");       
-    hSignal->Draw("hist");           
+    hSignal->Draw("same hist");           
 
     TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
     leg->AddEntry(hDiMuonMass_PM, "Opposite sign pairs", "l");
