@@ -39,6 +39,7 @@ void fitJpsi(TH1D* hist) {
 
     // Step 5: Plot the results
     TCanvas* c = new TCanvas("c", "Fit Result", 800, 600);
+    c->cd();
     RooPlot* frame = m.frame();
     data.plotOn(frame, MarkerSize(0.5));
     // data.plotOn(frame, Binning(40));  // Adjust binning if needed
@@ -50,46 +51,20 @@ void fitJpsi(TH1D* hist) {
     result->Print(); 
 } // fitJpsi
 
-void drawHist(TH2F* hMass_Pt_PM, TH2F* hMass_Pt_PP, TH2F* hMass_Pt_MM)
+void drawHist(TH2F* hMass_Pt_PM)
  {
-    TH1D *hDiMuonMass_PM, *hDiMuonMass_PP, *hDiMuonMass_MM;
+    TH1D *hDiMuonMass_PM;
+    hMass_Pt_PM->GetYaxis()->SetRangeUser(5, 30);
     hDiMuonMass_PM = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
-    hDiMuonMass_PP = hMass_Pt_PP->ProjectionX("hDiMuonMass_PP");
-    hDiMuonMass_MM = hMass_Pt_MM->ProjectionX("hDiMuonMass_MM");
     // hMass_Pt_PM->Scale(1/(hGlobalMuonMass->Integral()));   
-
-    // Now subtract background by using the mu+mu+ and mu-mu- pairs
-    TH1D* hBackground = (TH1D*)hDiMuonMass_PP->Clone("hBackground");
-    hBackground->Add(hDiMuonMass_MM);
-    hBackground->Scale(0.5);
-
-    TH1D* hSignal = (TH1D*)hDiMuonMass_PM->Clone("hSignal");
-    hSignal->Add(hBackground, -1);  
 
     // Plot the results
     TCanvas* c = new TCanvas("c", "Signal Extraction", 800, 600);
     hDiMuonMass_PM->SetLineColor(kBlack);  
-    hDiMuonMass_PM->SetLineStyle(2);
-    hBackground->SetLineColor(kBlack);      
-    hSignal->SetLineColor(kRed);        
+    // hDiMuonMass_PM->SetLineStyle(2);    
+    hDiMuonMass_PM->Draw("hist E");
 
-    hDiMuonMass_PM->Draw("hist");         
-    hBackground->Draw("same hist");       
-    hSignal->Draw("same hist");           
-
-    TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
-    leg->AddEntry(hDiMuonMass_PM, "Opposite sign pairs", "l");
-    leg->AddEntry(hBackground, "Same-sign pairs", "l");
-    leg->AddEntry(hSignal, "Background subtracted", "l");
-    leg->Draw();
-
-    // Draw other histograms
-    // hGlobalMuonMass->SetStats(0);
-    // hGlobalMuonMass->GetYaxis()->SetTitle("entries / total entries");
-    // hMass_Pt_PM->Draw("hist E");
-    // hDiMuonMass_PM->Draw("hist E");
-
-    // fitJpsi(hDiMuonMass_PM);
+    fitJpsi(hDiMuonMass_PM);
     
     /*
     // Draw legend
@@ -106,7 +81,7 @@ int DiMuonMassSpectrum()
  {
     THashList *listDiMuon;
     TList *subListDiMuonPM, *subListDiMuonPP, *subListDiMuonMM;
-    TFile* fDiMuon = new TFile("AnalysisResults-2.root", "READ");
+    TFile* fDiMuon = new TFile("AnalysisResults.root", "READ");
     listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
     subListDiMuonPM = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
     subListDiMuonPP = (TList*)listDiMuon->FindObject("PairsMuonSEPP_muonLowPt510SigmaPDCA");
