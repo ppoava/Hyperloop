@@ -19,7 +19,9 @@
 using namespace RooFit;
 
 void fitJpsi(TH1D* hist) {
-    // Step 1: Define the search range
+    // Step 1: Define the x-axis range
+    double mMin = hist->GetXaxis()->GetXmin();
+    double mMax = hist->GetXaxis()->GetXmax();
     // 3.1 +/- 0.3 GeV
     double mMin = 2.8;
     double mMax = 3.4;
