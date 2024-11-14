@@ -14,6 +14,9 @@
 #include "RooRealVar.h"
 #include "RooDataHist.h"
 #include "RooPlot.h"
+#include "RooAddPdf.h"
+#include "RooExponential.h"
+#include "RooChi2Var.h"
 #include "RooGaussian.h"
 #include "RooCrystalBall.h"
 #include "RooFitResult.h"
@@ -52,33 +55,58 @@ void fitJpsiGauss(TH1D* hist) {
 
 void fitJpsiCB(TH1D* hist) {
     // Initialise
-    RooRealVar m("m", "invariant mass", hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
-    m.setRange("fitRange", 2.9, 3.25);
+    Double_t mMin = 2;
+    Double_t mMax = 5;
+    RooRealVar m("m", "invariant mass", mMin, mMax);
+    m.setRange("fitRange", 2, 5);
     RooDataHist* data = new RooDataHist("data", "Di-muon spectrum", m, Import(*hist));
 
     // Crystal Ball
     RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
     RooRealVar sigma("sigma", "Sigma of Gaussian", 0.08, 0.05, 0.12);
     RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
+    alphaL.setConstant();
     RooRealVar nL("nL", "Exponent Left", 9.940, 5.0, 20.0); 
+    nL.setConstant();
     RooRealVar alphaR("alphaR", "Alpha Right", 1.832, 1.0, 3.0);
+    alphaR.setConstant();
     RooRealVar nR("nR", "Exponent Right", 15.323, 5.0, 25.0);  
+    nR.setConstant();
 
-    RooCrystalBall doubleSidedCB("doubleSidedCB", "Double Sided Crystal Ball", m, m0, sigma, alphaL, nL, alphaR, nR);
-    doubleSidedCB.fitTo(*data, Range("fitRange"));
+    RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB", "Double Sided Crystal Ball", m, m0, sigma, alphaL, nL, alphaR, nR);
+    // doubleSidedCB->fitTo(*data);
+
+    // Exponential 
+    RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
+	RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
+
+    // Add them
+    RooRealVar sigYield("sigYield", "N_{sig}", 50, 0., 100000000);
+   	RooRealVar bkgYield("bkgYield", "N_{bkg}", 10000, 0., 1000000000);
+    RooAddPdf model("model", "combined mass model", {*doubleSidedCB, *BKG}, {sigYield, bkgYield});
+    model.fitTo(*data, Range("fitRange"));
 
     // Plot
     RooPlot* frame = m.frame();
     data->plotOn(frame, MarkerSize(0.4));
-    doubleSidedCB.plotOn(frame);
+    model.plotOn(frame, LineColor(kBlue), Name("full_Model"));
+    double chi2M = frame->chiSquare(); // reduced χ (?)
+    // doubleSidedCB->plotOn(frame);
     TCanvas* canvas = new TCanvas("canvas", "Double Sided Crystal Ball Fit", 800, 600);
     canvas->cd();
+
+    model.plotOn(frame, Components(*doubleSidedCB), LineStyle(kDashed), LineColor(kRed), Name("signal_Model"));
+   	model.plotOn(frame, Components(*BKG), LineStyle(kDashed), LineColor(kBlue), Name("bkg_Model"));
+   	model.paramOn(frame,ShowConstants(true),Format("TE",AutoPrecision(3)));
+
     frame->Draw();
 
-    double chi2 = frame->chiSquare();
+    // RooChi2Var* chi2Var = new RooChi2Var("chi2","chi2", *doubleSidedCB, *data, true, RooAbsData::ErrorType::Poisson);
+    // double chi2M = chi2Var->getVal();
+
     TLegend *legend = new TLegend(0.6, 0.7, 0.9, 0.9);
     legend->AddEntry(frame->getObject(0), "Data", "point");
-    legend->AddEntry(frame->getObject(1), Form("#chi^{2} = %.2f", chi2), "l");
+    legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
     legend->Draw();
 
     m0.Print();
@@ -87,6 +115,15 @@ void fitJpsiCB(TH1D* hist) {
     nL.Print();
     alphaR.Print();
     nR.Print();
+
+    TCanvas* pullCanvas = new TCanvas("pull", "pull");
+    // Construct a histogram with the pulls of the data w.r.t the curve
+   RooHist *hpull = frame->pullHist();
+   // Create a new frame to draw the pull distribution and add the distribution to the frame
+   RooPlot *frame_pull = m.frame(Title("Pull Distribution"));
+   frame_pull->addPlotable(hpull, "P");
+   pullCanvas->cd();
+   frame_pull->Draw();
 
 } // fitJpsiCB
 
