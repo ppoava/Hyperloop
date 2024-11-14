@@ -15,31 +15,32 @@
 #include "RooDataHist.h"
 #include "RooPlot.h"
 #include "RooGaussian.h"
+#include "RooCrystalBall.h"
 #include "RooFitResult.h"
 
 using namespace RooFit;
 
 void fitJpsiGauss(TH1D* hist) {
-    // Define the x-axis range
-    double mMin = hist->GetXaxis()->GetXmin();
-    double mMax = hist->GetXaxis()->GetXmax();
-    RooRealVar m("m", "m", mMin, mMax);
-    RooDataHist data("data", "Di-muon spectrum", m, Import(*hist));
+    // Initialise
+    Double_t mMin = hist->GetXaxis()->GetXmin();
+    Double_t mMax = hist->GetXaxis()->GetXmax();
+    RooRealVar m("m", "invariant mass", mMin, mMax);
+    RooDataHist* data = new RooDataHist("data", "Di-muon spectrum", m, Import(*hist));
 
     // Gaussian
-    RooRealVar mean("mean", "mean", hist->GetMean(), mMin, mMax);
+    RooRealVar mean("mean", "mean", mMin, mMax);
     RooRealVar sigma("sigma", "width", hist->GetRMS(), 0, (mMax - mMin) / 2);
     RooGaussian gauss("gauss", "Gaussian PDF", m, mean, sigma);
 
     // Fit
     m.setRange("fitRange", 2.8, 3.4);  // Define the fit range
-    RooFitResult* result = gauss.fitTo(data, Save(), Range("fitRange"));
+    RooFitResult* result = gauss.fitTo(*data, Save(), Range("fitRange"));
 
     // Plot
     TCanvas* c = new TCanvas("c", "Fit Result", 800, 600);
     c->cd();
     RooPlot* frame = m.frame();
-    data.plotOn(frame, MarkerSize(0.5));
+    data->plotOn(frame, MarkerSize(0.5));
     // data.plotOn(frame, Binning(40)); 
     gauss.plotOn(frame, Range("fitRange")); 
 
@@ -47,7 +48,47 @@ void fitJpsiGauss(TH1D* hist) {
 
     // Optional: Print fit results
     result->Print(); 
-} // fitJpsi
+} // fitJpsiGauss
+
+void fitJpsiCB(TH1D* hist) {
+    // Initialise
+    RooRealVar m("m", "invariant mass", hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
+    m.setRange("fitRange", 2.9, 3.25);
+    RooDataHist* data = new RooDataHist("data", "Di-muon spectrum", m, Import(*hist));
+
+    // Crystal Ball
+    RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
+    RooRealVar sigma("sigma", "Sigma of Gaussian", 0.08, 0.05, 0.12);
+    RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
+    RooRealVar nL("nL", "Exponent Left", 9.940, 5.0, 20.0); 
+    RooRealVar alphaR("alphaR", "Alpha Right", 1.832, 1.0, 3.0);
+    RooRealVar nR("nR", "Exponent Right", 15.323, 5.0, 25.0);  
+
+    RooCrystalBall doubleSidedCB("doubleSidedCB", "Double Sided Crystal Ball", m, m0, sigma, alphaL, nL, alphaR, nR);
+    doubleSidedCB.fitTo(*data, Range("fitRange"));
+
+    // Plot
+    RooPlot* frame = m.frame();
+    data->plotOn(frame, MarkerSize(0.4));
+    doubleSidedCB.plotOn(frame);
+    TCanvas* canvas = new TCanvas("canvas", "Double Sided Crystal Ball Fit", 800, 600);
+    canvas->cd();
+    frame->Draw();
+
+    double chi2 = frame->chiSquare();
+    TLegend *legend = new TLegend(0.6, 0.7, 0.9, 0.9);
+    legend->AddEntry(frame->getObject(0), "Data", "point");
+    legend->AddEntry(frame->getObject(1), Form("#chi^{2} = %.2f", chi2), "l");
+    legend->Draw();
+
+    m0.Print();
+    sigma.Print();
+    alphaL.Print();
+    nL.Print();
+    alphaR.Print();
+    nR.Print();
+
+} // fitJpsiCB
 
 void drawHist(TH2F* hMass_Pt_PM)
  {
@@ -62,7 +103,8 @@ void drawHist(TH2F* hMass_Pt_PM)
     // hDiMuonMass_PM->SetLineStyle(2);    
     hDiMuonMass_PM->Draw("hist E");
 
-    fitJpsiGauss(hDiMuonMass_PM);
+    // fitJpsiGauss(hDiMuonMass_PM);
+    fitJpsiCB(hDiMuonMass_PM);
     
     /*
     // Draw legend
