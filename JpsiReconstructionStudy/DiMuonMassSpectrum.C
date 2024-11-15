@@ -19,6 +19,7 @@
 #include "RooChi2Var.h"
 #include "RooGaussian.h"
 #include "RooCrystalBall.h"
+#include "RooChebychev.h"
 #include "RooFitResult.h"
 
 using namespace RooFit;
@@ -76,9 +77,20 @@ void fitJpsiCB(TH1D* hist) {
     RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB", "Double Sided Crystal Ball", m, m0, sigma, alphaL, nL, alphaR, nR);
     // doubleSidedCB->fitTo(*data);
 
-    // Exponential 
-    RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
-	RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
+    // Exponential for background
+    // RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
+	// RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
+
+    // Initializing Chebyshev polynomials for background
+    RooRealVar a0("a0","a_{0}",-0.01,-1.0,1.0);
+	RooRealVar a1("a1","a_{1}",-0.01,-1.0,1.0);
+	RooRealVar a2("a2","a_{2}",-0.01,-1.0,1.0);
+	// RooRealVar a3("a3","a_{3}",0.1,-2.0,2.0);
+	// RooRealVar a4("a4","a_{4}",0.0,-2.0,2.0);
+	//RooRealVar a5("a5","a_{5}",0.0,-2.0,2.0);
+	//RooRealVar a6("a6","a_{6}",0.0,-2.0,2.0);
+	//RooRealVar a7("a7","a_{7}",0.0,-2.0,2.0);
+	RooChebychev* BKG = new RooChebychev("BKG","Chebyshev background", m, {a0,a1,a2});
 
     // Add them
     RooRealVar sigYield("sigYield", "N_{sig}", 50, 0., 100000000);
