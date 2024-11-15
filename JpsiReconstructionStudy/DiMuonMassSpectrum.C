@@ -13,6 +13,7 @@
 #include "TLegend.h"
 #include "RooRealVar.h"
 #include "RooDataHist.h"
+#include "RooHist.h"
 #include "RooPlot.h"
 #include "RooAddPdf.h"
 #include "RooExponential.h"
@@ -24,7 +25,7 @@
 
 using namespace RooFit;
 
-void fitJpsiGauss(TH1D* hist) {
+void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     // Initialise
     Double_t mMin = hist->GetXaxis()->GetXmin();
     Double_t mMax = hist->GetXaxis()->GetXmax();
@@ -54,7 +55,7 @@ void fitJpsiGauss(TH1D* hist) {
     result->Print(); 
 } // fitJpsiGauss
 
-void fitJpsiCB(TH1D* hist) {
+void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     // Initialise
     Double_t mMin = 2;
     Double_t mMax = 5;
@@ -84,7 +85,7 @@ void fitJpsiCB(TH1D* hist) {
     // Initializing Chebyshev polynomials for background
     RooRealVar a0("a0","a_{0}",-0.01,-1.0,1.0);
 	RooRealVar a1("a1","a_{1}",-0.01,-1.0,1.0);
-	RooRealVar a2("a2","a_{2}",-0.01,-1.0,1.0);
+	RooRealVar a2("a2","a_{2}",-0.01,-1.0,1.0); // essentially best result here, by iterative fitting
 	// RooRealVar a3("a3","a_{3}",0.1,-2.0,2.0);
 	// RooRealVar a4("a4","a_{4}",0.0,-2.0,2.0);
 	//RooRealVar a5("a5","a_{5}",0.0,-2.0,2.0);
@@ -102,9 +103,11 @@ void fitJpsiCB(TH1D* hist) {
     RooPlot* frame = m.frame();
     data->plotOn(frame, MarkerSize(0.4));
     model.plotOn(frame, LineColor(kBlue), Name("full_Model"));
-    double chi2M = frame->chiSquare(); // reduced χ (?)
+    double chi2M = frame->chiSquare(); // reduced χ2 (?)
     // doubleSidedCB->plotOn(frame);
-    TCanvas* canvas = new TCanvas("canvas", "Double Sided Crystal Ball Fit", 800, 600);
+    TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f", pTMin, pTMax), 
+                                  Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f", pTMin, pTMax),
+                                  800, 600);
     canvas->cd();
 
     model.plotOn(frame, Components(*doubleSidedCB), LineStyle(kDashed), LineColor(kRed), Name("signal_Model"));
@@ -116,7 +119,9 @@ void fitJpsiCB(TH1D* hist) {
     // RooChi2Var* chi2Var = new RooChi2Var("chi2","chi2", *doubleSidedCB, *data, true, RooAbsData::ErrorType::Poisson);
     // double chi2M = chi2Var->getVal();
 
-    TLegend *legend = new TLegend(0.6, 0.7, 0.9, 0.9);
+    TLegend *legend = new TLegend(0.6, 0.7, 0.82, 0.8);
+    legend->SetTextSize(0.03);
+    legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
     legend->Draw();
@@ -128,59 +133,70 @@ void fitJpsiCB(TH1D* hist) {
     alphaR.Print();
     nR.Print();
 
-    TCanvas* pullCanvas = new TCanvas("pull", "pull");
+    TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f", pTMin, pTMax), 
+                                  Form("Pull canvas %.0f < p_{T} < %.0f", pTMin, pTMax),
+                                  800, 600);
     // Construct a histogram with the pulls of the data w.r.t the curve
    RooHist *hpull = frame->pullHist();
    // Create a new frame to draw the pull distribution and add the distribution to the frame
    RooPlot *frame_pull = m.frame(Title("Pull Distribution"));
-   frame_pull->addPlotable(hpull, "P");
+   // frame_pull->addPlotable(hpull, "P");
    pullCanvas->cd();
-   frame_pull->Draw();
+   hpull->Draw();
+   // frame_pull->Draw();
 
 } // fitJpsiCB
 
-void drawHist(TH2F* hMass_Pt_PM)
- {
-    TH1D *hDiMuonMass_PM;
-    hMass_Pt_PM->GetYaxis()->SetRangeUser(5, 30);
-    hDiMuonMass_PM = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
-    // hMass_Pt_PM->Scale(1/(hGlobalMuonMass->Integral()));   
-
-    // Plot the results
-    TCanvas* c = new TCanvas("c", "Signal Extraction", 800, 600);
-    hDiMuonMass_PM->SetLineColor(kBlack);  
-    // hDiMuonMass_PM->SetLineStyle(2);    
-    hDiMuonMass_PM->Draw("hist E");
-
-    // fitJpsiGauss(hDiMuonMass_PM);
-    fitJpsiCB(hDiMuonMass_PM);
-    
-    /*
-    // Draw legend
-    TLegend *leg = new TLegend(0.2, 0.6, 0.4, 0.8);
-    leg->AddEntry((TObject*)0, "muonQualityCuts", "");
-    leg->AddEntry(hGlobalMuonMass, "global muon pp");
-    leg->Draw("same");
-        */
-
-    } // drawHist()
-
-
 int DiMuonMassSpectrum() 
  {
+
+
+    // **********************************************
+    // G  E  T    D  A  T  A
+    // **********************************************
+
+
     THashList *listDiMuon;
-    TList *subListDiMuonPM, *subListDiMuonPP, *subListDiMuonMM;
+    TList *subListDiMuonPM;
     TFile* fDiMuon = new TFile("AnalysisResults.root", "READ");
     listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
     subListDiMuonPM = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
-    subListDiMuonPP = (TList*)listDiMuon->FindObject("PairsMuonSEPP_muonLowPt510SigmaPDCA");
-    subListDiMuonMM = (TList*)listDiMuon->FindObject("PairsMuonSEMM_muonLowPt510SigmaPDCA");
 
-    TH2F *hMass_Pt_PM, *hMass_Pt_PP, *hMass_Pt_MM;
+    TH2F *hMass_Pt_PM;
     hMass_Pt_PM = (TH2F*)subListDiMuonPM->FindObject("Mass_Pt");
-    hMass_Pt_PP = (TH2F*)subListDiMuonPP->FindObject("Mass_Pt");
-    hMass_Pt_MM = (TH2F*)subListDiMuonMM->FindObject("Mass_Pt");
-    drawHist(hMass_Pt_PM);
+
+
+    // **********************************************
+    // S  E  T    P  _  T    C  U  T  S
+    // **********************************************
+
+    TH2F *hMass_Pt_PM_Pt_0_2,    *hMass_Pt_PM_Pt_2_5,    *hMass_Pt_PM_Pt_5_30;
+    TH1D *hDiMuonMass_PM_Pt_0_2, *hDiMuonMass_PM_Pt_2_5, *hDiMuonMass_PM_Pt_5_30;
+
+    hMass_Pt_PM->GetYaxis()->SetRangeUser(0, 2);
+    hDiMuonMass_PM_Pt_0_2 = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
+
+    hMass_Pt_PM->GetYaxis()->SetRangeUser(2, 5);
+    hDiMuonMass_PM_Pt_2_5 = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
+
+    hMass_Pt_PM->GetYaxis()->SetRangeUser(5, 30);
+    hDiMuonMass_PM_Pt_5_30 = hMass_Pt_PM->ProjectionX("hDiMuonMass_PM");
+    
+
+
+    // **********************************************
+    // F  I  T  T  I  N  G
+    // **********************************************
+
+
+    // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
+    fitJpsiCB(hDiMuonMass_PM_Pt_0_2, 0, 2);
+
+    // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
+    fitJpsiCB(hDiMuonMass_PM_Pt_2_5, 2, 5);
+
+    // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
+    fitJpsiCB(hDiMuonMass_PM_Pt_5_30, 5, 30);
 
     return 0;
  }
