@@ -359,7 +359,7 @@ void DrawPlots(RooWorkspace &ws){
     int ndf = 11;
     TH1* hist_sdata = data.createHistogram("fMass", nBins);
     RooDataHist* h_sdata = new RooDataHist("h_sdata", "h_sdata", RooArgSet(*x), hist_sdata);
-    RooChi2Var* chi2Var = new RooChi2Var("chi2","chi2", *model, *h_sdata, true, DataError(RooAbsData::Poisson));
+    RooChi2Var* chi2Var = new RooChi2Var("chi2","chi2", *model, *h_sdata, DataError(RooAbsData::Poisson));
     double chi2M = chi2Var->getVal();
 
 
