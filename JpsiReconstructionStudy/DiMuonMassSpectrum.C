@@ -214,10 +214,10 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // **********************************************
 
 
-    Double_t mMin = 2;
-    Double_t mMax = 5;
+    Double_t mMin = 2.;
+    Double_t mMax = 5.;
     RooRealVar m(Form("m_Pt_%.0f_%.0f", pTMin, pTMax), "invariant mass", mMin, mMax);
-    m.setRange("fitRange", 2, 5);
+    m.setRange("fitRange", mMin, mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", pTMin, pTMax), "Di-muon spectrum", m, Import(*hist));
 
     RooAddPdf* model;
@@ -251,7 +251,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
 	// RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
 
-    // Initiallise Chebychev
+    // Initiallise Chebychev OLD
+    // These values give a lower χ2
+    
     RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
     RooRealVar a1("a1", "a_{1}", 0.0, -1.0, 1.0);
     RooRealVar a2("a2", "a_{2}", 0.0, -0.5, 0.5);
@@ -260,6 +262,19 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     RooRealVar a5("a5", "a_{5}", 0.0, -0.3, 0.3);
     RooRealVar a6("a6", "a_{6}", 0.0, -0.1, 0.1);
     RooRealVar a7("a7", "a_{7}", 0.0, -0.05, 0.05);
+    
+
+    // Initialise Chebychev NEW
+    /*
+    RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
+    RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
+    RooRealVar a2("a2", "a_{2}", -0.01, -0.1, 0.1);
+    RooRealVar a3("a3", "a_{3}", 0.0, -0.05, 0.05);
+    RooRealVar a4("a4", "a_{4}", 0.0, -0.03, 0.03);
+    RooRealVar a5("a5", "a_{5}", 0.0, -0.05, 0.05);
+    RooRealVar a6("a6", "a_{6}", 0.0, -0.05, 0.05);
+    RooRealVar a7("a7", "a_{7}", 0.0, -0.005, 0.005);
+    */
 
     // Initially set all parameters to constant (kTRUE)
     // Iterative fitting releases parameters one-by-one
