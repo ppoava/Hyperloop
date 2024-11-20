@@ -215,7 +215,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
 
 
     Double_t mMin = 2.;
-    Double_t mMax = 5.;
+    Double_t mMax = 4.8;
     RooRealVar m(Form("m_Pt_%.0f_%.0f", pTMin, pTMax), "invariant mass", mMin, mMax);
     m.setRange("fitRange", mMin, mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", pTMin, pTMax), "Di-muon spectrum", m, Import(*hist));
@@ -225,7 +225,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
 
     // Crystal Ball
     RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
-    RooRealVar sigma("sigma", "Sigma of Gaussian", 0.08, 0.05, 0.12);
+    RooRealVar sigma("sigma", "#sigma", 0.08, 0.05, 0.12);
     RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
     alphaL.setConstant();
     RooRealVar nL("nL", "Exponent Left", 9.940, 5.0, 20.0); 
@@ -321,9 +321,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     Double_t chi2M = 100000; // arbitrary starting value
     if (BKG_model == "Chebychev") {
         for (Int_t i = 0; i < parameters.size(); i++) {
-            if (chi2M < 0 || chi2M > 1.4) {
+            if (chi2M < 0 || chi2M > 1.4 || std::isnan(chi2M)) {
                 parameters[i]->setConstant(kFALSE);
-                model->fitTo(*data, Range("fitRange"));
+                model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
                 frame = m.frame();
                 data->plotOn(frame, MarkerSize(0.4));
                 model->plotOn(frame, LineColor(kBlue), Name("full_Model"));
@@ -336,7 +336,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     }
 
     if (BKG_model != "Chebychev") {
-        model->fitTo(*data, Range("fitRange"));
+        model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
         frame = m.frame();
         data->plotOn(frame, MarkerSize(0.4));
         model->plotOn(frame, LineColor(kBlue), Name("full_Model"));
@@ -441,7 +441,7 @@ int DiMuonMassSpectrum()
 
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Gaussian");
+    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
     fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
