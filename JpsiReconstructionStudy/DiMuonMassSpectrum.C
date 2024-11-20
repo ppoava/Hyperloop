@@ -24,8 +24,157 @@
 #include "RooChebychev.h"
 #include "RooFitResult.h"
 #include "RooMsgService.h"
+#include "RooWorkspace.h"
 
 using namespace RooFit;
+
+/*
+void getTree(const char* fileName, Double_t ptMin, Double_t ptMax);
+void defSigModels(RooWorkspace &ws);
+void defBkgModels(RooWorkspace &ws, std::string BKG_model);
+void doJpsiFit(RooWorkspace &ws);
+void drawPlots(RooWorkspace &ws);
+
+int DiMuonMassSpectrum() {
+
+    RooWorkspace wspace{"myWS"};
+
+    // getTree("AnalysisResultsDiMuons.root",0.,2.);
+    // getTree("AnalysisResultsDiMuons.root",3.,4.);
+    getTree("AnalysisResultsDiMuons.root",5.,30.);
+
+    return 0;
+}
+
+void getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
+
+
+    // **********************************************
+    // G  E  T    D  A  T  A
+    // **********************************************
+
+
+    THashList *listDiMuon;
+    TList *subListDiMuon;
+    TH2F *hMass_Pt;
+    //
+    TFile* fDiMuon = new TFile(fileName, "READ");
+    listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
+    hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
+
+
+    THashList *listDiMuon;
+    TList *subListDiMuon;
+    //
+    TFile* fDiMuon = new TFile("AnalysisResultsDiMuons.root", "READ");
+    listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
+    //
+    TH2F *hMass_Pt;
+    hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
+
+
+    // **********************************************
+    // S  E  T    P  _  T    C  U  T
+    // **********************************************
+
+
+    TH1D *hDiMuonMass_PtCut;
+    //
+    hMass_Pt = (TH2F*)hMass_Pt->Clone();
+    hMass_Pt->GetYaxis()->SetRangeUser(ptMin, ptMax);
+    hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
+
+
+} // void getTree()
+
+
+void defSigModels(RooWorkspace &ws, std::string BKG_model) {
+
+
+    RooRealVar m("fMass","M_{#mu^{+}#mu^{-}}",2.,5.,"GeV/c2");
+    // m.setRange("fitRange",2.,5.);
+
+    // Crystal Ball for mass signal
+    RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
+    RooRealVar sigma("sigma", "Sigma of Gaussian", 0.08, 0.05, 0.12);
+    RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
+    alphaL.setConstant();
+    RooRealVar nL("nL", "Exponent Left", 9.940, 5.0, 20.0); 
+    nL.setConstant();
+    RooRealVar alphaR("alphaR", "Alpha Right", 1.832, 1.0, 3.0);
+    alphaR.setConstant();
+    RooRealVar nR("nR", "Exponent Right", 15.323, 5.0, 25.0);  
+    nR.setConstant();
+    //
+    RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB","Double Sided Crystal Ball",
+                                                       m,m0,sigma,alphaL,nL,alphaR,nR);
+    ws.import(m);
+    ws.import(*doubleSidedCB);
+    
+
+} // void defSigModels()
+
+
+void defBkgModel(RooWorkspace &w, std::string BKG_model) {
+
+
+    // Initiallise Chebychev for background
+    RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
+    RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
+    RooRealVar a2("a2", "a_{2}", -0.01, -0.1, 0.1);
+    RooRealVar a3("a3", "a_{3}", 0.0, -0.05, 0.05);
+    RooRealVar a4("a4", "a_{4}", 0.0, -0.03, 0.03);
+    RooRealVar a5("a5", "a_{5}", 0.0, -0.05, 0.05);
+    RooRealVar a6("a6", "a_{6}", 0.0, -0.05, 0.05);
+    RooRealVar a7("a7", "a_{7}", 0.0, -0.005, 0.005);
+
+    // Initially set all parameters to constant (kTRUE)
+    // Iterative fitting releases parameters one-by-one
+    std::vector<RooRealVar*> parameters = {&a0, &a1, &a2, &a3, &a4, &a5, &a6, &a7};
+    for (auto& param : parameters) {
+        param->setConstant(kTRUE);
+    }
+
+    // Initialise a Gaussian for background
+    RooRealVar BKG_mean("BKG_mean", "Mean of background Gaussian", 2.5, 0., 10);
+    RooRealVar BKG_sigma("BKG_sigma", "Sigma of background Gaussian", 1.7, 0., 2.5);
+    
+    // Initialise an exponential for background
+    RooRealVar exp0("exp0","exp_{0}",-1,-5,0.001);
+
+    // Select background model (all are initialised, one is picked)
+    RooRealVar* sigYield;
+    RooRealVar* bkgYield;
+
+    if (BKG_model == "Chebychev") {
+        BKG = new RooChebychev(Form("BKG_Pt_%.0f_%.0f", pTMin, pTMax),"Chebyshev background", m, {a0,a1,a2,a3,a4,a5,a6,a7});
+        sigYield = new RooRealVar("sigYieldCheb", "N_{sig}", 2000, 0., 10000000);
+        bkgYield = new RooRealVar("bkgYieldCheb", "N_{bkg}", 150000, 0., 100000000);
+    }
+
+    if (BKG_model == "Gaussian") {
+        BKG = new RooGaussian("gauss", "Background gaussian", m, BKG_mean, BKG_sigma);
+        sigYield = new RooRealVar("sigYieldGauss", "N_{sig}", 50000, 0., 100000000);
+        bkgYield = new RooRealVar("bkgYieldGauss", "N_{bkg}", 1000000, 0., 1000000000);
+    }
+
+    if (BKG_model == "Exponential") {
+        BKG = new RooExponential("BKG","Power background", m, exp0);
+        sigYield = new RooRealVar("sigYieldExp", "N_{sig}", 5000, 0., 100000000);
+        bkgYield = new RooRealVar("bkgYieldExp", "N_{bkg}", 10000000, 0., 1000000000);
+    }
+
+    RooAbsPdf* BKG;
+}
+*/
+
+
+
+
+
+
 
 void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     // Initialise
@@ -119,29 +268,38 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
         param->setConstant(kTRUE);
     }
 
-    // Initialise a variable width Gaussian for background
-    // Define width = base + slope * m
-        std::cout<<"hoi"<<std::endl;
-        RooRealVar BKG_mean("BKG_mean", "Mean of background Gaussian", 2.2);
-        RooRealVar BKG_base("BKG_base", "Base of variable width Gaussian", 1.0, 0.1, 10.0);
-        RooRealVar BKG_slope("BKG_slope", "Slope of variable width Gaussian", 0.1, -1.0, 1.0);
-        RooFormulaVar BKG_sigma("BKG_sigma", "Variable width of Background Gaussian", "@0 + @1*@2", 
-                                RooArgList(BKG_base, BKG_slope, m));
+    // Initialise a Gaussian for background
+    RooRealVar BKG_mean("BKG_mean", "Mean of background Gaussian", 2.5, 0., 10);
+    RooRealVar BKG_sigma("BKG_sigma", "Sigma of background Gaussian", 1.7, 0., 2.5);
     
+    // Initialise an exponential for background
+    RooRealVar exp0("exp0","exp_{0}",-1,-5,0.001);
+
     // Select background model (all are initialised, one is picked)
+    RooRealVar* sigYield;
+    RooRealVar* bkgYield;
+
     if (BKG_model == "Chebychev") {
         BKG = new RooChebychev(Form("BKG_Pt_%.0f_%.0f", pTMin, pTMax),"Chebyshev background", m, {a0,a1,a2,a3,a4,a5,a6,a7});
+        sigYield = new RooRealVar("sigYieldCheb", "N_{sig}", 2000, 0., 10000000);
+        bkgYield = new RooRealVar("bkgYieldCheb", "N_{bkg}", 150000, 0., 100000000);
     }
 
     if (BKG_model == "Gaussian") {
-        BKG = new RooGaussian("gauss", "Gaussian with variable width", m, BKG_mean, BKG_sigma);
+        BKG = new RooGaussian("gauss", "Background gaussian", m, BKG_mean, BKG_sigma);
+        sigYield = new RooRealVar("sigYieldGauss", "N_{sig}", 50000, 0., 100000000);
+        bkgYield = new RooRealVar("bkgYieldGauss", "N_{bkg}", 1000000, 0., 1000000000);
     }
 
-    // Add them
-    RooRealVar sigYield("sigYield", "N_{sig}", 50000, 0., 100000000);
-    RooRealVar bkgYield("bkgYield", "N_{bkg}", 1000000, 0., 1000000000);
+    if (BKG_model == "Exponential") {
+        BKG = new RooExponential("BKG","Power background", m, exp0);
+        sigYield = new RooRealVar("sigYieldExp", "N_{sig}", 5000, 0., 100000000);
+        bkgYield = new RooRealVar("bkgYieldExp", "N_{bkg}", 10000000, 0., 1000000000);
+    }
+
+    // Add signal and background models
     model = new RooAddPdf(Form("model_Pt_%.0f_%.0f", pTMin, pTMax), "combined mass model", 
-                                {*doubleSidedCB, *BKG}, {sigYield, bkgYield});
+                                {*doubleSidedCB, *BKG}, {*sigYield, *bkgYield});
 
     // Start iterative fitting (only for Chebychev)
     // Release orders one-by-one as long as reduced χ2 is above desired value
@@ -232,7 +390,7 @@ int DiMuonMassSpectrum()
 
     THashList *listDiMuon;
     TList *subListDiMuon;
-    TFile* fDiMuon = new TFile("AnalysisResults.root", "READ");
+    TFile* fDiMuon = new TFile("AnalysisResultsDiMuons.root", "READ");
     listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
     subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
 
@@ -277,4 +435,6 @@ int DiMuonMassSpectrum()
     fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
 
     return 0;
+
+
  }
