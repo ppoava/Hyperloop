@@ -53,7 +53,7 @@ void DoSplot(RooWorkspace &ws);
 void DrawPlots(RooWorkspace &ws);
 void GetTree(TChain *fChain, std::string FileName="AO2D.root", std::string TreeName="O2rtdimuonall");
 
-void JPsiQAFit(){
+void JPsiQAFit() {
 
 	// Initializing workspace
 	RooWorkspace wspace{"myWS"};
