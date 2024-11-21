@@ -174,20 +174,84 @@ void defBkgModel(RooWorkspace &w, std::string BKG_model) {
 
 
 
-Double_t calculateSigOverBkgRatio(RooAbsPdf* SIG_model, RooAbsPdf* BKG_model) {
+Double_t calculateSigOverBkgRatio(RooRealVar observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+
+    
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
     RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find("m0"));
     RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
-    RooArgSet* observables = SIG_model->getObservables(nullptr);
 
     // Integrate over mean +/- 3 sigma range
+    double rangeMin = mean->getVal() - 3 * sigma->getVal();
+    double rangeMax = mean->getVal() + 3 * sigma->getVal();
+    observable.setRange("signalRange", rangeMin, rangeMax);
+
     RooAbsReal* SIG_integral = SIG_model->createIntegral(
-        RooArgSet(*observables),
-        RooFit::Range(mean->getVal()-3*sigma->getVal(),mean->getVal()+3*sigma->getVal())
+        RooArgSet(observable),
+        RooFit::Range("signalRange")
+    );
+    RooAbsReal* BKG_integral = BKG_model->createIntegral(
+        RooArgSet(observable),
+        RooFit::Range("signalRange")
     );
 
-    return 2;
+
+    return (SIG_integral->getVal())/(BKG_integral->getVal());
+
 }
+
+
+Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+
+    
+    RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
+    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find("m0"));
+    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
+
+    // Integrate over mean +/- 3 sigma range
+    double rangeMin = mean->getVal() - 3 * sigma->getVal();
+    double rangeMax = mean->getVal() + 3 * sigma->getVal();
+    observable.setRange("signalRange", rangeMin, rangeMax);
+
+    RooAbsReal* SIG_integral = SIG_model->createIntegral(
+        RooArgSet(observable),
+        RooFit::Range("signalRange")
+    );
+    RooAbsReal* BKG_integral = BKG_model->createIntegral(
+        RooArgSet(observable),
+        RooFit::Range("signalRange")
+    );
+
+
+    return (SIG_integral->getVal())/(sqrt(SIG_integral->getVal()+BKG_integral->getVal()));
+
+}
+
+
+TH1F calculatePullHist(TH1 *hist, RooAbsPdf *model) {
+    
+    TH1F pullHist("pulls", "Pull Distribution", 100, -5, 5);
+
+    // Loop over all bins of the histogram
+    for (Int_t i = 1; i <= hist->GetNbinsX(); ++i) {
+        Double_t dataValue = hist->GetBinContent(i);
+        Double_t dataError = hist->GetBinError(i);
+        Double_t binCenter = hist->GetBinCenter(i);
+        Double_t modelValue = (*model).getVal();
+
+        // Set the value of the observable 'x' to the bin center
+        // x.setVal(binCenter);
+        
+        // Compute the pull for this bin
+        if (dataError != 0) {  
+            Double_t pull = (dataValue-modelValue)/dataError;
+            pullHist.Fill(pull);
+        }
+    }
+
+    return pullHist;
+}
+
 
 void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     // Initialise
@@ -219,7 +283,7 @@ void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     result->Print(); 
 } // fitJpsiGauss
 
-void fitJpsiCB(RooWorkspace &ws, TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model) {
+void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model) {
 
 
     // **********************************************
@@ -403,7 +467,14 @@ void fitJpsiCB(RooWorkspace &ws, TH1D* hist, Double_t pTMin, Double_t pTMax, std
    hpull->Draw();
    // frame_pull->Draw();
 
-   calculateSigOverBkgRatio(doubleSidedCB, BKG);
+    std::cout<<calculateSigOverBkgRatio(m, doubleSidedCB, BKG)<<std::endl;
+    std::cout<<calculateSignificance(m, doubleSidedCB, BKG)<<std::endl;
+
+    TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
+                                                Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
+    hand_made_pullCanvas->cd();
+    TH1F pullHist = calculatePullHist(hist,model);
+    pullHist.Draw();
 
 } // fitJpsiCB
 
@@ -449,25 +520,19 @@ int DiMuonMassSpectrum()
     hDiMuonMass_PtCut_5_30 = hMass_Pt_PtCut_5_30->ProjectionX("hDiMuonMass_PtCut_5_30");
 
 
-
     // **********************************************
     // F  I  T  T  I  N  G
     // **********************************************
 
 
-    RooWorkspace wspace0_2{"myWS0_2"};
-    RooWorkspace wspace3_4{"myWS3_4"};
-    RooWorkspace wspace5_30{"myWS5_30"};
-
-
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    fitJpsiCB(wspace0_2, hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    fitJpsiCB(wspace3_4, hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
-    fitJpsiCB(wspace5_30, hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
 
     return 0;
 
