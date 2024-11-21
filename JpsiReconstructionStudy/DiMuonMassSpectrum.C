@@ -174,7 +174,20 @@ void defBkgModel(RooWorkspace &w, std::string BKG_model) {
 
 
 
+Double_t calculateSigOverBkgRatio(RooAbsPdf* SIG_model, RooAbsPdf* BKG_model) {
+    RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
+    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find("m0"));
+    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
+    RooArgSet* observables = SIG_model->getObservables(nullptr);
 
+    // Integrate over mean +/- 3 sigma range
+    RooAbsReal* SIG_integral = SIG_model->createIntegral(
+        RooArgSet(*observables),
+        RooFit::Range(mean->getVal()-3*sigma->getVal(),mean->getVal()+3*sigma->getVal())
+    );
+
+    return 2;
+}
 
 void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     // Initialise
@@ -206,7 +219,7 @@ void fitJpsiGauss(TH1D* hist, Double_t pTMin, Double_t pTMax) {
     result->Print(); 
 } // fitJpsiGauss
 
-void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model) {
+void fitJpsiCB(RooWorkspace &ws, TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model) {
 
 
     // **********************************************
@@ -224,7 +237,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     RooPlot* frame;
 
     // Crystal Ball
-    RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
+    RooRealVar m0("m0", "#mu", 3.097, 3.05, 3.13);
     RooRealVar sigma("sigma", "#sigma", 0.08, 0.05, 0.12);
     RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
     alphaL.setConstant();
@@ -255,8 +268,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // These values give a lower χ2
     
     RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
-    RooRealVar a1("a1", "a_{1}", 0.0, -1.0, 1.0);
-    RooRealVar a2("a2", "a_{2}", 0.0, -0.5, 0.5);
+    RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
+    RooRealVar a2("a2", "a_{2}", -0.01, -0.5, 0.5);
     RooRealVar a3("a3", "a_{3}", 0.0, -0.5, 0.5);
     RooRealVar a4("a4", "a_{4}", 0.0, -0.3, 0.3);
     RooRealVar a5("a5", "a_{5}", 0.0, -0.3, 0.3);
@@ -390,6 +403,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
    hpull->Draw();
    // frame_pull->Draw();
 
+   calculateSigOverBkgRatio(doubleSidedCB, BKG);
+
 } // fitJpsiCB
 
 int DiMuonMassSpectrum() 
@@ -440,14 +455,19 @@ int DiMuonMassSpectrum()
     // **********************************************
 
 
+    RooWorkspace wspace0_2{"myWS0_2"};
+    RooWorkspace wspace3_4{"myWS3_4"};
+    RooWorkspace wspace5_30{"myWS5_30"};
+
+
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    fitJpsiCB(wspace0_2, hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    fitJpsiCB(wspace3_4, hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
-    fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
+    fitJpsiCB(wspace5_30, hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
 
     return 0;
 
