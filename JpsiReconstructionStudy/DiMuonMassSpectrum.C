@@ -229,23 +229,79 @@ Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooA
 }
 
 
-TGraphErrors* calculatePullHist(RooRealVar observable, TH1 *hist, RooAbsPdf *model) {
+Double_t calculateChi2(RooRealVar observable, TH1 *data, RooAbsPdf *model) {
+
+
+    Int_t nBins=0;
+    Double_t chi2=0;
+
+    for (Int_t i = 1; i <= data->GetNbinsX(); ++i) {
+        Double_t dataValue = data->GetBinContent(i);
+        std::cout<<"dataValue = "<<dataValue<<std::endl;
+        Double_t dataError = data->GetBinError(i);
+        Double_t binCenter = data->GetBinCenter(i); 
+        Double_t binLowEdge = data->GetBinLowEdge(i);
+        Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
+
+        // Integrate the model over the bin range
+        observable.setVal(binCenter);
+        observable.setRange("binRange", binLowEdge, binHighEdge);
+        Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
+                                                       RooFit::Range("binRange"))->getVal();
+        std::cout<<"modelValue = "<<modelValue<<std::endl;
+
+        if (dataError != 0) {
+            // Compute the chi2 and store
+            chi2 += (std::pow((dataValue - modelValue), 2))/modelValue;
+            nBins+=1;
+            
+        } else {
+            std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
+        }
+    }
+
+
+    return chi2/(nBins-4);
+    // WHY < 0 ?
+
+
+}
+
+
+TGraphErrors* calculatePullHist(RooRealVar observable, TH1 *data, RooAbsPdf *model) {
+
+
     // Number of bins in the input histogram
-    Int_t nBins = hist->GetNbinsX();
+    Int_t nBins = data->GetNbinsX();
 
     std::vector<Double_t> xVals;
     std::vector<Double_t> yVals;
-    std::vector<Double_t> xErrors(hist->GetNbinsX(),0);
-    std::vector<Double_t> yErrors(hist->GetNbinsX(),0);     
+    std::vector<Double_t> xErrors(data->GetNbinsX(),0);
+    std::vector<Double_t> yErrors(data->GetNbinsX(),0);     
 
-    for (Int_t i = 1; i <= hist->GetNbinsX(); ++i) {
-        Double_t dataValue = hist->GetBinContent(i);  // Data value
-        Double_t dataError = hist->GetBinError(i);    // Data error (sigma)
-        Double_t binCenter = hist->GetBinCenter(i);   // Mass value
+    for (Int_t i = 1; i <= data->GetNbinsX(); ++i) {
+        Double_t dataValue = data->GetBinContent(i);
+        Double_t dataError = data->GetBinError(i);
+        Double_t binCenter = data->GetBinCenter(i);
+
+
+        Double_t binLowEdge = data->GetBinLowEdge(i);
+        Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
+
+        // Integrate the model over the bin range
+        observable.setVal(binCenter);
+        observable.setRange("binRange", binLowEdge, binHighEdge);
+        Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
+                                                       RooFit::Range("binRange"))->getVal();
+
+
 
         // Set the observable to the bin center to evaluate the model
-        observable.setVal(binCenter);
-        Double_t modelValue = model->getVal();
+        // observable.setVal(binCenter);
+        // Double_t modelValue = model->getVal();
+        // IDENTICAL TO UPPER?
+
+        
 
         if (dataError != 0) {
             // Compute the pull value and store
@@ -264,7 +320,10 @@ TGraphErrors* calculatePullHist(RooRealVar observable, TH1 *hist, RooAbsPdf *mod
     pullPlot->SetMarkerStyle(20); // Optional: Style of markers
     pullPlot->SetMarkerSize(0.8); // Optional: Size of markers
 
+
     return pullPlot;
+
+
 }
 
 
@@ -461,6 +520,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
+    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m, doubleSidedCB, BKG)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB, BKG)), "");
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m, hist, model)/4), "");
     legend->Draw();
 
     m0.Print();
@@ -481,9 +543,6 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
    pullCanvas->cd();
    hpull->Draw();
    // frame_pull->Draw();
-
-    std::cout<<calculateSigOverBkgRatio(m, doubleSidedCB, BKG)<<std::endl;
-    std::cout<<calculateSignificance(m, doubleSidedCB, BKG)<<std::endl;
 
     TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
                                                 Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
