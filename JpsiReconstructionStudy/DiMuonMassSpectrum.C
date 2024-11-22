@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include "TGraphErrors.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -228,28 +229,42 @@ Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooA
 }
 
 
-TH1F calculatePullHist(TH1 *hist, RooAbsPdf *model) {
-    
-    TH1F pullHist("pulls", "Pull Distribution", 100, -5, 5);
+TGraphErrors* calculatePullHist(RooRealVar observable, TH1 *hist, RooAbsPdf *model) {
+    // Number of bins in the input histogram
+    Int_t nBins = hist->GetNbinsX();
 
-    // Loop over all bins of the histogram
+    std::vector<Double_t> xVals;
+    std::vector<Double_t> yVals;
+    std::vector<Double_t> xErrors(hist->GetNbinsX(),0);
+    std::vector<Double_t> yErrors(hist->GetNbinsX(),0);     
+
     for (Int_t i = 1; i <= hist->GetNbinsX(); ++i) {
-        Double_t dataValue = hist->GetBinContent(i);
-        Double_t dataError = hist->GetBinError(i);
-        Double_t binCenter = hist->GetBinCenter(i);
-        Double_t modelValue = (*model).getVal();
+        Double_t dataValue = hist->GetBinContent(i);  // Data value
+        Double_t dataError = hist->GetBinError(i);    // Data error (sigma)
+        Double_t binCenter = hist->GetBinCenter(i);   // Mass value
 
-        // Set the value of the observable 'x' to the bin center
-        // x.setVal(binCenter);
-        
-        // Compute the pull for this bin
-        if (dataError != 0) {  
-            Double_t pull = (dataValue-modelValue)/dataError;
-            pullHist.Fill(pull);
+        // Set the observable to the bin center to evaluate the model
+        observable.setVal(binCenter);
+        Double_t modelValue = model->getVal();
+
+        if (dataError != 0) {
+            // Compute the pull value and store
+            Double_t pull = (dataValue - modelValue) / dataError;
+            xVals.push_back(binCenter);
+            yVals.push_back(pull);
+            yErrors.push_back(0);
+        } else {
+            std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
         }
     }
 
-    return pullHist;
+    // Create a TGraphErrors object for the pull plot
+    auto *pullPlot = new TGraphErrors(xVals.size(), xVals.data(), yVals.data(), xErrors.data(), yErrors.data());
+    pullPlot->SetTitle("Pull Plot;Observable;Pull Value (data - model) / sigma");
+    pullPlot->SetMarkerStyle(20); // Optional: Style of markers
+    pullPlot->SetMarkerSize(0.8); // Optional: Size of markers
+
+    return pullPlot;
 }
 
 
@@ -473,8 +488,11 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
                                                 Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
     hand_made_pullCanvas->cd();
-    TH1F pullHist = calculatePullHist(hist,model);
-    pullHist.Draw();
+    TGraphErrors* pullGraph = calculatePullHist(m,hist,model);
+    pullGraph->SetTitle("pull plot by hand (equal to machine?)");
+    pullGraph->GetXaxis()->SetRangeUser(mMin,mMax);
+    pullGraph->GetXaxis()->SetTitle("invariant mass");
+    pullGraph->Draw();
 
 } // fitJpsiCB
 
