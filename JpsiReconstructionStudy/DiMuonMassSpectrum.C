@@ -229,40 +229,37 @@ Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooA
 }
 
 
-Double_t calculateChi2(RooRealVar observable, TH1 *data, RooAbsPdf *model) {
+Double_t calculateChi2(RooRealVar observable, RooDataHist *data, RooAbsPdf *model) {
 
 
-    Int_t nBins=0;
-    Double_t chi2=0;
+    Double_t chi2 = 0.0;
+    Int_t nBins = data->numEntries(); // Get the number of bins in the data
+    
+    // Loop over the bins of the data
+    for (Int_t i = 1; i <= nBins; ++i) {
+        // Get data value and error for the i-th bin
+        Double_t dataValue = data->get(i-1)->getVal();  // Observed data value (event count in the bin)
+        Double_t dataError = data->get(i-1)->error();   // Data error (typically Poisson error)
 
-    for (Int_t i = 1; i <= data->GetNbinsX(); ++i) {
-        Double_t dataValue = data->GetBinContent(i);
-        std::cout<<"dataValue = "<<dataValue<<std::endl;
-        Double_t dataError = data->GetBinError(i);
-        Double_t binCenter = data->GetBinCenter(i); 
-        Double_t binLowEdge = data->GetBinLowEdge(i);
-        Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
+        // Get the bin center
+        Double_t binCenter = data->get(i-1)->getX();
 
-        // Integrate the model over the bin range
+        // Set the observable value to the bin center to calculate model expectation
         observable.setVal(binCenter);
-        observable.setRange("binRange", binLowEdge, binHighEdge);
-        Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
-                                                       RooFit::Range("binRange"))->getVal();
-        std::cout<<"modelValue = "<<modelValue<<std::endl;
 
+        // Calculate model value (expected counts) for this bin
+        Double_t modelValue = model->getVal();
+
+        // Avoid division by zero and compute chi-squared
         if (dataError != 0) {
-            // Compute the chi2 and store
-            chi2 += (std::pow((dataValue - modelValue), 2))/modelValue;
-            nBins+=1;
-            
+            chi2 += std::pow((dataValue - modelValue), 2) / modelValue;
         } else {
             std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
         }
     }
 
-
-    return chi2/(nBins-4);
-    // WHY < 0 ?
+    // Return the calculated chi-squared value
+    return chi2;
 
 
 }
@@ -522,7 +519,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
     legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m, doubleSidedCB, BKG)), "");
     legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB, BKG)), "");
-    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m, hist, model)/4), "");
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m, data, model)/4), "");
     legend->Draw();
 
     m0.Print();
