@@ -177,7 +177,7 @@ void Print(const char *name, Double_t value) {
     std::cout<<Form("%s = ", name)<<value<<std::endl;
 }
 
-Double_t calculateSigOverBkgRatio(RooRealVar observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
@@ -187,14 +187,14 @@ Double_t calculateSigOverBkgRatio(RooRealVar observable, RooAbsPdf *SIG_model, R
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
-    observable.setRange("signalRange", rangeMin, rangeMax);
+    observable->setRange("signalRange", rangeMin, rangeMax);
 
     RooAbsReal* SIG_integral = SIG_model->createIntegral(
-        RooArgSet(observable),
+        RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
     RooAbsReal* BKG_integral = BKG_model->createIntegral(
-        RooArgSet(observable),
+        RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
 
@@ -204,7 +204,7 @@ Double_t calculateSigOverBkgRatio(RooRealVar observable, RooAbsPdf *SIG_model, R
 }
 
 
-Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
@@ -214,14 +214,14 @@ Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooA
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
-    observable.setRange("signalRange", rangeMin, rangeMax);
+    observable->setRange("signalRange", rangeMin, rangeMax);
 
     RooAbsReal* SIG_integral = SIG_model->createIntegral(
-        RooArgSet(observable),
+        RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
     RooAbsReal* BKG_integral = BKG_model->createIntegral(
-        RooArgSet(observable),
+        RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
 
@@ -231,44 +231,7 @@ Double_t calculateSignificance(RooRealVar observable, RooAbsPdf *SIG_model, RooA
 }
 
 
-Double_t calculateChi2(RooRealVar observable, RooDataHist *data, RooAbsPdf *model) {
-
-
-    Double_t chi2 = 0.0;
-    Int_t nBins = data->numEntries(); // Get the number of bins in the data
-    
-    // Loop over the bins of the data
-    for (Int_t i = 1; i <= nBins; ++i) {
-        // Get data value and error for the i-th bin
-        const RooArgSet* bin = data->get(i); // Get the RooArgSet for the i-th bin
-        Double_t dataValue = data->weight(); // Observed value (data in the bin)
-        Double_t dataError = data->weightError();
-
-        // Set the observable value to the bin center to calculate model expectation
-        // observable.setVal(binCenter);
-
-        // Calculate model value (expected counts) for this bin
-        Double_t modelValue = model->getVal();
-
-        std::cout<<"dataValue = "<<dataValue<<std::endl;
-        std::cout<<"modelValue = "<<modelValue<<std::endl;
-
-        // Avoid division by zero and compute chi-squared
-        if (dataError != 0) {
-            chi2 += std::pow((dataValue - modelValue), 2) / modelValue;
-        } else {
-            std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
-        }
-    }
-
-    // Return the calculated chi-squared value
-    return chi2;
-
-
-}
-
-// in process of fixing
-TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
+Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
 
     Double_t mMin = observable->getMin();
     Double_t mMax = observable->getMax();
@@ -282,12 +245,66 @@ TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
     Double_t binWidth = (xMax - xMin) / nBinsOld;
     Int_t nBins = static_cast<Int_t>((mMax - mMin) / binWidth);
 
+    // Calculate chi2 by hand
+    Double_t chi2 = -1.;
+    // Loop over the bins of the data
+    for (Int_t i = data->FindBin(mMin); i <= data->FindBin(mMax); ++i) {
+        Double_t dataValue = data->GetBinContent(i);
+        Double_t dataError = data->GetBinError(i);
+        Double_t binCenter = data->GetBinCenter(i);
+
+
+        Double_t binLowEdge = data->GetBinLowEdge(i);
+        Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
+
+        // Integrate the model over the bin range
+        observable->setVal(binCenter);          // invariant mass
+        std::cout<<"observableChi2 = "<<*observable<<std::endl;
+        Double_t modelValue = model->getVal();
+        // observable.setRange("binRange", binLowEdge, binHighEdge);
+        // Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
+        //                                                RooFit::Range("binRange"))->getVal();
+        Print("modelValueChi2",modelValue);
+        Print("dataValueChi2",dataValue);
+
+        // Avoid division by zero and compute chi-squared
+        if (dataError != 0) {
+            chi2 += std::pow((dataValue - modelValue), 2) / dataError;
+        } else {
+            std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
+        }
+    }
+
+    // Return the calculated chi-squared value
+    return chi2;
+
+
+}
+
+// in process of fixing
+// what is up with the normalisation?
+TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
+
+    Double_t mMin = observable->getMin();
+    Double_t mMax = observable->getMax();
+    data->GetXaxis()->SetRangeUser(mMin,mMax);
+
+    // Number of bins in the input histogram
+    // Int_t nBins = data->GetNbinsX();
+    Int_t nBinsOld = data->GetNbinsX();
+    Double_t xMin = data->GetXaxis()->GetXmin();
+    Double_t xMax = data->GetXaxis()->GetXmax();
+    Double_t binWidth = (xMax - xMin) / nBinsOld;
+    Int_t nBins = static_cast<Int_t>((mMax - mMin) / binWidth);
+
+    // data->Scale(1.0 / data->Integral(data->FindBin(mMin),data->FindBin(mMax)));
+
     std::vector<Double_t> xVals;
     std::vector<Double_t> yVals;
     std::vector<Double_t> xErrors(data->GetNbinsX(),0);
     std::vector<Double_t> yErrors(data->GetNbinsX(),0);     
 
-    for (Int_t i = data->FindBin(mMin); i < data->FindBin(mMax); ++i) {
+    for (Int_t i = data->FindBin(mMin); i <= data->FindBin(mMax); ++i) {
         Double_t dataValue = data->GetBinContent(i);
         Double_t dataError = data->GetBinError(i);
         Double_t binCenter = data->GetBinCenter(i);
@@ -529,10 +546,13 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
-    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(*m, doubleSidedCB, BKG)), "");
-    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(*m, doubleSidedCB, BKG)), "");
-    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(*m, data, model)/4), "");
+    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m, doubleSidedCB, BKG)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB, BKG)), "");
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m, hist, model)/4), "");
     legend->Draw();
+
+    // check output
+    calculateChi2(m, hist, model);
 
     m0.Print();
     sigma.Print();
