@@ -177,7 +177,8 @@ void Print(const char *name, Double_t value) {
     std::cout<<Form("%s = ", name)<<value<<std::endl;
 }
 
-Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, 
+                                  RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
@@ -199,12 +200,13 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
     );
 
 
-    return (SIG_integral->getVal())/(BKG_integral->getVal());
+    return (sigYield->getVal()*SIG_integral->getVal())/(bkgYield->getVal()*BKG_integral->getVal());
+
 
 }
 
 
-Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
+Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *comb_model) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
@@ -216,6 +218,7 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
     observable->setRange("signalRange", rangeMin, rangeMax);
 
+    // Yield
     RooAbsReal* SIG_integral = SIG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::Range("signalRange")
@@ -225,8 +228,10 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
         RooFit::Range("signalRange")
     );
 
+    // TODO integral of combined model
 
-    return (SIG_integral->getVal())/(sqrt(SIG_integral->getVal()+BKG_integral->getVal()));
+
+    return SIG_integral->getVal()/(sqrt(SIG_integral->getVal()+BKG_integral->getVal()));
 
 }
 
@@ -281,8 +286,7 @@ Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
 
 }
 
-// in process of fixing
-// what is up with the normalisation?
+
 TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
 
     Double_t mMin = observable->getMin();
@@ -390,8 +394,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // **********************************************
 
 
-    Double_t mMin = 2.;
-    Double_t mMax = 4.8;
+    Double_t mMin = 2.0;
+    Double_t mMax = 4.3;
     hist->GetXaxis()->SetRangeUser(mMin, mMax);
     RooRealVar* m = new RooRealVar(Form("m_Pt_%.0f_%.0f", pTMin, pTMax), "invariant mass", mMin, mMax);
     m->setRange("fitRange", mMin, mMax);
@@ -415,7 +419,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // Signal model
     RooCrystalBall* doubleSidedCB = new RooCrystalBall(Form("doubleSidedCB_Pt_%.0f_%.0f", pTMin, pTMax), 
                                                             "Double Sided Crystal Ball", *m, m0, sigma, alphaL, nL, alphaR, nR);
-
+    
 
     // **********************************************
     // G  E  T    D  A  T  A
@@ -428,9 +432,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
 	// RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
 
-    // Initiallise Chebychev OLD
-    // These values give a lower χ2
-    
+    // Initiallise Chebychev
     RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
     RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
     RooRealVar a2("a2", "a_{2}", -0.01, -0.5, 0.5);
@@ -439,19 +441,6 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     RooRealVar a5("a5", "a_{5}", 0.0, -0.3, 0.3);
     RooRealVar a6("a6", "a_{6}", 0.0, -0.1, 0.1);
     RooRealVar a7("a7", "a_{7}", 0.0, -0.05, 0.05);
-    
-
-    // Initialise Chebychev NEW
-    /*
-    RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
-    RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
-    RooRealVar a2("a2", "a_{2}", -0.01, -0.1, 0.1);
-    RooRealVar a3("a3", "a_{3}", 0.0, -0.05, 0.05);
-    RooRealVar a4("a4", "a_{4}", 0.0, -0.03, 0.03);
-    RooRealVar a5("a5", "a_{5}", 0.0, -0.05, 0.05);
-    RooRealVar a6("a6", "a_{6}", 0.0, -0.05, 0.05);
-    RooRealVar a7("a7", "a_{7}", 0.0, -0.005, 0.005);
-    */
 
     // Initially set all parameters to constant (kTRUE)
     // Iterative fitting releases parameters one-by-one
@@ -512,6 +501,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
         }
     }
 
+    // Construct a histogram with the pulls of the data w.r.t the curve
+    RooHist *hpull = frame->pullHist();
+
     if (BKG_model != "Chebychev") {
         model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
         frame = m->frame();
@@ -546,9 +538,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
-    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m, doubleSidedCB, BKG)), "");
-    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB, BKG)), "");
-    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m, hist, model)/4), "");
+    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,model)), "");
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model)/4), "");
     legend->Draw();
 
     // check output
@@ -564,14 +556,12 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f", pTMin, pTMax), 
                                   Form("Pull canvas %.0f < p_{T} < %.0f", pTMin, pTMax),
                                   800, 600);
-    // Construct a histogram with the pulls of the data w.r.t the curve
-   RooHist *hpull = frame->pullHist();
-   // Create a new frame to draw the pull distribution and add the distribution to the frame
-   RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
-   // frame_pull->addPlotable(hpull, "P");
-   pullCanvas->cd();
-   hpull->Draw();
-   // frame_pull->Draw();
+    // Create a new frame to draw the pull distribution and add the distribution to the frame
+    RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
+    // frame_pull->addPlotable(hpull, "P");
+    pullCanvas->cd();
+    hpull->Draw();
+    // frame_pull->Draw();
 
     TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
                                                 Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
@@ -632,10 +622,10 @@ int DiMuonMassSpectrum()
 
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    // fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    // fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
     fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
