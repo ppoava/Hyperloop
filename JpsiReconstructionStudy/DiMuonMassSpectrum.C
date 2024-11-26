@@ -173,7 +173,9 @@ void defBkgModel(RooWorkspace &w, std::string BKG_model) {
 
 
 
-
+void Print(const char *name, Double_t value) {
+    std::cout<<Form("%s = ", name)<<value<<std::endl;
+}
 
 Double_t calculateSigOverBkgRatio(RooRealVar observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model) {
 
@@ -288,9 +290,12 @@ TGraphErrors* calculatePullHist(RooRealVar observable, TH1 *data, RooAbsPdf *mod
 
         // Integrate the model over the bin range
         observable.setVal(binCenter);
-        observable.setRange("binRange", binLowEdge, binHighEdge);
-        Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
-                                                       RooFit::Range("binRange"))->getVal();
+        Double_t modelValue = model->getVal();
+        // observable.setRange("binRange", binLowEdge, binHighEdge);
+        // Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
+        //                                                RooFit::Range("binRange"))->getVal();
+        Print("modelValue",modelValue);
+        Print("dataValue",dataValue);
 
 
 
@@ -601,10 +606,10 @@ int DiMuonMassSpectrum()
 
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    // fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    // fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
     fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
