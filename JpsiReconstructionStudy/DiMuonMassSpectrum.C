@@ -238,17 +238,18 @@ Double_t calculateChi2(RooRealVar observable, RooDataHist *data, RooAbsPdf *mode
     // Loop over the bins of the data
     for (Int_t i = 1; i <= nBins; ++i) {
         // Get data value and error for the i-th bin
-        Double_t dataValue = data->get(i-1)->getVal();  // Observed data value (event count in the bin)
-        Double_t dataError = data->get(i-1)->error();   // Data error (typically Poisson error)
-
-        // Get the bin center
-        Double_t binCenter = data->get(i-1)->getX();
+        const RooArgSet* bin = data->get(i); // Get the RooArgSet for the i-th bin
+        Double_t dataValue = data->weight(); // Observed value (data in the bin)
+        Double_t dataError = data->weightError();
 
         // Set the observable value to the bin center to calculate model expectation
-        observable.setVal(binCenter);
+        // observable.setVal(binCenter);
 
         // Calculate model value (expected counts) for this bin
         Double_t modelValue = model->getVal();
+
+        std::cout<<"dataValue = "<<dataValue<<std::endl;
+        std::cout<<"modelValue = "<<modelValue<<std::endl;
 
         // Avoid division by zero and compute chi-squared
         if (dataError != 0) {
