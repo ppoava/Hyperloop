@@ -230,8 +230,8 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
-
-    // TODO integral of combined model
+    Print("sigYieldSignificance = ",sigYield->getVal());
+    Print("bkgYieldSignificance = ",bkgYield->getVal());
 
 
     return sigYield->getVal()*SIG_integral->getVal() 
@@ -407,11 +407,49 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     m->setRange("fitRange", mMin, mMax);
     data->Print("v");
 
+    /*
+    // Print hist information
     for (int i = 1; i <= hist->GetNbinsX(); i++) {
-    double binLowEdge = hist->GetXaxis()->GetBinLowEdge(i);
-    double binUpEdge = hist->GetXaxis()->GetBinUpEdge(i);
-    std::cout << "Bin " << i << ": [" << binLowEdge << ", " << binUpEdge << "]" << std::endl;
-}
+        double binLowEdge = hist->GetXaxis()->GetBinLowEdge(i);
+        double binUpEdge = hist->GetXaxis()->GetBinUpEdge(i);
+        std::cout << "Bin " << i << ": [" << binLowEdge << ", " << binUpEdge << "]" << std::endl;
+    }
+
+    // Print bin information for the RooDataHist
+    const RooArgSet* obsSet = data->get(0); // Get observables (assumes single observable)
+    if (obsSet) {
+        RooRealVar* m_var = (RooRealVar*)obsSet->find("m_Pt_5_30");
+        if (m_var) {
+            int nBins = data->numEntries(); // Number of bins in RooDataHist
+            double rangeMin = m_var->getMin();
+            double rangeMax = m_var->getMax();
+            double binWidth = (rangeMax - rangeMin) / nBins;
+
+            std::cout << "Number of bins: " << nBins << std::endl;
+            std::cout << "Observable range: [" << rangeMin << ", " << rangeMax << "]" << std::endl;
+            std::cout << "Bin width: " << binWidth << std::endl;
+
+            for (int i = 0; i < nBins; ++i) {
+                double binLowEdge = rangeMin + i * binWidth;
+                double binHighEdge = binLowEdge + binWidth;
+                const RooArgSet* binContent = data->get(i); // Get the i-th bin
+                double binCenter = m_var->getVal();
+                double binWeight = data->weight(); // Bin content (weight)
+
+                std::cout << "Bin " << i + 1
+                        << " Edges: [" << binLowEdge << ", " << binHighEdge << "]"
+                        << ", Center: " << binCenter
+                        << ", Weight: " << binWeight
+                        << std::endl;
+            }
+        } else {
+            std::cerr << "Observable 'm_Pt_5_30' not found in RooDataHist." << std::endl;
+        }
+    } else {
+        std::cerr << "No observables found in the RooDataHist." << std::endl;
+    }
+    */
+
 
 
     RooAddPdf* model;
