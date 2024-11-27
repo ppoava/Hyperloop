@@ -198,15 +198,18 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
+    Print("sigYield = ",sigYield->getVal());
+    Print("bkgYield = ",bkgYield->getVal());
 
 
-    return (sigYield->getVal()*SIG_integral->getVal())/(bkgYield->getVal()*BKG_integral->getVal());
+    return sigYield->getVal()*SIG_integral->getVal() / bkgYield->getVal()*BKG_integral->getVal();
 
 
 }
 
 
-Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *comb_model) {
+Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model,
+                               RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
@@ -231,7 +234,9 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     // TODO integral of combined model
 
 
-    return SIG_integral->getVal()/(sqrt(SIG_integral->getVal()+BKG_integral->getVal()));
+    return sigYield->getVal()*SIG_integral->getVal() 
+           /
+           sqrt(sigYield->getVal()*SIG_integral->getVal()+bkgYield->getVal()*BKG_integral->getVal());
 
 }
 
@@ -264,13 +269,13 @@ Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
 
         // Integrate the model over the bin range
         observable->setVal(binCenter);          // invariant mass
-        std::cout<<"observableChi2 = "<<*observable<<std::endl;
+        // std::cout<<"observableChi2 = "<<*observable<<std::endl;
         Double_t modelValue = model->getVal();
         // observable.setRange("binRange", binLowEdge, binHighEdge);
         // Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
         //                                                RooFit::Range("binRange"))->getVal();
-        Print("modelValueChi2",modelValue);
-        Print("dataValueChi2",dataValue);
+        // Print("modelValueChi2",modelValue);
+        // Print("dataValueChi2",dataValue);
 
         // Avoid division by zero and compute chi-squared
         if (dataError != 0) {
@@ -394,12 +399,20 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // **********************************************
 
 
-    Double_t mMin = 2.0;
+    Double_t mMin = 2.3;
     Double_t mMax = 4.3;
     hist->GetXaxis()->SetRangeUser(mMin, mMax);
     RooRealVar* m = new RooRealVar(Form("m_Pt_%.0f_%.0f", pTMin, pTMax), "invariant mass", mMin, mMax);
-    m->setRange("fitRange", mMin, mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", pTMin, pTMax), "Di-muon spectrum", *m, Import(*hist));
+    m->setRange("fitRange", mMin, mMax);
+    data->Print("v");
+
+    for (int i = 1; i <= hist->GetNbinsX(); i++) {
+    double binLowEdge = hist->GetXaxis()->GetBinLowEdge(i);
+    double binUpEdge = hist->GetXaxis()->GetBinUpEdge(i);
+    std::cout << "Bin " << i << ": [" << binLowEdge << ", " << binUpEdge << "]" << std::endl;
+}
+
 
     RooAddPdf* model;
     RooPlot* frame;
@@ -484,10 +497,10 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
 
     // Start iterative fitting (only for Chebychev)
     // Release orders one-by-one as long as reduced χ2 is above desired value
-    Double_t chi2M = 100000; // arbitrary starting value
+    Double_t chi2M = -1.; // arbitrary starting value
     if (BKG_model == "Chebychev") {
         for (Int_t i = 0; i < parameters.size(); i++) {
-            if (chi2M < 0 || chi2M > 1.4 || std::isnan(chi2M)) {
+            if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
                 parameters[i]->setConstant(kFALSE);
                 model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
                 frame = m->frame();
@@ -497,7 +510,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
                 std::cout << "chi2M = " << chi2M << std::endl;
             }
             else { break; }
-            if (i == 7 && (chi2M < 0 || chi2M > 1.4)) { std::cout << "WARNING. Fitting failed. No convergence" << std::endl; }
+            if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout << "WARNING. Fitting failed. No convergence" << std::endl; }
         }
     }
 
@@ -539,7 +552,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
     legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
-    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,model)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,sigYield,bkgYield)), "");
     legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model)/4), "");
     legend->Draw();
 
@@ -563,14 +576,14 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     hpull->Draw();
     // frame_pull->Draw();
 
-    TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
-                                                Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
-    hand_made_pullCanvas->cd();
-    TGraphErrors* pullGraph = calculatePullHist(m,hist,model);
-    pullGraph->SetTitle("pull plot by hand (equal to machine?)");
-    pullGraph->GetXaxis()->SetRangeUser(mMin,mMax);
-    pullGraph->GetXaxis()->SetTitle("invariant mass");
-    pullGraph->Draw();
+    // TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
+    //                                             Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
+    // hand_made_pullCanvas->cd();
+    // TGraphErrors* pullGraph = calculatePullHist(m,hist,model);
+    // pullGraph->SetTitle("pull plot by hand (equal to machine?)");
+    // pullGraph->GetXaxis()->SetRangeUser(mMin,mMax);
+    // pullGraph->GetXaxis()->SetTitle("invariant mass");
+    // pullGraph->Draw();
 
 } // fitJpsiCB
 
@@ -622,10 +635,10 @@ int DiMuonMassSpectrum()
 
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    // fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    // fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
     fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
