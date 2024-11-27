@@ -190,19 +190,21 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
     observable->setRange("signalRange", rangeMin, rangeMax);
 
-    RooAbsReal* SIG_integral = SIG_model->createIntegral(
+    RooAbsReal* sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
-    RooAbsReal* BKG_integral = BKG_model->createIntegral(
+    RooAbsReal* bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
+    Print("sigIntegral = ",sigIntegral->getVal());
+    Print("bkgIntegral = ",bkgIntegral->getVal());
     Print("sigYield = ",sigYield->getVal());
     Print("bkgYield = ",bkgYield->getVal());
 
 
-    return sigYield->getVal()*SIG_integral->getVal() / bkgYield->getVal()*BKG_integral->getVal();
+    return sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal();
 
 
 }
@@ -219,24 +221,27 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
+    std::cout<<"integration range = ["<<rangeMin<<","<<rangeMax<<"]"<<std::endl;
     observable->setRange("signalRange", rangeMin, rangeMax);
 
     // Yield
-    RooAbsReal* SIG_integral = SIG_model->createIntegral(
+    RooAbsReal* sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
-    RooAbsReal* BKG_integral = BKG_model->createIntegral(
+    RooAbsReal* bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::Range("signalRange")
     );
+    Print("sigIntegralSignificance = ",sigIntegral->getVal());
+    Print("bkgIntegralSignificance = ",bkgIntegral->getVal());
     Print("sigYieldSignificance = ",sigYield->getVal());
     Print("bkgYieldSignificance = ",bkgYield->getVal());
+    
 
-
-    return sigYield->getVal()*SIG_integral->getVal() 
+    return sigYield->getVal()*sigIntegral->getVal() 
            /
-           sqrt(sigYield->getVal()*SIG_integral->getVal()+bkgYield->getVal()*BKG_integral->getVal());
+           sqrt(sigYield->getVal()*sigIntegral->getVal()+bkgYield->getVal()*bkgIntegral->getVal());
 
 }
 
@@ -399,8 +404,9 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     // **********************************************
 
 
-    Double_t mMin = 2.3;
-    Double_t mMax = 4.3;
+    // hist->Rebin(2);
+    Double_t mMin = 2.5;
+    Double_t mMax = 4.5;
     hist->GetXaxis()->SetRangeUser(mMin, mMax);
     RooRealVar* m = new RooRealVar(Form("m_Pt_%.0f_%.0f", pTMin, pTMax), "invariant mass", mMin, mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", pTMin, pTMax), "Di-muon spectrum", *m, Import(*hist));
@@ -452,8 +458,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
 
 
 
-    RooAddPdf* model;
-    RooPlot* frame;
+    RooAddPdf *model;
+    RooPlot *frame;
 
     // Crystal Ball
     RooRealVar m0("m0", "#mu", 3.097, 3.05, 3.13);
@@ -539,11 +545,12 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     if (BKG_model == "Chebychev") {
         for (Int_t i = 0; i < parameters.size(); i++) {
             if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
+                frame = nullptr;
                 parameters[i]->setConstant(kFALSE);
-                model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
+                model->fitTo(*data, Range("fitRange"),Extended(kTRUE),Verbose(kFALSE));
                 frame = m->frame();
-                data->plotOn(frame, MarkerSize(0.4));
-                model->plotOn(frame, LineColor(kBlue), Name("full_Model"));
+                data->plotOn(frame, MarkerSize(0.4),Range("fitRange"));
+                model->plotOn(frame, LineColor(kBlue), Name("full_Model"),Range("fitRange"));
                 chi2M = frame->chiSquare();
                 std::cout << "chi2M = " << chi2M << std::endl;
             }
@@ -559,7 +566,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
         model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
         frame = m->frame();
         data->plotOn(frame, MarkerSize(0.4));
-        model->plotOn(frame, LineColor(kBlue), Name("full_Model"));
+        model->plotOn(frame, LineColor(kBlue), Name("full_Model"),Range("fitRange"));
         chi2M = frame->chiSquare();
         std::cout << "chi2M = " << chi2M << std::endl;
     }
@@ -575,8 +582,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
                                   800, 600);
     canvas->cd();
 
-    model->plotOn(frame, Components(*doubleSidedCB), LineStyle(kDashed), LineColor(kRed), Name("signal_Model"));
-   	model->plotOn(frame, Components(*BKG), LineStyle(kDashed), LineColor(kBlue), Name("bkg_Model"));
+    model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
+   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
    	model->paramOn(frame,ShowConstants(true),Format("TE",AutoPrecision(3)));
 
     frame->Draw();
@@ -589,7 +596,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
-    legend->AddEntry("", Form("signal/background = %.2f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
+    legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
     legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,sigYield,bkgYield)), "");
     legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model)/4), "");
     legend->Draw();
@@ -673,7 +680,7 @@ int DiMuonMassSpectrum()
 
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_0_2, 0, 2);
-    // fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
     // fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
