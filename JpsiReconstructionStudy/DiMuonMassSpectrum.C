@@ -192,10 +192,12 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
 
     RooAbsReal* sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
+        // NormSet(*observable),
         RooFit::Range("signalRange")
     );
     RooAbsReal* bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
+        // NormSet(*observable),
         RooFit::Range("signalRange")
     );
     Print("sigIntegral = ",sigIntegral->getVal());
@@ -204,6 +206,8 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
     Print("bkgYield = ",bkgYield->getVal());
 
 
+    // print statement only for bug fixing
+    std::cout<<"s/b from function = "<<sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal()<<std::endl;
     return sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal();
 
 
@@ -227,17 +231,19 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     // Yield
     RooAbsReal* sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
+        // NormSet(*observable),
         RooFit::Range("signalRange")
     );
     RooAbsReal* bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
+        // NormSet(*observable),
         RooFit::Range("signalRange")
     );
     Print("sigIntegralSignificance = ",sigIntegral->getVal());
     Print("bkgIntegralSignificance = ",bkgIntegral->getVal());
     Print("sigYieldSignificance = ",sigYield->getVal());
     Print("bkgYieldSignificance = ",bkgYield->getVal());
-    
+
 
     return sigYield->getVal()*sigIntegral->getVal() 
            /
@@ -559,8 +565,13 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
         }
     }
 
-    // Construct a histogram with the pulls of the data w.r.t the curve
+
     RooHist *hpull = frame->pullHist();
+
+
+    /*
+    // Construct a histogram with the pulls of the data w.r.t the curve
+    // Conclusion: it doesn't
 
     if (BKG_model != "Chebychev") {
         model->fitTo(*data, Range("fitRange"),Extended(kTRUE));
@@ -571,6 +582,29 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
         std::cout << "chi2M = " << chi2M << std::endl;
     }
 
+    // Test to see if integral calculation depends on getting arguments through a function or not
+    // Integrate over mean +/- 3 sigma range
+    double rangeMin = m0.getVal() - 3 * sigma.getVal();
+    double rangeMax = m0.getVal() + 3 * sigma.getVal();
+    m->setRange("signalRange", rangeMin, rangeMax);
+
+    RooAbsReal* sigIntegral = doubleSidedCB->createIntegral(
+        RooArgSet(*m),
+        // NormSet(*m),
+        RooFit::Range("signalRange")
+    );
+    RooAbsReal* bkgIntegral = BKG->createIntegral(
+        RooArgSet(*m),
+        // NormSet(*m),
+        RooFit::Range("signalRange")
+    );
+    Print("sigIntegralLocal = ",sigIntegral->getVal());
+    Print("bkgIntegralLocal = ",bkgIntegral->getVal());
+    Print("sigYieldLocal = ",sigYield->getVal());
+    Print("bkgYieldLocal = ",bkgYield->getVal());
+    std::cout<<"s/b local = "<<sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal()<<std::endl;
+    */
+   
 
     // **********************************************
     // P  L  O  T  T  I  N  G
