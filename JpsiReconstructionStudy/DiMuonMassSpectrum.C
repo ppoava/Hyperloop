@@ -190,7 +190,6 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
     observable->setRange("signalRange", rangeMin, rangeMax);
 
-
     /*
     // This method was implemented for bug fixing
     // The method agrees with the other (old) one as long as RooFit::NormSet is used 
@@ -233,9 +232,9 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
     Print("sigYield = ",sigYield->getVal());
     Print("bkgYield = ",bkgYield->getVal());
 
-    // print statement only for bug fixing
-    std::cout<<"s/b from function = "<<sigYield->getVal()*sigIntegral / bkgYield->getVal()*bkgIntegral<<std::endl;
-    return sigYield->getVal()*sigIntegral / bkgYield->getVal()*bkgIntegral;
+    // brackets are absolutely necessary!!
+    std::cout<<"s/b from function = "<<(sigYield->getVal()*sigIntegral) / (bkgYield->getVal()*bkgIntegral)<<std::endl;
+    return (sigYield->getVal()*sigIntegral) / (bkgYield->getVal()*bkgIntegral);
 
 
 }
@@ -255,7 +254,7 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     std::cout<<"integration range = ["<<rangeMin<<","<<rangeMax<<"]"<<std::endl;
     observable->setRange("signalRange", rangeMin, rangeMax);
 
-    // Yield
+    // Should it be normalised to the whole 'model' in the range?
     Double_t sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
         RooFit::NormSet(*observable),
@@ -277,10 +276,13 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     Print("sigYieldSignificance = ",sigYield->getVal());
     Print("bkgYieldSignificance = ",bkgYield->getVal());
 
-
-    return sigYield->getVal()*sigIntegral 
+    std::cout<<"significance from function = "<<(sigYield->getVal()*sigIntegral) 
            /
-           sqrt(sigYield->getVal()*sigIntegral+bkgYield->getVal()*bkgIntegral);
+           (sqrt((sigYield->getVal()*sigIntegral)+(bkgYield->getVal()*bkgIntegral)))<<std::endl;
+    return (sigYield->getVal()*sigIntegral) 
+           /
+           (sqrt((sigYield->getVal()*sigIntegral)+(bkgYield->getVal()*bkgIntegral)));
+
 
 }
 
