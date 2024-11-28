@@ -758,7 +758,7 @@ int DiMuonMassSpectrum()
     fitJpsiCB(hDiMuonMass_PtCut_0_2,  0, 2, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_2_5, 2, 5);
-    // fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
+    fitJpsiCB(hDiMuonMass_PtCut_3_4,  3, 4, "Chebychev");
 
     // fitJpsiGauss(hDiMuonMass_PM_Pt_5_30, 5, 30);
     fitJpsiCB(hDiMuonMass_PtCut_5_30, 5, 30, "Chebychev");
