@@ -252,7 +252,8 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
 }
 
 
-Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
+Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model,
+                       RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     Double_t mMin = observable->getMin();
     Double_t mMax = observable->getMax();
@@ -280,30 +281,34 @@ Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
 
         // Integrate the model over the bin range
         observable->setVal(binCenter);          // invariant mass
-        // std::cout<<"observableChi2 = "<<*observable<<std::endl;
-        Double_t modelValue = model->getVal();
-        // observable.setRange("binRange", binLowEdge, binHighEdge);
-        // Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
-        //                                                RooFit::Range("binRange"))->getVal();
+        observable->setRange("binRange", binLowEdge, binHighEdge);
+        Double_t modelValue = model->createIntegral(*observable, RooFit::NormSet(*observable),
+                                                        RooFit::Range("binRange"))->getVal();
+        // Multiply model value by combined yield to equalise to data values
+        modelValue *= sigYield->getVal()+bkgYield->getVal();
         // Print("modelValueChi2",modelValue);
         // Print("dataValueChi2",dataValue);
 
         // Avoid division by zero and compute chi-squared
         if (dataError != 0) {
-            chi2 += std::pow((dataValue - modelValue), 2) / dataError;
+            chi2 += std::pow((dataValue-modelValue),2)/dataValue;
         } else {
             std::cerr << "Warning: Zero error in bin " << i << ", skipping." << std::endl;
         }
     }
 
     // Return the calculated chi-squared value
+    // for debugging print statement
+    Int_t ndf = (data->FindBin(mMax)-data->FindBin(mMin))-8;
+    std::cout<<"chi2/ndf by hand = "<<chi2/ndf<<std::endl;
     return chi2;
 
 
 }
 
 
-TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model) {
+TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model,
+                                RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     Double_t mMin = observable->getMin();
     Double_t mMax = observable->getMax();
@@ -335,13 +340,15 @@ TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
 
         // Integrate the model over the bin range
         observable->setVal(binCenter);          // invariant mass
-        std::cout<<"observable = "<<*observable<<std::endl;
-        Double_t modelValue = model->getVal();
-        // observable.setRange("binRange", binLowEdge, binHighEdge);
-        // Double_t modelValue = model->createIntegral(observable, RooFit::NormSet(observable),
-        //                                                RooFit::Range("binRange"))->getVal();
-        Print("modelValue",modelValue);
-        Print("dataValue",dataValue);
+        observable->setRange("binRange", binLowEdge, binHighEdge);
+        Double_t modelValue = model->createIntegral(*observable, RooFit::NormSet(*observable),
+                                                        RooFit::Range("binRange"))->getVal();
+        // Multiply model value by combined yield to equalise to data values
+        modelValue *= sigYield->getVal()+bkgYield->getVal();
+        // Print("modelValueChi2",modelValue);
+        // Print("dataValueChi2",dataValue);
+        // Print("modelValue",modelValue);
+        // Print("dataValue",dataValue);
 
         
 
@@ -604,7 +611,7 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     Print("bkgYieldLocal = ",bkgYield->getVal());
     std::cout<<"s/b local = "<<sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal()<<std::endl;
     */
-   
+
 
     // **********************************************
     // P  L  O  T  T  I  N  G
@@ -632,11 +639,12 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
     legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
     legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,sigYield,bkgYield)), "");
-    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model)/4), "");
+    Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model,sigYield,bkgYield)/ndf), "");
     legend->Draw();
 
     // check output
-    calculateChi2(m, hist, model);
+    std::cout<<"chi2/ndf by machine = "<<chi2M<<std::endl;
 
     m0.Print();
     sigma.Print();
@@ -650,19 +658,21 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
                                   800, 600);
     // Create a new frame to draw the pull distribution and add the distribution to the frame
     RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
-    // frame_pull->addPlotable(hpull, "P");
+    frame_pull->addPlotable(hpull, "P");
     pullCanvas->cd();
     hpull->Draw();
-    // frame_pull->Draw();
+    frame_pull->Draw();
 
-    // TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
-    //                                             Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
-    // hand_made_pullCanvas->cd();
-    // TGraphErrors* pullGraph = calculatePullHist(m,hist,model);
-    // pullGraph->SetTitle("pull plot by hand (equal to machine?)");
-    // pullGraph->GetXaxis()->SetRangeUser(mMin,mMax);
-    // pullGraph->GetXaxis()->SetTitle("invariant mass");
-    // pullGraph->Draw();
+    /*
+    TCanvas *hand_made_pullCanvas = new TCanvas(Form("hand-made_pull_%.0f_%.0f",pTMin,pTMax),
+                                                Form("hand-made pull_%.0f_%.0f",pTMin,pTMax));
+    hand_made_pullCanvas->cd();
+    TGraphErrors* pullGraph = calculatePullHist(m,hist,model,sigYield,bkgYield);
+    pullGraph->SetTitle("pull plot by hand (equal to machine?)");
+    pullGraph->GetXaxis()->SetRangeUser(mMin,mMax);
+    pullGraph->GetXaxis()->SetTitle("invariant mass");
+    pullGraph->Draw();
+    */
 
 } // fitJpsiCB
 
