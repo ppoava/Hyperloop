@@ -192,9 +192,12 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
 
 
     /*
+    // This method was implemented for bug fixing
+    // The method agrees with the other (old) one as long as RooFit::NormSet is used 
+    // (i.e. it is proof that it is required)
     Double_t binCenter = data->GetBinCenter(data->FindBin(mean->getVal()));
     Double_t binLowEdge = data->GetBinLowEdge(data->FindBin(rangeMin));
-    Double_t binHighEdge = binLowEdge + data->GetBinWidth(data->FindBin(rangeMax));
+    Double_t binHighEdge = data->GetBinLowEdge(data->FindBin(rangeMax)) + data->GetBinWidth(data->FindBin(mean->getVal()));
     observable->setVal(binCenter);          // invariant mass
     observable->setRange("binRange", binLowEdge, binHighEdge);
     std::cout<<"binLowEdge = "<<binLowEdge<<std::endl;
@@ -207,28 +210,28 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
                                                     RooFit::Range("binRange"))->getVal();
     */
 
-
     Double_t sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
     Double_t bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
     Double_t fullIntegral = full_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
+
+    Print("mean = ",mean->getVal());
     Print("sigIntegral = ",sigIntegral);
     Print("bkgIntegral = ",bkgIntegral);
     Print("fullIntegral = ",fullIntegral);
     Print("sigYield = ",sigYield->getVal());
     Print("bkgYield = ",bkgYield->getVal());
-
 
     // print statement only for bug fixing
     std::cout<<"s/b from function = "<<sigYield->getVal()*sigIntegral / bkgYield->getVal()*bkgIntegral<<std::endl;
@@ -247,25 +250,25 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
 
     // Integrate over mean +/- 3 sigma range
-    double rangeMin = mean->getVal() - 1 * sigma->getVal();
-    double rangeMax = mean->getVal() + 1 * sigma->getVal();
+    double rangeMin = mean->getVal() - 3 * sigma->getVal();
+    double rangeMax = mean->getVal() + 3 * sigma->getVal();
     std::cout<<"integration range = ["<<rangeMin<<","<<rangeMax<<"]"<<std::endl;
     observable->setRange("signalRange", rangeMin, rangeMax);
 
     // Yield
     Double_t sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
     Double_t bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
     Double_t fullIntegral = full_model->createIntegral(
         RooArgSet(*observable),
-        // NormSet(*observable),
+        RooFit::NormSet(*observable),
         RooFit::Range("signalRange")
     )->getVal();
     Print("sigIntegralSignificance = ",sigIntegral);
