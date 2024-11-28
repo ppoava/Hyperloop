@@ -177,7 +177,7 @@ void Print(const char *name, Double_t value) {
     std::cout<<Form("%s = ", name)<<value<<std::endl;
 }
 
-Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, 
+Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *full_model, 
                                   RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     
@@ -190,31 +190,55 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, RooAbsPdf *SIG_model, 
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
     observable->setRange("signalRange", rangeMin, rangeMax);
 
-    RooAbsReal* sigIntegral = SIG_model->createIntegral(
+
+    /*
+    Double_t binCenter = data->GetBinCenter(data->FindBin(mean->getVal()));
+    Double_t binLowEdge = data->GetBinLowEdge(data->FindBin(rangeMin));
+    Double_t binHighEdge = binLowEdge + data->GetBinWidth(data->FindBin(rangeMax));
+    observable->setVal(binCenter);          // invariant mass
+    observable->setRange("binRange", binLowEdge, binHighEdge);
+    std::cout<<"binLowEdge = "<<binLowEdge<<std::endl;
+    std::cout<<"binHighEdge = "<<binHighEdge<<std::endl;
+    Double_t sigIntegral = SIG_model->createIntegral(*observable, RooFit::NormSet(*observable),
+                                                    RooFit::Range("binRange"))->getVal();
+    Double_t bkgIntegral = BKG_model->createIntegral(*observable, RooFit::NormSet(*observable),
+                                                    RooFit::Range("binRange"))->getVal();
+    Double_t fullIntegral = full_model->createIntegral(*observable, RooFit::NormSet(*observable),
+                                                    RooFit::Range("binRange"))->getVal();
+    */
+
+
+    Double_t sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
         // NormSet(*observable),
         RooFit::Range("signalRange")
-    );
-    RooAbsReal* bkgIntegral = BKG_model->createIntegral(
+    )->getVal();
+    Double_t bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
         // NormSet(*observable),
         RooFit::Range("signalRange")
-    );
-    Print("sigIntegral = ",sigIntegral->getVal());
-    Print("bkgIntegral = ",bkgIntegral->getVal());
+    )->getVal();
+    Double_t fullIntegral = full_model->createIntegral(
+        RooArgSet(*observable),
+        // NormSet(*observable),
+        RooFit::Range("signalRange")
+    )->getVal();
+    Print("sigIntegral = ",sigIntegral);
+    Print("bkgIntegral = ",bkgIntegral);
+    Print("fullIntegral = ",fullIntegral);
     Print("sigYield = ",sigYield->getVal());
     Print("bkgYield = ",bkgYield->getVal());
 
 
     // print statement only for bug fixing
-    std::cout<<"s/b from function = "<<sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal()<<std::endl;
-    return sigYield->getVal()*sigIntegral->getVal() / bkgYield->getVal()*bkgIntegral->getVal();
+    std::cout<<"s/b from function = "<<sigYield->getVal()*sigIntegral / bkgYield->getVal()*bkgIntegral<<std::endl;
+    return sigYield->getVal()*sigIntegral / bkgYield->getVal()*bkgIntegral;
 
 
 }
 
 
-Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model,
+Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *full_model,
                                RooRealVar *sigYield, RooRealVar *bkgYield) {
 
     
@@ -223,31 +247,37 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
 
     // Integrate over mean +/- 3 sigma range
-    double rangeMin = mean->getVal() - 3 * sigma->getVal();
-    double rangeMax = mean->getVal() + 3 * sigma->getVal();
+    double rangeMin = mean->getVal() - 1 * sigma->getVal();
+    double rangeMax = mean->getVal() + 1 * sigma->getVal();
     std::cout<<"integration range = ["<<rangeMin<<","<<rangeMax<<"]"<<std::endl;
     observable->setRange("signalRange", rangeMin, rangeMax);
 
     // Yield
-    RooAbsReal* sigIntegral = SIG_model->createIntegral(
+    Double_t sigIntegral = SIG_model->createIntegral(
         RooArgSet(*observable),
         // NormSet(*observable),
         RooFit::Range("signalRange")
-    );
-    RooAbsReal* bkgIntegral = BKG_model->createIntegral(
+    )->getVal();
+    Double_t bkgIntegral = BKG_model->createIntegral(
         RooArgSet(*observable),
         // NormSet(*observable),
         RooFit::Range("signalRange")
-    );
-    Print("sigIntegralSignificance = ",sigIntegral->getVal());
-    Print("bkgIntegralSignificance = ",bkgIntegral->getVal());
+    )->getVal();
+    Double_t fullIntegral = full_model->createIntegral(
+        RooArgSet(*observable),
+        // NormSet(*observable),
+        RooFit::Range("signalRange")
+    )->getVal();
+    Print("sigIntegralSignificance = ",sigIntegral);
+    Print("bkgIntegralSignificance = ",bkgIntegral);
+    Print("fullIntegral = ",fullIntegral);
     Print("sigYieldSignificance = ",sigYield->getVal());
     Print("bkgYieldSignificance = ",bkgYield->getVal());
 
 
-    return sigYield->getVal()*sigIntegral->getVal() 
+    return sigYield->getVal()*sigIntegral 
            /
-           sqrt(sigYield->getVal()*sigIntegral->getVal()+bkgYield->getVal()*bkgIntegral->getVal());
+           sqrt(sigYield->getVal()*sigIntegral+bkgYield->getVal()*bkgIntegral);
 
 }
 
@@ -274,8 +304,6 @@ Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model,
         Double_t dataValue = data->GetBinContent(i);
         Double_t dataError = data->GetBinError(i);
         Double_t binCenter = data->GetBinCenter(i);
-
-
         Double_t binLowEdge = data->GetBinLowEdge(i);
         Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
 
@@ -333,8 +361,6 @@ TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
         Double_t dataValue = data->GetBinContent(i);
         Double_t dataError = data->GetBinError(i);
         Double_t binCenter = data->GetBinCenter(i);
-
-
         Double_t binLowEdge = data->GetBinLowEdge(i);
         Double_t binHighEdge = binLowEdge + data->GetBinWidth(i);
 
@@ -637,8 +663,8 @@ void fitJpsiCB(TH1D* hist, Double_t pTMin, Double_t pTMax, std::string BKG_model
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", pTMin, pTMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
-    legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,doubleSidedCB,BKG,sigYield,bkgYield)), "");
-    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,sigYield,bkgYield)), "");
+    legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
     legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model,sigYield,bkgYield)/ndf), "");
     legend->Draw();
