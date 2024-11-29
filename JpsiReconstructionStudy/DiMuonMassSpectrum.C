@@ -31,9 +31,10 @@ using namespace RooFit;
 
 
 void getTree(const char* fileName, Double_t ptMin, Double_t ptMax);
-void defSigModels(RooWorkspace &ws);
-void defBkgModels(RooWorkspace &ws, std::string BKG_model);
-void doJpsiFit(RooWorkspace &ws);
+void defSigModel(RooWorkspace &ws);
+void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
+void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
+void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void drawPlots(RooWorkspace &ws);
 
 int DiMuonMassSpectrum() {
@@ -47,7 +48,7 @@ int DiMuonMassSpectrum() {
     return 0;
 }
 
-void getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
+TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 
 
     // **********************************************
@@ -86,6 +87,9 @@ void getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     hMass_Pt = (TH2F*)hMass_Pt->Clone();
     hMass_Pt->GetYaxis()->SetRangeUser(ptMin, ptMax);
     hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
+
+
+    return hDiMuonMass_PtCut;
 
 
 } // void getTree()
@@ -142,13 +146,6 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
     RooRealVar a6("a6", "a_{6}", 0.0, -0.1, 0.1);
     RooRealVar a7("a7", "a_{7}", 0.0, -0.05, 0.05);
 
-    // Initially set all parameters to constant (kTRUE)
-    // Iterative fitting releases parameters one-by-one
-    std::vector<RooRealVar*> parameters = {&a0, &a1, &a2, &a3, &a4, &a5, &a6, &a7};
-    for (auto& param : parameters) {
-        param->setConstant(kTRUE);
-    }
-
     // Initialise a Gaussian for background
     RooRealVar BKG_mean("BKG_mean", "Mean of background Gaussian", 2.5, 0., 10);
     RooRealVar BKG_sigma("BKG_sigma", "Sigma of background Gaussian", 1.7, 0., 2.5);
@@ -178,7 +175,18 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
         bkgYield = new RooRealVar("bkgYieldExp", "N_{bkg}", 10000000, 0., 1000000000);
     }
 
+    // Add parameters to the workspace
+    // This step is necessary for the iterative fitting later
+    ws.import(a0);
+    ws.import(a1);
+    ws.import(a2);
+    ws.import(a3);
+    ws.import(a4);
+    ws.import(a5);
+    ws.import(a6);
+    ws.import(a7);
 
+    // Add models
     ws.import(*BKG);
     ws.import(*bkgYield);
 
@@ -198,7 +206,32 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
 } // defCombinedModel
 
 
-void fitModelToData(RooWorkspace &ws, TH1 *data, std::string BKG_model) {
+void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax) {
+
+
+    Double_t mMin = 2.5;
+    Double_t mMax = 4.5;
+    RooRealVar *m = ws.var("m");
+    RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", ptMin, ptMax), "Di-muon spectrum", *m, Import(*hist));
+    m->setRange("fitRange", mMin, mMax);
+    RooAbsPdf *model = ws.pdf("model");
+    RooPlot *frame;
+
+
+    // Retreive Chebyshev parameters
+    std::vector<RooRealVar*> parameters = {
+        ws.var("a0"),
+        ws.var("a1"),
+        ws.var("a2"),
+        ws.var("a3"),
+        ws.var("a4"),
+        ws.var("a5"),
+        ws.var("a6"),
+        ws.var("a7")
+    };
+    // Initially set all parameters to constant (kTRUE)
+    // Iterative fitting releases parameters one-by-one
+    for (auto& param : parameters) { param->setConstant(kTRUE); }
 
 
     // Start iterative fitting (only for Chebychev)
@@ -222,11 +255,76 @@ void fitModelToData(RooWorkspace &ws, TH1 *data, std::string BKG_model) {
     }
 
 
+    // Pull needs to be calculated before more fitting is done
+    // (so that it is calculated with respect to the correct model)
     RooHist *hpull = frame->pullHist();
+
+    ws.import(*hpull);
+    ws.import(*frame);
 
 
 } // void fitModelToData()
 
+
+void drawPlots(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
+
+
+    // Collect everything from workspace  
+    RooAbsPdf *doubleSidedCB = ws.pdf("doubleSidedCB");
+    RooAbsPdf *BKG = ws.pdf("BKG");
+    RooAbsPdf *model = ws.pdf("model");
+
+    RooPlot *frame = dynamic_cast<RooPlot*>(ws.obj("frame"));
+    RooHist *hpull = dynamic_cast<RooHist*>(ws.obj("hpull"));
+    Double_t chi2M = frame->chiSquare();
+    
+
+    TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f", ptMin, ptMax), 
+                                  Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f", ptMin, ptMax),
+                                  800, 600);
+    canvas->cd();
+    
+    model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
+   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
+   	model->paramOn(frame,ShowConstants(true),Format("TE",AutoPrecision(3)));
+    frame->Draw();
+
+    // RooChi2Var* chi2Var = new RooChi2Var("chi2","chi2", *doubleSidedCB, *data, true, RooAbsData::ErrorType::Poisson);
+    // double chi2M = chi2Var->getVal();
+
+    TLegend *legend = new TLegend(0.6, 0.7, 0.82, 0.8);
+    legend->SetTextSize(0.03);
+    legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", ptMin, ptMax), "");
+    legend->AddEntry(frame->getObject(0), "Data", "point");
+    legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", chi2M), "l");
+    legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
+    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
+    Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
+    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model,sigYield,bkgYield)/ndf), "");
+    legend->Draw();
+
+    // check output
+    std::cout<<"chi2/ndf by machine = "<<chi2M<<std::endl;
+
+    // m0.Print();
+    // sigma.Print();
+    // alphaL.Print();
+    // nL.Print();
+    // alphaR.Print();
+    // nR.Print();
+
+    TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f", pTMin, pTMax), 
+                                  Form("Pull canvas %.0f < p_{T} < %.0f", pTMin, pTMax),
+                                  800, 600);
+    // Create a new frame to draw the pull distribution and add the distribution to the frame
+    RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
+    frame_pull->addPlotable(hpull, "P");
+    pullCanvas->cd();
+    hpull->Draw();
+    frame_pull->Draw();
+
+
+} // void drawPlots()
 
 
 
