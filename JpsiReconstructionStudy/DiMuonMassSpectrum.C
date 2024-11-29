@@ -29,7 +29,7 @@
 
 using namespace RooFit;
 
-/*
+
 void getTree(const char* fileName, Double_t ptMin, Double_t ptMax);
 void defSigModels(RooWorkspace &ws);
 void defBkgModels(RooWorkspace &ws, std::string BKG_model);
@@ -91,10 +91,10 @@ void getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 } // void getTree()
 
 
-void defSigModels(RooWorkspace &ws, std::string BKG_model) {
+void defSigModel(RooWorkspace &ws) {
 
 
-    RooRealVar m("fMass","M_{#mu^{+}#mu^{-}}",2.,5.,"GeV/c2");
+    RooRealVar *m = new RooRealVar("fMass","M_{#mu^{+}#mu^{-}}",2.,5.,"GeV/c2");
     // m.setRange("fitRange",2.,5.);
 
     // Crystal Ball for mass signal
@@ -108,28 +108,39 @@ void defSigModels(RooWorkspace &ws, std::string BKG_model) {
     alphaR.setConstant();
     RooRealVar nR("nR", "Exponent Right", 15.323, 5.0, 25.0);  
     nR.setConstant();
-    //
+    
+    // Becomes important when signal and background model are combined
+    RooRealVar* sigYield;
+    
     RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB","Double Sided Crystal Ball",
-                                                       m,m0,sigma,alphaL,nL,alphaR,nR);
-    ws.import(m);
+                                                       *m,m0,sigma,alphaL,nL,alphaR,nR);
+    ws.import(*m);
+    ws.import(*sigYield);
     ws.import(*doubleSidedCB);
     
 
-} // void defSigModels()
+} // void defSigModel()
 
 
-void defBkgModel(RooWorkspace &w, std::string BKG_model) {
+void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax) {
 
 
-    // Initiallise Chebychev for background
+    RooAbsPdf *BKG;
+    RooRealVar *m = ws.var("m");
+
+    // Exponential for background
+    // RooRealVar a0("a0","a_{0}",-1,-5,0.000001);
+	// RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
+
+    // Initiallise Chebychev
     RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
     RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
-    RooRealVar a2("a2", "a_{2}", -0.01, -0.1, 0.1);
-    RooRealVar a3("a3", "a_{3}", 0.0, -0.05, 0.05);
-    RooRealVar a4("a4", "a_{4}", 0.0, -0.03, 0.03);
-    RooRealVar a5("a5", "a_{5}", 0.0, -0.05, 0.05);
-    RooRealVar a6("a6", "a_{6}", 0.0, -0.05, 0.05);
-    RooRealVar a7("a7", "a_{7}", 0.0, -0.005, 0.005);
+    RooRealVar a2("a2", "a_{2}", -0.01, -0.5, 0.5);
+    RooRealVar a3("a3", "a_{3}", 0.0, -0.5, 0.5);
+    RooRealVar a4("a4", "a_{4}", 0.0, -0.3, 0.3);
+    RooRealVar a5("a5", "a_{5}", 0.0, -0.3, 0.3);
+    RooRealVar a6("a6", "a_{6}", 0.0, -0.1, 0.1);
+    RooRealVar a7("a7", "a_{7}", 0.0, -0.05, 0.05);
 
     // Initially set all parameters to constant (kTRUE)
     // Iterative fitting releases parameters one-by-one
@@ -146,30 +157,77 @@ void defBkgModel(RooWorkspace &w, std::string BKG_model) {
     RooRealVar exp0("exp0","exp_{0}",-1,-5,0.001);
 
     // Select background model (all are initialised, one is picked)
-    RooRealVar* sigYield;
-    RooRealVar* bkgYield;
+    RooRealVar *bkgYield;
+    RooRealVar *sigYield = ws.var("sigYield");
 
     if (BKG_model == "Chebychev") {
-        BKG = new RooChebychev(Form("BKG_Pt_%.0f_%.0f", pTMin, pTMax),"Chebyshev background", m, {a0,a1,a2,a3,a4,a5,a6,a7});
+        BKG = new RooChebychev(Form("BKG_Pt_%.0f_%.0f", ptMin, ptMax),"Chebyshev background", *m, {a0,a1,a2,a3,a4,a5,a6,a7});
         sigYield = new RooRealVar("sigYieldCheb", "N_{sig}", 2000, 0., 10000000);
         bkgYield = new RooRealVar("bkgYieldCheb", "N_{bkg}", 150000, 0., 100000000);
     }
 
     if (BKG_model == "Gaussian") {
-        BKG = new RooGaussian("gauss", "Background gaussian", m, BKG_mean, BKG_sigma);
+        BKG = new RooGaussian("gauss", "Background gaussian", *m, BKG_mean, BKG_sigma);
         sigYield = new RooRealVar("sigYieldGauss", "N_{sig}", 50000, 0., 100000000);
         bkgYield = new RooRealVar("bkgYieldGauss", "N_{bkg}", 1000000, 0., 1000000000);
     }
 
     if (BKG_model == "Exponential") {
-        BKG = new RooExponential("BKG","Power background", m, exp0);
+        BKG = new RooExponential("BKG","Power background", *m, exp0);
         sigYield = new RooRealVar("sigYieldExp", "N_{sig}", 5000, 0., 100000000);
         bkgYield = new RooRealVar("bkgYieldExp", "N_{bkg}", 10000000, 0., 1000000000);
     }
 
-    RooAbsPdf* BKG;
-}
-*/
+
+    ws.import(*BKG);
+    ws.import(*bkgYield);
+
+
+} // void defBkgModel()
+
+
+void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
+
+
+    // Add signal and background models
+    RooAbsPdf *model = new RooAddPdf(Form("model_Pt_%.0f_%.0f", ptMin, ptMax), "combined mass model", 
+                                {ws.pdf("doubleSidedCB"), ws.pdf("BKG")}, {ws.var("sigYield"), ws.var("bkgYield")});
+    ws.import(*model);
+
+
+} // defCombinedModel
+
+
+void fitModelToData(RooWorkspace &ws, TH1 *data, std::string BKG_model) {
+
+
+    // Start iterative fitting (only for Chebychev)
+    // Release orders one-by-one as long as reduced χ2 is above desired value
+    Double_t chi2M = -1.; // arbitrary starting value
+    if (BKG_model == "Chebychev") {
+        for (Int_t i = 0; i < parameters.size(); i++) {
+            if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
+                frame = nullptr;
+                parameters[i]->setConstant(kFALSE);
+                model->fitTo(*data, Range("fitRange"),Extended(kTRUE),Verbose(kFALSE));
+                frame = m->frame();
+                data->plotOn(frame, MarkerSize(0.4),Range("fitRange"));
+                model->plotOn(frame, LineColor(kBlue), Name("full_Model"),Range("fitRange"));
+                chi2M = frame->chiSquare();
+                std::cout << "chi2M = " << chi2M << std::endl;
+            }
+            else { break; }
+            if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout << "WARNING. Fitting failed. No convergence" << std::endl; }
+        }
+    }
+
+
+    RooHist *hpull = frame->pullHist();
+
+
+} // void fitModelToData()
+
+
 
 
 
