@@ -278,6 +278,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
 // run macro with root -l 'DiMuonmassSpectrum.C(Double_t ptMin, Double_t ptMax)'
 int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
 
+
     RooWorkspace wspace{"myWS"};
 
     TH1D *hist = getTree("AnalysisResultsDiMuons.root",ptMin,ptMax);
@@ -288,7 +289,10 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
     fitModelToData(wspace,hist,"Chebychev",ptMin,ptMax);
     drawPlots(wspace,hist,ptMin,ptMax);
 
+
     return 0;
+
+
 }
 
 TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
@@ -303,7 +307,7 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     TList *subListDiMuon;
     TH2F *hMass_Pt;
     
-    TFile* fDiMuon = new TFile(fileName, "READ");
+    TFile* fDiMuon = new TFile(fileName,"READ");
     listDiMuon = (THashList*)fDiMuon->Get("analysis-same-event-pairing/output");
     subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
     hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
@@ -317,7 +321,7 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     TH1D *hDiMuonMass_PtCut;
     
     hMass_Pt = (TH2F*)hMass_Pt->Clone();
-    hMass_Pt->GetYaxis()->SetRangeUser(ptMin, ptMax);
+    hMass_Pt->GetYaxis()->SetRangeUser(ptMin,ptMax);
     hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
 
 
@@ -336,19 +340,21 @@ void defSigModel(RooWorkspace &ws) {
     m->setRange("fitRange",mMin,mMax);
 
     // Crystal Ball for mass signal
-    RooRealVar m0("m0", "Mean", 3.097, 3.05, 3.13);
-    RooRealVar sigma("sigma", "Sigma of Gaussian", 0.08, 0.05, 0.12);
-    RooRealVar alphaL("alphaL", "Alpha Left", 0.883, 0.5, 3.0);
+    RooRealVar m0("m0","Mean",3.097,3.05,3.13);
+    RooRealVar sigma("sigma","Sigma of Gaussian",0.08,0.05,0.12);
+    RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
-    RooRealVar nL("nL", "Exponent Left", 9.940, 5.0, 20.0); 
+    RooRealVar nL("nL","Exponent Left",9.940,5.0,20.0); 
     nL.setConstant();
-    RooRealVar alphaR("alphaR", "Alpha Right", 1.832, 1.0, 3.0);
+    RooRealVar alphaR("alphaR","Alpha Right",1.832,1.0,3.0);
     alphaR.setConstant();
-    RooRealVar nR("nR", "Exponent Right", 15.323, 5.0, 25.0);  
+    RooRealVar nR("nR","Exponent Right",15.323,5.0,25.0);  
     nR.setConstant();
     
     RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB","Double Sided Crystal Ball",
                                                        *m,m0,sigma,alphaL,nL,alphaR,nR);
+
+
     ws.import(*m);
     ws.import(*doubleSidedCB);
     
@@ -367,18 +373,18 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
 	// RooExponential* BKG = new RooExponential("BKG","Power background", m, a0);
 
     // Initiallise Chebychev
-    RooRealVar a0("a0", "a_{0}", -0.01, -2.0, 2.0);
-    RooRealVar a1("a1", "a_{1}", -0.01, -1.0, 1.0);
-    RooRealVar a2("a2", "a_{2}", -0.01, -0.5, 0.5);
-    RooRealVar a3("a3", "a_{3}", 0.0, -0.5, 0.5);
-    RooRealVar a4("a4", "a_{4}", 0.0, -0.3, 0.3);
-    RooRealVar a5("a5", "a_{5}", 0.0, -0.3, 0.3);
-    RooRealVar a6("a6", "a_{6}", 0.0, -0.1, 0.1);
-    RooRealVar a7("a7", "a_{7}", 0.0, -0.05, 0.05);
+    RooRealVar a0("a0","a_{0}",-0.01,-2.0,2.0);
+    RooRealVar a1("a1","a_{1}",-0.01,-1.0,1.0);
+    RooRealVar a2("a2","a_{2}",-0.01,-0.5,0.5);
+    RooRealVar a3("a3","a_{3}",0.0,-0.5,0.5);
+    RooRealVar a4("a4","a_{4}",0.0,-0.3,0.3);
+    RooRealVar a5("a5","a_{5}",0.0,-0.3,0.3);
+    RooRealVar a6("a6","a_{6}",0.0,-0.1,0.1);
+    RooRealVar a7("a7","a_{7}",0.0,-0.05,0.05);
 
     // Initialise a Gaussian for background
-    RooRealVar BKG_mean("BKG_mean", "Mean of background Gaussian", 2.5, 0., 10);
-    RooRealVar BKG_sigma("BKG_sigma", "Sigma of background Gaussian", 1.7, 0., 2.5);
+    RooRealVar BKG_mean("BKG_mean","Mean of background Gaussian",2.5,0.,10);
+    RooRealVar BKG_sigma("BKG_sigma","Sigma of background Gaussian",1.7,0.,2.5);
     
     // Initialise an exponential for background
     RooRealVar exp0("exp0","exp_{0}",-1,-5,0.001);
@@ -387,23 +393,25 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
     RooRealVar *bkgYield;
     RooRealVar *sigYield;
 
+
     if (BKG_model == "Chebychev") {
-        BKG = new RooChebychev("BKG","Chebyshev background", *m, {a0,a1,a2,a3,a4,a5,a6,a7});
-        sigYield = new RooRealVar("sigYield", "N_{sig}", 2000, 0., 10000000);
-        bkgYield = new RooRealVar("bkgYield", "N_{bkg}", 150000, 0., 100000000);
+        BKG = new RooChebychev("BKG","Chebyshev background",*m,{a0,a1,a2,a3,a4,a5,a6,a7});
+        sigYield = new RooRealVar("sigYield","N_{sig}",2000,0.,10000000);
+        bkgYield = new RooRealVar("bkgYield","N_{bkg}",150000,0.,100000000);
     }
 
     if (BKG_model == "Gaussian") {
-        BKG = new RooGaussian("BKG", "Background gaussian", *m, BKG_mean, BKG_sigma);
-        sigYield = new RooRealVar("sigYield", "N_{sig}", 50000, 0., 100000000);
-        bkgYield = new RooRealVar("bkgYield", "N_{bkg}", 1000000, 0., 1000000000);
+        BKG = new RooGaussian("BKG","Background gaussian",*m,BKG_mean,BKG_sigma);
+        sigYield = new RooRealVar("sigYield","N_{sig}",50000,0.,100000000);
+        bkgYield = new RooRealVar("bkgYield","N_{bkg}",1000000,0.,1000000000);
     }
 
     if (BKG_model == "Exponential") {
-        BKG = new RooExponential("BKG","Power background", *m, exp0);
-        sigYield = new RooRealVar("sigYield", "N_{sig}", 5000, 0., 100000000);
-        bkgYield = new RooRealVar("bkgYield", "N_{bkg}", 10000000, 0., 1000000000);
+        BKG = new RooExponential("BKG","Power background",*m,exp0);
+        sigYield = new RooRealVar("sigYield","N_{sig}",5000,0.,100000000);
+        bkgYield = new RooRealVar("bkgYield","N_{bkg}",10000000,0.,1000000000);
     }
+
 
     // Add parameters to the workspace
     // This step is necessary for the iterative fitting later
@@ -415,7 +423,6 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
     ws.import(a5);
     ws.import(a6);
     ws.import(a7);
-
     // Add models
     ws.import(*BKG);
     ws.import(*sigYield);
@@ -430,7 +437,9 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
 
     // Add signal and background models
     RooAbsPdf *model = new RooAddPdf("model", "combined mass model", 
-                                {*ws.pdf("doubleSidedCB"), *ws.pdf("BKG")}, {*ws.var("sigYield"), *ws.var("bkgYield")});
+                                {*ws.pdf("doubleSidedCB"),*ws.pdf("BKG")},{*ws.var("sigYield"),*ws.var("bkgYield")});
+
+
     ws.import(*model);
 
 
@@ -439,11 +448,12 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
 
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax) {
 
+
     RooRealVar *m = ws.var("m");
     Double_t mMin = m->getMin("fitRange");
     Double_t mMax = m->getMax("fitRange");
-    m->setRange("fitRange", mMin, mMax);
-    RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", ptMin, ptMax), "Di-muon spectrum", *m, Import(*hist));
+    m->setRange("fitRange",mMin,mMax);
+    RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f",ptMin,ptMax),"Di-muon spectrum",*m,Import(*hist));
     RooAbsPdf *model = ws.pdf("model");
     RooPlot *frame;
 
@@ -472,15 +482,15 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
             if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
                 frame = nullptr;
                 parameters[i]->setConstant(kFALSE);
-                model->fitTo(*data, Range("fitRange"),Extended(kTRUE),Verbose(kFALSE));
+                model->fitTo(*data,Range("fitRange"),Extended(kTRUE),Verbose(kFALSE));
                 frame = m->frame();
-                data->plotOn(frame, MarkerSize(0.4),Range("fitRange"));
-                model->plotOn(frame, LineColor(kBlue), Name("full_Model"),Range("fitRange"));
+                data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
+                model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
                 chi2M = frame->chiSquare();
-                std::cout << "chi2M = " << chi2M << std::endl;
+                std::cout<<"chi2M = "<<chi2M<<std::endl;
             }
             else { break; }
-            if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout << "WARNING. Fitting failed. No convergence" << std::endl; }
+            if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout<<"WARNING. Fitting failed. No convergence"<<std::endl; }
         }
     }
 
@@ -488,7 +498,8 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
     // Pull needs to be calculated before more fitting is done
     // (so that it is calculated with respect to the correct model)
     RooHist *hpull = frame->pullHist();
-    RooRealVar chi2Var("chi2M", "Chi-squared value", chi2M, -1., 1e6);
+    RooRealVar chi2Var("chi2M", "Chi-squared value",chi2M,-1.,1e6);
+
 
     ws.import(*hpull);
     ws.import(chi2Var);
@@ -505,14 +516,14 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     RooRealVar *m = ws.var("m");
     Double_t mMin = m->getMin("fitRange");
     Double_t mMax = m->getMax("fitRange");
-    m->setRange("fitRange", mMin, mMax);
+    m->setRange("fitRange",mMin,mMax);
     
     RooAbsPdf *doubleSidedCB = ws.pdf("doubleSidedCB");
     RooAbsPdf *BKG = ws.pdf("BKG");
     RooAbsPdf *model = ws.pdf("model");
     RooRealVar *sigYield = ws.var("sigYield");
     RooRealVar *bkgYield = ws.var("bkgYield");
-    RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f", ptMin, ptMax), "Di-muon spectrum", *m, Import(*hist));
+    RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f",ptMin,ptMax),"Di-muon spectrum",*m,Import(*hist));
 
 
     // RooPlot *frame = dynamic_cast<RooPlot*>(ws.obj("frame"));
@@ -521,13 +532,13 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     TGraphErrors *hpull = calculatePullHist(m,hist,model,sigYield,bkgYield);
 
 
-    data->plotOn(frame, MarkerSize(0.4),Range("fitRange"));
-    model->plotOn(frame, LineColor(kBlue), Name("full_Model"),Range("fitRange"));
+    data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
+    model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
     
 
-    TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f", ptMin, ptMax), 
-                                  Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f", ptMin, ptMax),
-                                  800, 600);
+    TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
+                                  Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",ptMin,ptMax),
+                                  800,600);
     canvas->cd();
     
     model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
@@ -543,15 +554,15 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
 
-    TLegend *legend = new TLegend(0.6, 0.7, 0.82, 0.8);
+    TLegend *legend = new TLegend(0.6,0.7,0.82,0.8);
     legend->SetTextSize(0.03);
-    legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", ptMin, ptMax), "");
-    legend->AddEntry(frame->getObject(0), "Data", "point");
-    legend->AddEntry(frame->getObject(1), Form("#chi^{2}/ndf = %.2f", ws.var("chi2M")->getVal()), "l");
-    legend->AddEntry("", Form("signal/background = %.3f", calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
-    legend->AddEntry("", Form("significance = %.2f", calculateSignificance(m, doubleSidedCB,BKG,model,sigYield,bkgYield)), "");
+    legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
+    legend->AddEntry(frame->getObject(0),"Data","point");
+    legend->AddEntry(frame->getObject(1),Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"l");
+    legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    legend->AddEntry("",Form("significance = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
-    legend->AddEntry("", Form("hand-made #chi^{2}/ndf = %.2f", calculateChi2(m,hist,model,sigYield,bkgYield)/ndf), "");
+    legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
     legend->Draw();
     // check output
     std::cout<<"chi2/ndf by machine = "<<ws.var("chi2M")->getVal()<<std::endl;
@@ -567,9 +578,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
    
-    TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f", ptMin, ptMax), 
-                                  Form("Pull canvas %.0f < p_{T} < %.0f", ptMin, ptMax),
-                                  800, 600);
+    TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
+                                  Form("Pull canvas %.0f < p_{T} < %.0f",ptMin,ptMax),
+                                  800,600);
     // Create a new frame to draw the pull distribution and add the distribution to the frame
     // RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
     // frame_pull->addPlotable(hpull, "P");
