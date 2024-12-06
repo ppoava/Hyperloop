@@ -275,19 +275,18 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
 
-int DiMuonMassSpectrum() {
+// run macro with root -l 'DiMuonmassSpectrum.C(Double_t ptMin, Double_t ptMax)'
+int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
 
     RooWorkspace wspace{"myWS"};
 
-    // getTree("AnalysisResultsDiMuons.root",0.,2.);
-    // getTree("AnalysisResultsDiMuons.root",3.,4.);
-    TH1D *hist = getTree("AnalysisResultsDiMuons.root",5.,30.);
+    TH1D *hist = getTree("AnalysisResultsDiMuons.root",ptMin,ptMax);
 
     defSigModel(wspace);
-    defBkgModel(wspace,"Chebychev",5.,30.);
-    defCombinedModel(wspace,5.,30.);
-    fitModelToData(wspace,hist,"Chebychev",5.,30.);
-    drawPlots(wspace,hist,5.,30.);
+    defBkgModel(wspace,"Chebychev",ptMin,ptMax);
+    defCombinedModel(wspace,ptMin,ptMax);
+    fitModelToData(wspace,hist,"Chebychev",ptMin,ptMax);
+    drawPlots(wspace,hist,ptMin,ptMax);
 
     return 0;
 }
@@ -518,7 +517,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
 
     // RooPlot *frame = dynamic_cast<RooPlot*>(ws.obj("frame"));
     RooPlot *frame = m->frame();
-    RooHist *hpull = dynamic_cast<RooHist*>(ws.obj("hpull"));
+    // RooHist *hpull = dynamic_cast<RooHist*>(ws.obj("hpull"));
+    TGraphErrors *hpull = calculatePullHist(m,hist,model,sigYield,bkgYield);
 
 
     data->plotOn(frame, MarkerSize(0.4),Range("fitRange"));
@@ -571,11 +571,11 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
                                   Form("Pull canvas %.0f < p_{T} < %.0f", ptMin, ptMax),
                                   800, 600);
     // Create a new frame to draw the pull distribution and add the distribution to the frame
-    RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
-    frame_pull->addPlotable(hpull, "P");
+    // RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
+    // frame_pull->addPlotable(hpull, "P");
     pullCanvas->cd();
     hpull->Draw();
-    frame_pull->Draw();
+    // frame_pull->Draw();
     
 
 } // void drawPlots()
