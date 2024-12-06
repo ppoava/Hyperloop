@@ -10,6 +10,7 @@
 #include "TH2F.h"
 #include "THashList.h"
 #include "TList.h"
+#include "TPaveText.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "RooRealVar.h"
@@ -341,7 +342,7 @@ void defSigModel(RooWorkspace &ws) {
 
     // Crystal Ball for mass signal
     RooRealVar m0("m0","Mean",3.097,3.05,3.13);
-    RooRealVar sigma("sigma","Sigma of Gaussian",0.08,0.05,0.12);
+    RooRealVar sigma("sigma","#sigma",0.08,0.05,0.12);
     RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
     RooRealVar nL("nL","Exponent Left",9.940,5.0,20.0); 
@@ -543,8 +544,21 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     
     model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
    	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
-   	model->paramOn(frame,ShowConstants(true),Format("TE",AutoPrecision(3)));
+   	model->paramOn(frame,ShowConstants(false),Format("TE",AutoPrecision(3)));
     frame->Draw();
+
+    // Beautify the box displaying the parameters
+    TPaveText* paramsBox = (TPaveText*)frame->findObject("model_paramBox");
+    paramsBox->SetTextSize(0.02);
+    paramsBox->SetX1NDC(0.70); // Left
+    paramsBox->SetY1NDC(0.45); // Bottom
+    paramsBox->SetX2NDC(0.95); // Right
+    paramsBox->SetY2NDC(0.90); // Top
+    std::cout << "TPaveText found with coordinates: "
+              << paramsBox->GetX1NDC() << ", "
+              << paramsBox->GetY1NDC() << ", "
+              << paramsBox->GetX2NDC() << ", "
+              << paramsBox->GetY2NDC() << std::endl;
 
 
     // alternative chi2 method
