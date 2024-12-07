@@ -13,6 +13,8 @@
 #include "TPaveText.h"
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "TPad.h"
+
 #include "RooRealVar.h"
 #include "RooDataHist.h"
 #include "RooHist.h"
@@ -276,6 +278,7 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
 
+
 // run macro with root -l 'DiMuonmassSpectrum.C(Double_t ptMin, Double_t ptMax)'
 int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
 
@@ -294,7 +297,7 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
     return 0;
 
 
-}
+} // int DiMuonMassSpectrum()
 
 TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 
@@ -341,7 +344,7 @@ void defSigModel(RooWorkspace &ws) {
     m->setRange("fitRange",mMin,mMax);
 
     // Crystal Ball for mass signal
-    RooRealVar m0("m0","Mean",3.097,3.05,3.13);
+    RooRealVar m0("m0","#mu",3.097,3.05,3.13);
     RooRealVar sigma("sigma","#sigma",0.08,0.05,0.12);
     RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
@@ -533,32 +536,59 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     TGraphErrors *hpull = calculatePullHist(m,hist,model,sigYield,bkgYield);
 
 
-    data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
-    model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
+    
     
 
     TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
                                   Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",ptMin,ptMax),
                                   800,600);
     canvas->cd();
+
+    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.2, 1.0, 1.0); // x1, y1, x2, y2
+    megaPad->SetBottomMargin(0.01);
+    megaPad->SetTicks(1,1);
+    megaPad->Draw();
+    TPad* miniPad = new TPad("miniPad", "miniPad", 0.0, 0.0, 1.0, 0.2); // x1, y1, x2, y2
+    miniPad->SetTopMargin(0.01);
+    miniPad->SetTicks(1,1);
+    miniPad->Draw();
     
+    megaPad->cd();
+    data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
+    model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
     model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
    	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
    	model->paramOn(frame,ShowConstants(false),Format("TE",AutoPrecision(3)));
-    frame->Draw();
+    
+
 
     // Beautify the box displaying the parameters
     TPaveText* paramsBox = (TPaveText*)frame->findObject("model_paramBox");
-    paramsBox->SetTextSize(0.02);
+    paramsBox->SetTextSize(0.025);
+    paramsBox->SetTextFont(42);
+    // This part below doesn't work?
+    // ** //
     paramsBox->SetX1NDC(0.70); // Left
     paramsBox->SetY1NDC(0.45); // Bottom
     paramsBox->SetX2NDC(0.95); // Right
     paramsBox->SetY2NDC(0.90); // Top
+    // ** //
     std::cout << "TPaveText found with coordinates: "
               << paramsBox->GetX1NDC() << ", "
               << paramsBox->GetY1NDC() << ", "
               << paramsBox->GetX2NDC() << ", "
               << paramsBox->GetY2NDC() << std::endl;
+    paramsBox->Draw();
+
+
+    // Beautify the canvas and frame
+    frame->SetTitle("J/#psi invariant mass plot");
+    frame->SetMaximum(1.4*frame->GetMaximum());
+
+
+
+
+    frame->Draw();
 
 
     // alternative chi2 method
@@ -568,15 +598,16 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
 
-    TLegend *legend = new TLegend(0.6,0.7,0.82,0.8);
-    legend->SetTextSize(0.03);
+    TLegend *legend = new TLegend(0.30,0.70,0.65,0.88);
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.025);
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
     legend->AddEntry(frame->getObject(0),"Data","point");
     legend->AddEntry(frame->getObject(1),Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"l");
-    legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
-    legend->AddEntry("",Form("significance = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
     legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
+    legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    legend->AddEntry("",Form("significance = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->Draw();
     // check output
     std::cout<<"chi2/ndf by machine = "<<ws.var("chi2M")->getVal()<<std::endl;
@@ -592,15 +623,12 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
    
-    TCanvas* pullCanvas = new TCanvas(Form("pull_canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
-                                  Form("Pull canvas %.0f < p_{T} < %.0f",ptMin,ptMax),
-                                  800,600);
-    // Create a new frame to draw the pull distribution and add the distribution to the frame
-    // RooPlot *frame_pull = m->frame(Title("Pull Distribution"));
-    // frame_pull->addPlotable(hpull, "P");
-    pullCanvas->cd();
+    miniPad->cd();
+    Double_t factor = 4.0;
+    hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
+    hpull->GetXaxis()->SetLabelSize(factor*frame->GetXaxis()->GetLabelSize());
+    hpull->GetYaxis()->SetLabelSize(factor*frame->GetYaxis()->GetLabelSize());
     hpull->Draw();
-    // frame_pull->Draw();
     
 
 } // void drawPlots()
