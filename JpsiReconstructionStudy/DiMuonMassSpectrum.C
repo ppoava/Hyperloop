@@ -544,12 +544,12 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
                                   800,600);
     canvas->cd();
 
-    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.2, 1.0, 1.0); // x1, y1, x2, y2
-    megaPad->SetBottomMargin(0.01);
+    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.2, 1.0, 1.0);
+    megaPad->SetBottomMargin(1e-3);
     megaPad->SetTicks(1,1);
     megaPad->Draw();
-    TPad* miniPad = new TPad("miniPad", "miniPad", 0.0, 0.0, 1.0, 0.2); // x1, y1, x2, y2
-    miniPad->SetTopMargin(0.01);
+    TPad* miniPad = new TPad("miniPad", "miniPad", 0.0, 0.0, 1.0, 0.2);
+    miniPad->SetTopMargin(1e-3);
     miniPad->SetTicks(1,1);
     miniPad->Draw();
     
@@ -584,8 +584,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     // Beautify the canvas and frame
     frame->SetTitle("J/#psi invariant mass plot");
     frame->SetMaximum(1.4*frame->GetMaximum());
-
-
+    frame->GetXaxis()->SetTitle("");
+    frame->GetXaxis()->SetLabelSize(0);
 
 
     frame->Draw();
@@ -625,9 +625,13 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
    
     miniPad->cd();
     Double_t factor = 4.0;
+    hpull->SetTitle("");
+    hpull->GetYaxis()->SetTitle("pull");
+    hpull->GetYaxis()->SetTitleSize(factor*frame->GetYaxis()->GetTitleSize());
+    hpull->GetYaxis()->SetTitleOffset(0.35);
+    hpull->GetYaxis()->SetLabelSize(factor*frame->GetYaxis()->GetLabelSize());
     hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
     hpull->GetXaxis()->SetLabelSize(factor*frame->GetXaxis()->GetLabelSize());
-    hpull->GetYaxis()->SetLabelSize(factor*frame->GetYaxis()->GetLabelSize());
     hpull->Draw();
     
 
