@@ -204,24 +204,26 @@ Double_t calculateChi2(RooRealVar *observable, TH1 *data, RooAbsPdf *model,
 TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *model,
                                 RooRealVar *sigYield, RooRealVar *bkgYield) {
 
+
     Double_t mMin = observable->getMin();
     Double_t mMax = observable->getMax();
     data->GetXaxis()->SetRangeUser(mMin,mMax);
+    std::cout<<"pullHist range = "<<"["<<mMin<<","<<mMax<<"]"<<std::endl;
 
     // Number of bins in the input histogram
     // Int_t nBins = data->GetNbinsX();
     Int_t nBinsOld = data->GetNbinsX();
     Double_t xMin = data->GetXaxis()->GetXmin();
     Double_t xMax = data->GetXaxis()->GetXmax();
-    Double_t binWidth = (xMax - xMin) / nBinsOld;
-    Int_t nBins = static_cast<Int_t>((mMax - mMin) / binWidth);
+    Double_t binWidth = (xMax-xMin)/nBinsOld;
+    Int_t nBins = static_cast<Int_t>((mMax-mMin)/binWidth);
 
     // data->Scale(1.0 / data->Integral(data->FindBin(mMin),data->FindBin(mMax)));
 
     std::vector<Double_t> xVals;
     std::vector<Double_t> yVals;
     std::vector<Double_t> xErrors(data->GetNbinsX(),0);
-    std::vector<Double_t> yErrors(data->GetNbinsX(),0);     
+    std::vector<Double_t> yErrors(data->GetNbinsX(),0);
 
     for (Int_t i = data->FindBin(mMin); i <= data->FindBin(mMax); ++i) {
         Double_t dataValue = data->GetBinContent(i);
@@ -542,14 +544,20 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
                                   Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",ptMin,ptMax),
                                   800,600);
+    canvas->SetBottomMargin(0);
     canvas->cd();
 
-    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.2, 1.0, 1.0);
-    megaPad->SetBottomMargin(1e-3);
+    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.4, 1.0, 1.0); // 0.3
+    megaPad->SetRightMargin(0.05);
+    megaPad->SetBottomMargin(0.10); // 1e-3
+    megaPad->SetLeftMargin(0.10);
     megaPad->SetTicks(1,1);
     megaPad->Draw();
-    TPad* miniPad = new TPad("miniPad", "miniPad", 0.0, 0.0, 1.0, 0.2);
+    TPad* miniPad = new TPad("miniPad", "miniPad", 0.0, 0.0, 1.0, 0.3);
     miniPad->SetTopMargin(1e-3);
+    miniPad->SetRightMargin(0.05);
+    miniPad->SetBottomMargin(0.40);
+    miniPad->SetLeftMargin(0.10);
     miniPad->SetTicks(1,1);
     miniPad->Draw();
     
@@ -564,14 +572,14 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
 
     // Beautify the box displaying the parameters
     TPaveText* paramsBox = (TPaveText*)frame->findObject("model_paramBox");
-    paramsBox->SetTextSize(0.025);
+    paramsBox->SetTextSize(0.04);
     paramsBox->SetTextFont(42);
     // This part below doesn't work?
     // ** //
-    paramsBox->SetX1NDC(0.70); // Left
-    paramsBox->SetY1NDC(0.45); // Bottom
-    paramsBox->SetX2NDC(0.95); // Right
-    paramsBox->SetY2NDC(0.90); // Top
+    paramsBox->SetX1NDC(0.70);
+    paramsBox->SetY1NDC(0.45);
+    paramsBox->SetX2NDC(0.95);
+    paramsBox->SetY2NDC(0.90);
     // ** //
     std::cout << "TPaveText found with coordinates: "
               << paramsBox->GetX1NDC() << ", "
@@ -583,9 +591,10 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
 
     // Beautify the canvas and frame
     frame->SetTitle("J/#psi invariant mass plot");
+    frame->SetMinimum(1e-1);
     frame->SetMaximum(1.4*frame->GetMaximum());
     frame->GetXaxis()->SetTitle("");
-    frame->GetXaxis()->SetLabelSize(0);
+    frame->GetXaxis()->SetLabelSize(0.035); // 0
 
 
     frame->Draw();
@@ -598,9 +607,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
 
-    TLegend *legend = new TLegend(0.30,0.70,0.65,0.88);
+    TLegend *legend = new TLegend(0.25,0.70,0.65,0.88);
     legend->SetBorderSize(0);
-    legend->SetTextSize(0.025);
+    legend->SetTextSize(0.04);
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
     legend->AddEntry(frame->getObject(0),"Data","point");
     legend->AddEntry(frame->getObject(1),Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"l");
@@ -624,14 +633,20 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
 
    
     miniPad->cd();
-    Double_t factor = 4.0;
+    Double_t factor = 3.33;
     hpull->SetTitle("");
     hpull->GetYaxis()->SetTitle("pull");
     hpull->GetYaxis()->SetTitleSize(factor*frame->GetYaxis()->GetTitleSize());
     hpull->GetYaxis()->SetTitleOffset(0.35);
-    hpull->GetYaxis()->SetLabelSize(factor*frame->GetYaxis()->GetLabelSize());
+    hpull->GetYaxis()->SetLabelSize(0.8*factor*frame->GetYaxis()->GetLabelSize());
+    hpull->SetMaximum(3.9);
+    //
+    hpull->GetXaxis()->SetTitle("mass [GeV/c^2]");
+    hpull->GetXaxis()->SetTitleSize(factor*frame->GetXaxis()->GetTitleSize());
+    hpull->GetXaxis()->SetTitleOffset(1.5);
+    hpull->GetXaxis()->SetLabelOffset(0.08);
     hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
-    hpull->GetXaxis()->SetLabelSize(factor*frame->GetXaxis()->GetLabelSize());
+    hpull->GetXaxis()->SetLabelSize(factor*0.035);
     hpull->Draw();
     
 
