@@ -14,6 +14,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TPad.h"
+#include "TLine.h"
 
 #include "RooRealVar.h"
 #include "RooDataHist.h"
@@ -49,7 +50,7 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
-    // observable->setRange("signalRange", rangeMin, rangeMax);
+    observable->setRange("signalRange", rangeMin, rangeMax);
 
     /*
     // This method was implemented for bug fixing
@@ -112,11 +113,11 @@ Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, Roo
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
     double rangeMax = mean->getVal() + 3 * sigma->getVal();
-   double rangeFullMin = observable->getMin();
-   double rangeFullMax = observable->getMax();
+    // double rangeFullMin = observable->getMin();
+    // double rangeFullMax = observable->getMax();
     std::cout<<"integration range = ["<<rangeMin<<","<<rangeMax<<"]"<<std::endl;
     observable->setRange("signalRange", rangeMin, rangeMax);
-    observable->setRange("fullRange",rangeFullMin,rangeFullMax);
+    // observable->setRange("fullRange",rangeFullMin,rangeFullMax);
     
 
     // Should it be normalised to the whole 'model' in the range?
@@ -306,6 +307,7 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
 
 
 } // int DiMuonMassSpectrum()
+
 
 TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 
@@ -621,7 +623,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     legend->AddEntry(frame->getObject(1),Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"l");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
     legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
-    // legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->AddEntry("",Form("significance = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->Draw();
     // check output
@@ -654,6 +656,13 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
     hpull->GetXaxis()->SetLabelSize(factor*0.035);
     hpull->Draw();
+
+    // FIX THIS
+    TLine *line1 = new TLine(miniPad->GetUxmin(), -1, miniPad->GetUxmax(), -1);
+    TLine *line2 = new TLine(miniPad->GetUxmin(), 1, miniPad->GetUxmax(), 1);
+    line1->Draw();
+    line2->Draw();
+    miniPad->Update();
     
 
 } // void drawPlots()
