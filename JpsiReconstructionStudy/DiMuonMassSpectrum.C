@@ -35,6 +35,14 @@
 using namespace RooFit;
 
 
+// From tutorial to make output less crowded: why doesn't it work?
+/*
+RooMsgService::instance().getStream(1).removeTopic(Minimization);
+RooMsgService::instance().getStream(1).removeTopic(Fitting);
+RooMsgService::instance().getStream(1).removeTopic(Generation);
+*/
+
+
 void Print(const char *name, Double_t value) {
     std::cout<<Form("%s = ", name)<<value<<std::endl;
 }
@@ -410,7 +418,7 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
 
     if (BKG_model == "Chebychev") {
         BKG = new RooChebychev("BKG","Chebyshev background",*m,{a0,a1,a2,a3,a4,a5,a6,a7});
-        sigYield = new RooRealVar("sigYield","N_{sig}",2000,0.,10000000);
+        sigYield = new RooRealVar("sigYield","N_{sig}",20000,0.,10000000);
         bkgYield = new RooRealVar("bkgYield","N_{bkg}",150000,0.,100000000);
     }
 
@@ -496,7 +504,8 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
             if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
                 frame = nullptr;
                 parameters[i]->setConstant(kFALSE);
-                model->fitTo(*data,Range("fitRange"),Extended(kTRUE),Verbose(kFALSE));
+                // IntegrateBins(1e-3): integrate per bin?
+                model->fitTo(*data,Range("fitRange"),PrintLevel(-1),Extended(kTRUE),Verbose(kFALSE));
                 frame = m->frame();
                 data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
                 model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
@@ -555,9 +564,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     canvas->SetBottomMargin(0);
     canvas->cd();
 
-    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.4, 1.0, 1.0); // 0.3
+    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.3, 1.0, 1.0);
     megaPad->SetRightMargin(0.05);
-    megaPad->SetBottomMargin(0.10); // 1e-3
+    megaPad->SetBottomMargin(1e-3);
     megaPad->SetLeftMargin(0.10);
     megaPad->SetTicks(1,1);
     megaPad->Draw();
@@ -600,9 +609,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     // Beautify the canvas and frame
     frame->SetTitle("J/#psi invariant mass plot");
     frame->SetMinimum(1e-1);
-    frame->SetMaximum(1.4*frame->GetMaximum());
+    frame->SetMaximum(1.5*frame->GetMaximum());
     frame->GetXaxis()->SetTitle("");
-    frame->GetXaxis()->SetLabelSize(0.035); // 0
+    frame->GetXaxis()->SetLabelSize(0);
 
 
     frame->Draw();
@@ -615,7 +624,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
 
-    TLegend *legend = new TLegend(0.25,0.70,0.65,0.88);
+    TLegend *legend = new TLegend(0.38,0.60,0.62,0.88);
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
@@ -623,8 +632,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     legend->AddEntry(frame->getObject(1),Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"l");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
     legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
-    legend->AddEntry("",Form("signal/background = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
-    legend->AddEntry("",Form("significance = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    legend->AddEntry("",Form("S/B (3#sigma) = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    legend->AddEntry("",Form("S/#sqrt{S+B} (3#sigma) = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->Draw();
     // check output
     std::cout<<"chi2/ndf by machine = "<<ws.var("chi2M")->getVal()<<std::endl;
@@ -647,23 +656,32 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     hpull->GetYaxis()->SetTitleSize(factor*frame->GetYaxis()->GetTitleSize());
     hpull->GetYaxis()->SetTitleOffset(0.35);
     hpull->GetYaxis()->SetLabelSize(0.8*factor*frame->GetYaxis()->GetLabelSize());
-    hpull->SetMaximum(3.9);
+    hpull->GetYaxis()->SetTickLength(frame->GetYaxis()->GetTickLength());
     //
     hpull->GetXaxis()->SetTitle("mass [GeV/c^2]");
     hpull->GetXaxis()->SetTitleSize(factor*frame->GetXaxis()->GetTitleSize());
     hpull->GetXaxis()->SetTitleOffset(1.5);
     hpull->GetXaxis()->SetLabelOffset(0.08);
-    hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
+    // hpull->GetXaxis()->SetTickLength(factor*frame->GetXaxis()->GetTickLength());
     hpull->GetXaxis()->SetLabelSize(factor*0.035);
+    hpull->GetXaxis()->SetRangeUser(frame->GetXaxis()->GetXmin(),frame->GetXaxis()->GetXmax());
+    hpull->GetXaxis()->SetTickLength(frame->GetXaxis()->GetTickLength());
     hpull->Draw();
 
     // FIX THIS
-    TLine *line1 = new TLine(miniPad->GetUxmin(), -1, miniPad->GetUxmax(), -1);
-    TLine *line2 = new TLine(miniPad->GetUxmin(), 1, miniPad->GetUxmax(), 1);
+    TLine *line1 = new TLine(frame->GetXaxis()->GetXmin(),-1,frame->GetXaxis()->GetXmax(),-1);
+    TLine *line2 = new TLine(frame->GetXaxis()->GetXmin(),1,frame->GetXaxis()->GetXmax(),1);
+    line1->SetLineWidth(3);
+    line1->SetLineColor(kRed);
+    //
+    line2->SetLineWidth(3);
+    line2->SetLineColor(kRed);
     line1->Draw();
     line2->Draw();
-    miniPad->Update();
+    // miniPad->Update();
     
+    // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
+    // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.png",ptMin,ptMax));
 
 } // void drawPlots()
 
