@@ -302,6 +302,13 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
 
     TH1D *hist = getTree("AnalysisResultsDiMuons.root",ptMin,ptMax);
 
+
+    Double_t mMin = 2.5;
+    Double_t mMax = 4.5;
+    RooRealVar *m = new RooRealVar("m","M_{#mu^{+}#mu^{-}}",mMin,mMax,"GeV/c2");
+    wspace.import(*m);
+
+
     defSigModel(wspace);
     defBkgModel(wspace,"Chebychev",ptMin,ptMax);
     defCombinedModel(wspace,ptMin,ptMax);
@@ -354,10 +361,11 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 void defSigModel(RooWorkspace &ws) {
 
 
-    Double_t mMin = 2.5;
-    Double_t mMax = 4.5;
-    RooRealVar *m = new RooRealVar("m","M_{#mu^{+}#mu^{-}}",mMin,mMax,"GeV/c2");
+    RooRealVar *m = ws.var("m");
+    Double_t mMin = m->getMin("fitRange");
+    Double_t mMax = m->getMax("fitRange");
     m->setRange("fitRange",mMin,mMax);
+
 
     // Crystal Ball for mass signal
     RooRealVar m0("m0","#mu",3.097,3.05,3.13);
@@ -370,10 +378,10 @@ void defSigModel(RooWorkspace &ws) {
     alphaR.setConstant();
     RooRealVar nR("nR","Exponent Right",15.323,5.0,25.0);  
     nR.setConstant();
+
     
     RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB","Double Sided Crystal Ball",
                                                        *m,m0,sigma,alphaL,nL,alphaR,nR);
-
 
     ws.import(*m);
     ws.import(*doubleSidedCB);
