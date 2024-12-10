@@ -2,3 +2,5 @@
 *.tar
 **/*.root
 **/*.tar
+*.pdf
+*.png
