@@ -11,7 +11,7 @@ for ptMin in "${ptMinValues[@]}"; do
         # Only execute if ptMax is greater than ptMin
         if (( ptMax > ptMin )); then
             echo "Running ROOT for ptMin=$ptMin and ptMax=$ptMax"
-            root -l -q "DiMuonMassSpectrum.C($ptMin, $ptMax)"
+            root -l -q -b "DiMuonMassSpectrum.C($ptMin, $ptMax)"
         fi
     done
 done
