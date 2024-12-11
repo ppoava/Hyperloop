@@ -483,7 +483,8 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
     m->setRange("fitRange",mMin,mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f",ptMin,ptMax),"Di-muon spectrum",*m,Import(*hist));
     RooAbsPdf *model = ws.pdf("model");
-    RooPlot *frame;
+    RooRealVar *sigYield = ws.var("sigYield");
+    RooRealVar *bkgYield = ws.var("bkgYield");
 
 
     // Retreive Chebyshev parameters
@@ -502,6 +503,7 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
     for (auto& param : parameters) { param->setConstant(kTRUE); }
 
 
+    /*
     // Start iterative fitting (only for Chebychev)
     // Release orders one-by-one as long as reduced χ2 is above desired value
     Double_t chi2M = -1.; // arbitrary starting value
@@ -511,10 +513,10 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
                 frame = nullptr;
                 parameters[i]->setConstant(kFALSE);
                 // IntegrateBins(1e-3): integrate per bin?
-                model->fitTo(*data,Range("fitRange"),NormRange("fitRange"),PrintLevel(-1),Extended(kTRUE),Verbose(kFALSE));
+                model->fitTo(*data,Range("fitRange"),PrintLevel(-1),Extended(kTRUE),Verbose(kFALSE));
                 frame = m->frame();
-                data->plotOn(frame,MarkerSize(0.4),Range("fitRange"),NormRange("fitRange"));
-                model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"),NormRange("fitRange"));
+                data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
+                model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
                 chi2M = frame->chiSquare();
                 std::cout<<"chi2M = "<<chi2M<<std::endl;
             }
@@ -522,15 +524,33 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
             if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout<<"WARNING. Fitting failed. No convergence"<<std::endl; }
         }
     }
+    */
 
+
+   // Alternative approach that prevents drawing frames every iteration
+   Double_t chi2M = -1.; // arbitrary starting value
+   Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
+    if (BKG_model == "Chebychev") {
+        for (Int_t i = 0; i < parameters.size(); i++) {
+            if (chi2M < 0. || chi2M > 2. || std::isnan(chi2M)) {
+                parameters[i]->setConstant(kFALSE);
+                // IntegrateBins(1e-3): integrate per bin?
+                model->fitTo(*data,Range("fitRange"),PrintLevel(-1),Extended(kTRUE),Verbose(kFALSE));
+                chi2M = calculateChi2(m,hist,model,sigYield,bkgYield)/ndf;
+                std::cout<<"chi2New = "<<chi2M<<std::endl;
+            }
+            else { break; }
+            if (i == 7 && (chi2M < 0. || chi2M > 2.)) { std::cout<<"WARNING. Fitting failed. No convergence"<<std::endl; }
+        }
+    }
 
     // Pull needs to be calculated before more fitting is done
     // (so that it is calculated with respect to the correct model)
-    RooHist *hpull = frame->pullHist();
+    // RooHist *hpull = frame->pullHist();
     RooRealVar chi2Var("chi2M", "Chi-squared value",chi2M,-1.,1e6);
 
 
-    ws.import(*hpull);
+    // ws.import(*hpull);
     ws.import(chi2Var);
     // ws.import(*frame);
 
@@ -582,10 +602,10 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     miniPad->Draw();
     
     megaPad->cd();
-    data->plotOn(frame,MarkerSize(0.4),Range("fitRange"),NormRange("fitRange"));
-    model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"),NormRange("fitRange"));
-    model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"),NormRange("fitRange"));
-   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"),NormRange("fitRange"));
+    data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
+    model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
+    model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
+   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"));
    	model->paramOn(frame,ShowConstants(false),Format("TE",AutoPrecision(3)));
     
 
