@@ -587,9 +587,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     canvas->SetBottomMargin(0);
     canvas->cd();
 
-    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.3, 1.0, 1.0);
+    TPad* megaPad = new TPad("megaPad", "megaPad", 0.0, 0.4, 1.0, 1.0); // 0.3
     megaPad->SetRightMargin(0.05);
-    megaPad->SetBottomMargin(1e-3);
+    megaPad->SetBottomMargin(0.10); // 1e-3
     megaPad->SetLeftMargin(0.10);
     megaPad->SetTicks(1,1);
     megaPad->Draw();
@@ -605,7 +605,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
     model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
     model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
-   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"));
+   	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
    	model->paramOn(frame,ShowConstants(false),Format("TE",AutoPrecision(3)));
     
 
@@ -633,7 +633,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     frame->SetMinimum(1e-1);
     frame->SetMaximum(1.5*frame->GetMaximum());
     frame->GetXaxis()->SetTitle("");
-    frame->GetXaxis()->SetLabelSize(0);
+    frame->GetXaxis()->SetLabelSize(0.035); // 0
 
 
     frame->Draw();
