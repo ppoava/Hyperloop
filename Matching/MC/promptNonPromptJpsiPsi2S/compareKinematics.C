@@ -55,6 +55,7 @@ TH1D *hDiMuonMass_PtCut;
 hMass_Pt = (TH2F*)hMass_Pt->Clone();
 hMass_Pt->GetYaxis()->SetRangeUser(ptMin,ptMax);
 hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
+hDiMuonMass_PtCut->GetXaxis()->SetRangeUser(0,8); // plot only relevant mass range
 
 
 return hDiMuonMass_PtCut;
@@ -66,7 +67,7 @@ return hDiMuonMass_PtCut;
 TCanvas* plotHist(TH1D *hNonPrompt, TH1D *hPrompt) {
 
 
-    TCanvas *canvas;
+    TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 600);
     canvas->cd();
     hNonPrompt->Draw("HIST E");
 
