@@ -81,7 +81,27 @@ return hist;
 } // getHistFromTree()
 
 
-TCanvas* plotHist(TH1D *hNonPrompt, TH1D *hPrompt) {
+// VtxZ taken from analysis-event-selection is the PV -- doesn't tell you anything about prompt/non-prompt
+// Why does the 'vertexing' option on hyperloop not give you the dimuon production vertex?
+TH1D* getVertexHistFromTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
+
+
+THashList *list;
+TList *subList;
+TFile *fDiMuon = new TFile(fileName,"READ");
+list = (THashList*)fDiMuon->Get("analysis-event-selection/output");
+subList = (TList*)list->FindObject("Event_AfterCuts");
+
+TH1D *hist = (TH1D*)subList->FindObject("VtxZ");
+
+
+return hist;
+
+
+} // getVertexHistFromTree()
+
+
+TCanvas* plotHist(const char* canvasName, TH1D *hNonPrompt, TH1D *hPrompt) {
 
 
     hNonPrompt->Scale(1/hNonPrompt->GetEntries());
@@ -89,7 +109,7 @@ TCanvas* plotHist(TH1D *hNonPrompt, TH1D *hPrompt) {
     hPrompt->Scale(1/hPrompt->GetEntries());
 
 
-    TCanvas *canvas = new TCanvas("canvas", "canvas", 800, 600);
+    TCanvas *canvas = new TCanvas(Form("%s",canvasName), Form("%s",canvasName), 800, 600);
     canvas->cd();
     hPrompt->Draw("HIST E");
     hNonPrompt->Draw("SAME HIST E");
@@ -115,8 +135,13 @@ int compareKinematics() {
 
     TH1D *hNonPrompt = getHistFromTree("/Users/pv280546/alice/nonPromptJpsiTest_AnalysisResults-3.root", 0, 30);
     TH1D *hPrompt = getHistFromTree("/Users/pv280546/alice/promptJpsiTest_AnalysisResults-3.root", 0, 30);
-    TCanvas *canvas = plotHist(hNonPrompt, hPrompt);
-    canvas->Draw();
+    TCanvas *canvasKinematics = plotHist("kinematics", hNonPrompt, hPrompt);
+    canvasKinematics->Draw();
+
+    TH1D *hVtxZNonPrompt = getVertexHistFromTree("/Users/pv280546/alice/nonPromptJpsiTest_AnalysisResults-3.root", 0, 30);
+    TH1D *hVtxZPrompt = getVertexHistFromTree("/Users/pv280546/alice/promptJpsiTest_AnalysisResults-3.root", 0, 30);
+    TCanvas *canvasVtxZ = plotHist("vtxz", hVtxZNonPrompt, hVtxZPrompt);
+    canvasVtxZ->Draw();
 
 
     return 0;
