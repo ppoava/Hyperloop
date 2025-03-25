@@ -289,7 +289,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
 
 
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
+int DiMuonMassSpectrumJpsiAndY(Double_t ptMin, Double_t ptMax) {
 
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -320,7 +320,7 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
     return 0;
 
 
-} // int DiMuonMassSpectrum()
+} // int DiMuonMassSpectrumJpsiAndY()
 
 
 TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
