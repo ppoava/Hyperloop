@@ -301,11 +301,11 @@ int DiMuonMassSpectrumJpsiAndY(Double_t ptMin, Double_t ptMax) {
     RooWorkspace wspace{"myWS"};
 
 
-    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_no_realignment.root",ptMin,ptMax);
+    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_moremerges.root",ptMin,ptMax);
 
 
-    Double_t mMin = 2.5;
-    Double_t mMax = 4.5;
+    Double_t mMin = 8; // 2.5
+    Double_t mMax = 12; // 10.5
     RooRealVar *m = new RooRealVar("m","M_{#mu^{+}#mu^{-}}",mMin,mMax,"GeV/c2");
     wspace.import(*m);
 
@@ -340,7 +340,9 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     // NAME DEPENDS ON CUT USED
     // PairsMuonSEPM_muonLowPt510SigmaPDCA
     // PairsMuonSEPM_muonQualityCuts
-    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonQualityCuts");
+    // For Jpsi: PairsMuonSEPM_muonLowPt510SigmaPDCA
+    // For Y(1S): PairsMuonSEPM_muonLowPt610SigmaPDCA
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt610SigmaPDCA");
     hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
 
 
@@ -354,6 +356,10 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     hMass_Pt = (TH2F*)hMass_Pt->Clone();
     hMass_Pt->GetYaxis()->SetRangeUser(ptMin,ptMax);
     hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
+
+    TCanvas *canvasPlot = new TCanvas("plot","plot",800,600);
+    canvasPlot->cd();
+    hDiMuonMass_PtCut->Draw("hist");
 
 
     return hDiMuonMass_PtCut;
@@ -606,6 +612,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     miniPad->Draw();
     
     megaPad->cd();
+    gPad->SetLogy();
     data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
     model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
     model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));

@@ -288,8 +288,16 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
 void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
 
 
+struct JpsiValues {
+    double JpsiWidth;
+    double JpsiPeak;
+    double JpsiWidthError;
+    double JpsiPeakError;
+};
+
+
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
+JpsiValues CalculateJpsiWidth(Double_t ptMin, Double_t ptMax) {
 
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -301,7 +309,7 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
     RooWorkspace wspace{"myWS"};
 
 
-    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_no_realignment.root",ptMin,ptMax);
+    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_no_realignment_moremerges.root",ptMin,ptMax);
 
 
     Double_t mMin = 2.5;
@@ -317,10 +325,64 @@ int DiMuonMassSpectrum(Double_t ptMin, Double_t ptMax) {
     drawPlots(wspace,hist,ptMin,ptMax);
 
 
+    JpsiValues JpsiValues;
+    double JpsiWidth = wspace.var("sigma")->getVal();
+    double JpsiPeak = wspace.var("m0")->getVal();
+    double JpsiWidthError = wspace.var("sigma")->getError();
+    double JpsiPeakError = wspace.var("m0")->getError();
+    JpsiValues.JpsiWidth = JpsiWidth;
+    JpsiValues.JpsiPeak = JpsiPeak;
+    JpsiValues.JpsiWidthError = JpsiWidthError;
+    JpsiValues.JpsiPeakError = JpsiPeakError;
+    return JpsiValues;
+
+
+} // int CalculateJpsiWidth()
+
+
+// Function is necessary to draw the pT dependence of the Jpsi widths
+int DiMuonMassSpectrum() {
+
+
+    // Low statistics at high pT
+    std::vector<std::pair<double, double>> ptBins = {
+        {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}
+    };
+
+    int nBins = ptBins.size();
+    TH1D *hWidths = new TH1D("hWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
+    TH1D *hPeaks = new TH1D("hPeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
+
+    // Loop through bins and calculate Jpsi width
+    for (int i = 0; i < nBins; i++) {
+        double width = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiWidth;
+        double peak = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiPeak;
+        double widthError = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiWidthError;
+        double peakError = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiPeakError;
+        hWidths->SetBinContent(i + 1, width);
+        hWidths->SetBinError(i + 1, widthError);
+        hWidths->GetXaxis()->SetBinLabel(i + 1, Form("%.0f-%.0f", ptBins[i].first, ptBins[i].second));
+        hPeaks->SetBinContent(i + 1, peak);
+        hPeaks->SetBinError(i + 1, peakError);
+        hPeaks->GetXaxis()->SetBinLabel(i + 1, Form("%.0f-%.0f", ptBins[i].first, ptBins[i].second));
+    }
+
+    TCanvas *canvasJpsiWidths = new TCanvas("hJpsiWidths", "hJpsiWidths", 800, 600);
+    canvasJpsiWidths->cd();
+    hWidths->SetStats(0);
+    hWidths->Draw("PE");
+    TCanvas *canvasJpsiPeaks = new TCanvas("hJpsiPeaks", "hJpsiPeaks", 800, 600);
+    canvasJpsiPeaks->cd();
+    hPeaks->SetStats(0);
+    hPeaks->Draw("PE");
+
+
     return 0;
 
 
-} // int DiMuonMassSpectrum()
+}
 
 
 TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
@@ -340,7 +402,9 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     // NAME DEPENDS ON CUT USED
     // PairsMuonSEPM_muonLowPt510SigmaPDCA
     // PairsMuonSEPM_muonQualityCuts
-    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonQualityCuts");
+    // For Jpsi: PairsMuonSEPM_muonLowPt510SigmaPDCA
+    // For Y(1S): PairsMuonSEPM_muonLowPt610SigmaPDCA
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
     hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
 
 
