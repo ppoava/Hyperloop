@@ -285,7 +285,7 @@ void defSigModel(RooWorkspace &ws);
 void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
-void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax);
+void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin, Double_t ptMax);
 
 
 struct JpsiValues {
@@ -297,7 +297,7 @@ struct JpsiValues {
 
 
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-JpsiValues CalculateJpsiWidth(Double_t ptMin, Double_t ptMax) {
+JpsiValues CalculateJpsiWidth(const char* treeName, Double_t ptMin, Double_t ptMax) {
 
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -309,7 +309,7 @@ JpsiValues CalculateJpsiWidth(Double_t ptMin, Double_t ptMax) {
     RooWorkspace wspace{"myWS"};
 
 
-    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_no_realignment_moremerges.root",ptMin,ptMax);
+    TH1D *hist = getTree(treeName,ptMin,ptMax);
 
 
     Double_t mMin = 2.5;
@@ -322,7 +322,7 @@ JpsiValues CalculateJpsiWidth(Double_t ptMin, Double_t ptMax) {
     defBkgModel(wspace,"Chebychev",ptMin,ptMax);
     defCombinedModel(wspace,ptMin,ptMax);
     fitModelToData(wspace,hist,"Chebychev",ptMin,ptMax);
-    drawPlots(wspace,hist,ptMin,ptMax);
+    drawPlots(wspace,hist,treeName,ptMin,ptMax);
 
 
     JpsiValues JpsiValues;
@@ -344,6 +344,13 @@ JpsiValues CalculateJpsiWidth(Double_t ptMin, Double_t ptMax) {
 int DiMuonMassSpectrum() {
 
 
+    std::vector<const char*> vTreeNames;
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_no_realignment_18_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_globalShiftY_18_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_18_04_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_18_04_2025_Hyperloop.root");
+
+
     // Low statistics at high pT
     std::vector<std::pair<double, double>> ptBins = {
         {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}
@@ -355,28 +362,59 @@ int DiMuonMassSpectrum() {
     TH1D *hPeaks = new TH1D("hPeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               nBins, 0, nBins);
 
-    // Loop through bins and calculate Jpsi width
-    for (int i = 0; i < nBins; i++) {
-        double width = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiWidth;
-        double peak = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiPeak;
-        double widthError = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiWidthError;
-        double peakError = CalculateJpsiWidth(ptBins[i].first, ptBins[i].second).JpsiPeakError;
-        hWidths->SetBinContent(i + 1, width);
-        hWidths->SetBinError(i + 1, widthError);
-        hWidths->GetXaxis()->SetBinLabel(i + 1, Form("%.0f-%.0f", ptBins[i].first, ptBins[i].second));
-        hPeaks->SetBinContent(i + 1, peak);
-        hPeaks->SetBinError(i + 1, peakError);
-        hPeaks->GetXaxis()->SetBinLabel(i + 1, Form("%.0f-%.0f", ptBins[i].first, ptBins[i].second));
-    }
+    TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
+    TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
 
-    TCanvas *canvasJpsiWidths = new TCanvas("hJpsiWidths", "hJpsiWidths", 800, 600);
-    canvasJpsiWidths->cd();
-    hWidths->SetStats(0);
-    hWidths->Draw("PE");
-    TCanvas *canvasJpsiPeaks = new TCanvas("hJpsiPeaks", "hJpsiPeaks", 800, 600);
-    canvasJpsiPeaks->cd();
-    hPeaks->SetStats(0);
-    hPeaks->Draw("PE");
+    TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
+    globalCanvasJpsiWidths->cd(); 
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.11);
+    hTemplateWidths->Draw("PE");
+    TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
+    globalCanvasJpsiPeaks->cd();
+    hTemplatePeaks->GetYaxis()->SetRangeUser(3.08, 3.13);
+    hTemplatePeaks->Draw("PE");
+
+
+    // Loop through different geometries
+    for (int i = 0; i < vTreeNames.size(); i++) {
+        const char *treeName = vTreeNames[i];
+        // Loop through bins and calculate Jpsi width
+        for (int j = 0; j < nBins; j++) {
+            double width = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidth;
+            double peak = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiPeak;
+            double widthError = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidthError;
+            double peakError = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiPeakError;
+            hWidths->SetBinContent(j + 1, width);
+            hWidths->SetBinError(j + 1, widthError);
+            hWidths->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+            hPeaks->SetBinContent(j + 1, peak);
+            hPeaks->SetBinError(j + 1, peakError);
+            hPeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+        }
+    
+        TCanvas *canvasJpsiWidths = new TCanvas(Form("cJpsiWidths_%s", treeName), Form("cJpsiWidths_%s", treeName), 800, 600);
+        canvasJpsiWidths->cd();
+        hWidths->SetStats(0);
+        hWidths->Draw("PE");
+        globalCanvasJpsiWidths->cd();
+        hWidths->Draw("same PE");
+        TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", treeName), Form("cJpsiPeaks_%s", treeName), 800, 600);
+        canvasJpsiPeaks->cd();
+        hPeaks->SetStats(0);
+        hPeaks->Draw("PE");
+        globalCanvasJpsiPeaks->cd();
+        hPeaks->Draw("PE");
+
+        // Save all outputs
+        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
+        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
+        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
+        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
+
+        CalculateJpsiWidth(treeName, 0, 30);
+    }
 
 
     return 0;
@@ -626,7 +664,7 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
 } // void fitModelToData()
 
 
-void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
+void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin, Double_t ptMax) {
 
 
     // Collect everything from workspace  
@@ -649,7 +687,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     TGraphErrors *hpull = calculatePullHist(m,hist,model,sigYield,bkgYield);
     
 
-    TCanvas* canvas = new TCanvas(Form("canvas_Pt_%.0f_%.0f",ptMin,ptMax), 
+    TCanvas* canvas = new TCanvas(Form("%s_canvas_Pt_%.0f_%.0f",treeName,ptMin,ptMax), 
                                   Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",ptMin,ptMax),
                                   800,600);
     canvas->SetBottomMargin(0);
@@ -772,6 +810,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     // miniPad->Update();
     
 
+    // Save outputs
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.png",ptMin,ptMax));
 
