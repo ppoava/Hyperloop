@@ -357,10 +357,6 @@ int DiMuonMassSpectrum() {
     };
 
     int nBins = ptBins.size();
-    TH1D *hWidths = new TH1D("hWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
-    TH1D *hPeaks = new TH1D("hPeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
 
     TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               nBins, 0, nBins);
@@ -380,6 +376,10 @@ int DiMuonMassSpectrum() {
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++) {
         const char *treeName = vTreeNames[i];
+        TH1D *hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
+        TH1D *hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              nBins, 0, nBins);
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++) {
             double width = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidth;
