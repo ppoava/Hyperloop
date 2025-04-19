@@ -350,6 +350,7 @@ int DiMuonMassSpectrum() {
     vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_18_04_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_18_04_2025_Hyperloop.root");
 
+    std::vector<Int_t> vLineColours = {1, 2, 3, 4};
 
     // Low statistics at high pT
     std::vector<std::pair<double, double>> ptBins = {
@@ -363,6 +364,9 @@ int DiMuonMassSpectrum() {
     TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               nBins, 0, nBins);
 
+    TH1D *hWidths;
+    TH1D *hPeaks;
+
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
     globalCanvasJpsiWidths->cd(); 
     hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.11);
@@ -372,13 +376,16 @@ int DiMuonMassSpectrum() {
     hTemplatePeaks->GetYaxis()->SetRangeUser(3.08, 3.13);
     hTemplatePeaks->Draw("PE");
 
+    TLegend *legendWidths = new TLegend(0.2, 0.4);
+    TLegend *legendPeaks = new TLegend(0.2, 0.4);
+
 
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++) {
         const char *treeName = vTreeNames[i];
-        TH1D *hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+        hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               nBins, 0, nBins);
-        TH1D *hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+        hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               nBins, 0, nBins);
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++) {
@@ -398,23 +405,40 @@ int DiMuonMassSpectrum() {
         canvasJpsiWidths->cd();
         hWidths->SetStats(0);
         hWidths->Draw("PE");
+
         globalCanvasJpsiWidths->cd();
+        hWidths->SetLineColor(vLineColours[i]);
         hWidths->Draw("same PE");
+        legendWidths->AddEntry(hWidths, treeName, "l");
+        legendWidths->Draw();
+
         TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", treeName), Form("cJpsiPeaks_%s", treeName), 800, 600);
         canvasJpsiPeaks->cd();
         hPeaks->SetStats(0);
         hPeaks->Draw("PE");
+
         globalCanvasJpsiPeaks->cd();
+        hPeaks->SetLineColor(vLineColours[i]);
         hPeaks->Draw("PE");
+        legendWidths->AddEntry(hPeaks, treeName, "l");
 
         // Save all outputs
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
         // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
         // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
+        canvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.pdf");
+        canvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.png");
+        canvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.pdf");
+        canvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.png");
 
         CalculateJpsiWidth(treeName, 0, 30);
     }
+
+    globalCanvasJpsiWidths->cd();
+    legendWidths->Draw();
+    globalCanvasJpsiPeaks->cd();
+    legendPeaks->Draw();
 
 
     return 0;
@@ -760,7 +784,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     legend->AddEntry(frame->getObject(1),"Full model","l");
     legend->AddEntry("",Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
-    legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
+    // legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
     legend->AddEntry("",Form("S/B (3#sigma) = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->AddEntry("",Form("S/#sqrt{S+B} (3#sigma) = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
     legend->Draw();
