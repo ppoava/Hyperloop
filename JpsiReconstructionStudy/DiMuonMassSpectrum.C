@@ -350,30 +350,47 @@ int DiMuonMassSpectrum() {
     vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_18_04_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_18_04_2025_Hyperloop.root");
 
-    std::vector<Int_t> vLineColours = {1, 2, 3, 4};
+    std::vector<Int_t> vLineColours = {1, 2, 4, 6};
+    std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // Low statistics at high pT
     std::vector<std::pair<double, double>> ptBins = {
-        {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}
+        {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}, {12, 20}
     };
 
-    int nBins = ptBins.size();
+    // Used for variable binning
+    std::vector<double> binEdges;
+    for (const auto& bin : ptBins) {
+        binEdges.push_back(bin.first);
+    }
+    binEdges.push_back(ptBins.back().second);  // Add last upper edge
+    int nBins = binEdges.size() - 1;
+    // 
 
-    TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
-    TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
+    // int nBins = ptBins.size();
+
+    // TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                                // nBins, 0, nBins);
+    // TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                                // nBins, 0, nBins);
+    TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}", 
+                                nBins, binEdges.data());
+    TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}", 
+                                nBins, binEdges.data());
+
 
     TH1D *hWidths;
     TH1D *hPeaks;
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
     globalCanvasJpsiWidths->cd(); 
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.11);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.15);
+    hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
     globalCanvasJpsiPeaks->cd();
-    hTemplatePeaks->GetYaxis()->SetRangeUser(3.08, 3.13);
+    hTemplatePeaks->GetYaxis()->SetRangeUser(3.05, 3.14);
+    hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
 
     TLegend *legendWidths = new TLegend(0.2, 0.4);
@@ -383,10 +400,15 @@ int DiMuonMassSpectrum() {
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++) {
         const char *treeName = vTreeNames[i];
-        hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
-        hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
-                              nBins, 0, nBins);
+        // hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              // nBins, 0, nBins);
+        // hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
+                              // nBins, 0, nBins);
+        hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+                   nBins, binEdges.data());
+        hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+                   nBins, binEdges.data());
+
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++) {
             double width = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidth;
@@ -395,11 +417,17 @@ int DiMuonMassSpectrum() {
             double peakError = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiPeakError;
             hWidths->SetBinContent(j + 1, width);
             hWidths->SetBinError(j + 1, widthError);
-            hWidths->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+            // hWidths->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+            // hTemplateWidths->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
             hPeaks->SetBinContent(j + 1, peak);
             hPeaks->SetBinError(j + 1, peakError);
-            hPeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+            // hPeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
+            // hTemplatePeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
         }
+
+        // Correct bin labels
+        // hWidths->LabelsOption("h", "X");
+        // hPeaks->LabelsOption("h", "X");
     
         TCanvas *canvasJpsiWidths = new TCanvas(Form("cJpsiWidths_%s", treeName), Form("cJpsiWidths_%s", treeName), 800, 600);
         canvasJpsiWidths->cd();
@@ -409,8 +437,7 @@ int DiMuonMassSpectrum() {
         globalCanvasJpsiWidths->cd();
         hWidths->SetLineColor(vLineColours[i]);
         hWidths->Draw("same PE");
-        legendWidths->AddEntry(hWidths, treeName, "l");
-        legendWidths->Draw();
+        legendWidths->AddEntry(hWidths, vLegendEntries[i], "l");
 
         TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", treeName), Form("cJpsiPeaks_%s", treeName), 800, 600);
         canvasJpsiPeaks->cd();
@@ -419,18 +446,8 @@ int DiMuonMassSpectrum() {
 
         globalCanvasJpsiPeaks->cd();
         hPeaks->SetLineColor(vLineColours[i]);
-        hPeaks->Draw("PE");
-        legendWidths->AddEntry(hPeaks, treeName, "l");
-
-        // Save all outputs
-        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
-        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
-        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
-        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
-        canvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.pdf");
-        canvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.png");
-        canvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.pdf");
-        canvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.png");
+        hPeaks->Draw("same PE");
+        legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
 
         CalculateJpsiWidth(treeName, 0, 30);
     }
@@ -439,6 +456,16 @@ int DiMuonMassSpectrum() {
     legendWidths->Draw();
     globalCanvasJpsiPeaks->cd();
     legendPeaks->Draw();
+
+    // Save all outputs
+    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
+    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
+    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
+    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
+    globalCanvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.pdf");
+    globalCanvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.png");
+    globalCanvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.pdf");
+    globalCanvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.png");
 
 
     return 0;
