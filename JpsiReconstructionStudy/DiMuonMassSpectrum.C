@@ -311,9 +311,9 @@ JpsiValues CalculateJpsiWidth(const char* treeName, Double_t ptMin, Double_t ptM
 
     TH1D *hist = getTree(treeName,ptMin,ptMax);
 
-
-    Double_t mMin = 8.0;
-    Double_t mMax = 12.0;
+    // For Upsilon: 8, 12
+    Double_t mMin = 2.5;
+    Double_t mMax = 4.5;
     RooRealVar *m = new RooRealVar("m","M_{#mu^{+}#mu^{-}}",mMin,mMax,"GeV/c2");
     wspace.import(*m);
 
