@@ -341,7 +341,7 @@ JpsiValues CalculateJpsiWidth(const char* treeName, Double_t ptMin, Double_t ptM
 
 
 // Function is necessary to draw the pT dependence of the Jpsi widths
-int DiMuonMassSpectrum() {
+int DiMuonMassSpectrum_OnlyUpsilon() {
 
 
     std::vector<const char*> vTreeNames;
@@ -399,9 +399,8 @@ int DiMuonMassSpectrum() {
 
     // Low statistics at high pT
     std::vector<std::pair<double, double>> ptBins = {
-        {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}, {12, 20}
+        {0,20}
     };
-    // For Upsilon: {0,20}
 
     // Used for variable binning
     std::vector<double> binEdges;
@@ -439,7 +438,7 @@ int DiMuonMassSpectrum() {
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
     globalCanvasJpsiPeaks->cd();
-    hTemplatePeaks->GetYaxis()->SetRangeUser(3.03, 3.18);
+    hTemplatePeaks->GetYaxis()->SetRangeUser(9.0, 10.0);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
     lineJpsiPDG->Draw("same");
@@ -501,9 +500,6 @@ int DiMuonMassSpectrum() {
         hPeaks->SetLineColor(vLineColours[i]);
         hPeaks->Draw("same PE");
         legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
-
-        CalculateJpsiWidth(treeName, 0, 30);
-        // Don't do this for Upsilon
     }
 
     globalCanvasJpsiWidths->cd();
@@ -512,15 +508,14 @@ int DiMuonMassSpectrum() {
     legendPeaks->Draw();
 
     // Save all outputs
-    // For Upsilon: change output names
-    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
-    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
-    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
-    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
-    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.pdf", legendTitle));
-    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.png", legendTitle));
-    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.pdf", legendTitle));
-    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.png", legendTitle));
+    // canvasJpsiWidths->SaveAs(Form("Plots/%s_UpsilonWidths.pdf", treeName));
+    // canvasJpsiWidths->SaveAs(Form("Plots/%s_UpsilonWidths.png", treeName));
+    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_UpsilonPeaks.pdf", treeName));
+    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_UpsilonPeaks.png", treeName));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasUpsilonWidths_%s.pdf", legendTitle));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasUpsilonWidths_%s.png", legendTitle));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasUpsilonPeaks_%s.pdf", legendTitle));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasUpsilonPeaks_%s.png", legendTitle));
 
 
     return 0;
@@ -580,8 +575,7 @@ void defSigModel(RooWorkspace &ws) {
 
 
     // Crystal Ball for mass signal
-    RooRealVar m0("m0","#mu",3.097,3.05,3.13);
-    // For Upsilon: RooRealVar m0("m0","#mu",9.46,9.40,9.52);
+    RooRealVar m0("m0","#mu",9.46,9.40,9.52);
     RooRealVar sigma("sigma","#sigma",0.08,0.05,0.12);
     RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
@@ -859,8 +853,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     */
 
 
-    TLegend *legend = new TLegend(0.38,0.60,0.62,0.88);
-    // For Upsilon: TLegend *legend = new TLegend(0.13,0.16,0.37,0.44);
+    TLegend *legend = new TLegend(0.13,0.16,0.37,0.44);
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
@@ -919,9 +912,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     
 
     // Save outputs
-    // For Upsilon: change name
-    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
-    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/UpsilonFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/UpsilonFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.png",ptMin,ptMax));
 

@@ -301,7 +301,7 @@ int DiMuonMassSpectrumJpsiAndY(Double_t ptMin, Double_t ptMax) {
     RooWorkspace wspace{"myWS"};
 
 
-    TH1D *hist = getTree("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_moremerges.root",ptMin,ptMax);
+    TH1D *hist = getTree("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_PbPb_values_22_04_2025_Hyperloop.root",ptMin,ptMax);
 
 
     Double_t mMin = 8; // 2.5
@@ -342,7 +342,7 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     // PairsMuonSEPM_muonQualityCuts
     // For Jpsi: PairsMuonSEPM_muonLowPt510SigmaPDCA
     // For Y(1S): PairsMuonSEPM_muonLowPt610SigmaPDCA
-    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt610SigmaPDCA");
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
     hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
 
 
@@ -378,7 +378,7 @@ void defSigModel(RooWorkspace &ws) {
 
 
     // Crystal Ball for mass signal
-    RooRealVar m0("m0","#mu",3.097,3.05,3.13);
+    RooRealVar m0("m0","#mu",9.46,9.40,9.52);
     RooRealVar sigma("sigma","#sigma",0.08,0.05,0.12);
     RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
@@ -657,7 +657,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, Double_t ptMin, Double_t ptMax) {
     */
 
 
-    TLegend *legend = new TLegend(0.38,0.60,0.62,0.88);
+    TLegend *legend = new TLegend(0.13,0.16,0.37,0.44);
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
