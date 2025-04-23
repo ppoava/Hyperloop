@@ -422,10 +422,10 @@ int DiMuonMassSpectrum_OnlyUpsilon() {
     TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}", 
                                 nBins, binEdges.data());
 
-    TLine* lineJpsiPDG = new TLine(binEdges.front(), 3.096, binEdges.back(), 3.096);
-    lineJpsiPDG->SetLineStyle(2);
-    lineJpsiPDG->SetLineColor(kGray+2);
-    lineJpsiPDG->SetLineWidth(2);
+    TLine* lineUpsilonPDG = new TLine(binEdges.front(), 9.46, binEdges.back(), 9.46);
+    lineUpsilonPDG->SetLineStyle(2);
+    lineUpsilonPDG->SetLineColor(kGray+2);
+    lineUpsilonPDG->SetLineWidth(2);
 
 
     TH1D *hWidths;
@@ -441,7 +441,7 @@ int DiMuonMassSpectrum_OnlyUpsilon() {
     hTemplatePeaks->GetYaxis()->SetRangeUser(9.0, 10.0);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
-    lineJpsiPDG->Draw("same");
+    lineUpsilonPDG->Draw("same");
 
     TLegend *legendWidths = new TLegend(0.2, 0.4);
     legendWidths->AddEntry((TObject*)0, legendTitle, "");

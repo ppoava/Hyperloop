@@ -424,6 +424,8 @@ int DiMuonMassSpectrum() {
                                 nBins, binEdges.data());
 
     TLine* lineJpsiPDG = new TLine(binEdges.front(), 3.096, binEdges.back(), 3.096);
+    // For Upsilon: TLine* lineUpsilonPDG = new TLine(binEdges.front(), 9.46, binEdges.back(), 9.46);
+    // and change names below
     lineJpsiPDG->SetLineStyle(2);
     lineJpsiPDG->SetLineColor(kGray+2);
     lineJpsiPDG->SetLineWidth(2);
@@ -442,6 +444,7 @@ int DiMuonMassSpectrum() {
     hTemplatePeaks->GetYaxis()->SetRangeUser(3.03, 3.18);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
+    // For Upsilon: change name here
     lineJpsiPDG->Draw("same");
 
     TLegend *legendWidths = new TLegend(0.2, 0.4);
