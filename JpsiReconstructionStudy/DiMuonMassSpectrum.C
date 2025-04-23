@@ -345,12 +345,56 @@ int DiMuonMassSpectrum() {
 
 
     std::vector<const char*> vTreeNames;
-    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_no_realignment_18_04_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_globalShiftY_18_04_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_18_04_2025_Hyperloop.root");
-    // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_18_04_2025_Hyperloop.root");
+    
+    /*
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_globalShiftY_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_javier_realignment_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_chi_realignment_pp_values_22_04_Hyperloop.root");
+    */
 
-    std::vector<Int_t> vLineColours = {1, 2, 4, 6};
+    
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_globalShiftY_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_javier_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_Hyperloop.root");
+    
+
+    /*
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_no_realignment_pp_values_18_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_globalShiftY_pp_values_18_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_pp_values_18_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_pp_values_18_04_2025_Hyperloop.root");
+    */
+    
+    /*
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_no_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_globalShiftY_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_javier_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_chi_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    */
+
+    /*
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_no_realignment_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_globalShiftY_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_javier_realignment_pp_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_chi_realignment_pp_values_22_04_2025_Hyperloop.root");
+    */
+
+    /*
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_no_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_globalShiftY_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_javier_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_2025_Hyperloop.root");
+    */
+
+    std::vector<Int_t> vLineColours = {1, 2, 4, 7};
+    // const char* legendTitle = "LHC24aq + ap pp-values";
+    const char* legendTitle = "LHC24aq + ap PbPb-values";
+    // const char* legendTitle = "LHC24aq pp-values";
+    // const char* legendTitle = "LHC24aq PbPb-values";
+    // const char* legendTitle = "LHC24ap pp-values";
+    // const char* legendTitle = "LHC24ap PbPb-values";
     std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // Low statistics at high pT
@@ -378,23 +422,31 @@ int DiMuonMassSpectrum() {
     TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}", 
                                 nBins, binEdges.data());
 
+    TLine* lineJpsiPDG = new TLine(binEdges.front(), 3.096, binEdges.back(), 3.096);
+    lineJpsiPDG->SetLineStyle(2);
+    lineJpsiPDG->SetLineColor(kGray+2);
+    lineJpsiPDG->SetLineWidth(2);
+
 
     TH1D *hWidths;
     TH1D *hPeaks;
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
     globalCanvasJpsiWidths->cd(); 
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.15);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.19);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
     globalCanvasJpsiPeaks->cd();
-    hTemplatePeaks->GetYaxis()->SetRangeUser(3.05, 3.14);
+    hTemplatePeaks->GetYaxis()->SetRangeUser(3.03, 3.18);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
+    lineJpsiPDG->Draw("same");
 
     TLegend *legendWidths = new TLegend(0.2, 0.4);
+    legendWidths->AddEntry((TObject*)0, legendTitle, "");
     TLegend *legendPeaks = new TLegend(0.2, 0.4);
+    legendPeaks->AddEntry((TObject*)0, legendTitle, "");
 
 
     // Loop through different geometries
@@ -462,10 +514,10 @@ int DiMuonMassSpectrum() {
     // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
     // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
     // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
-    globalCanvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.pdf");
-    globalCanvasJpsiWidths->SaveAs("Plots/globalCanvasJpsiWidths.png");
-    globalCanvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.pdf");
-    globalCanvasJpsiPeaks->SaveAs("Plots/globalCanvasJpsiPeaks.png");
+    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.pdf", legendTitle));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.png", legendTitle));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.pdf", legendTitle));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.png", legendTitle));
 
 
     return 0;
@@ -862,8 +914,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     
 
     // Save outputs
-    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
-    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
+    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
+    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.png",ptMin,ptMax));
 
