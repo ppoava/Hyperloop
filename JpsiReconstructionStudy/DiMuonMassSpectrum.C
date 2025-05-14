@@ -40,12 +40,12 @@ void Print(const char *name, Double_t value) {
 }
 
 Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *full_model, 
-                                  RooRealVar *sigYield, RooRealVar *bkgYield) {
+                                  RooRealVar *sigYield, RooRealVar *bkgYield, const std::string& meanName, const std::string& sigmaName) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
-    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find("m0"));
-    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
+    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find(meanName.c_str()));
+    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find(sigmaName.c_str()));
 
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
@@ -103,12 +103,12 @@ Double_t calculateSigOverBkgRatio(RooRealVar *observable, TH1 *data, RooAbsPdf *
 
 
 Double_t calculateSignificance(RooRealVar *observable, RooAbsPdf *SIG_model, RooAbsPdf *BKG_model, RooAbsPdf *full_model,
-                               RooRealVar *sigYield, RooRealVar *bkgYield) {
+                               RooRealVar *sigYield, RooRealVar *bkgYield, const std::string& meanName, const std::string& sigmaName) {
 
     
     RooArgSet* params = SIG_model->getParameters((RooArgSet*)0);
-    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find("m0"));
-    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find("sigma"));
+    RooRealVar* mean = dynamic_cast<RooRealVar*>(params->find(meanName.c_str()));
+    RooRealVar* sigma = dynamic_cast<RooRealVar*>(params->find(sigmaName.c_str()));
 
     // Integrate over mean +/- 3 sigma range
     double rangeMin = mean->getVal() - 3 * sigma->getVal();
@@ -285,7 +285,7 @@ void defSigModel(RooWorkspace &ws);
 void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
-void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin, Double_t ptMax);
+void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, const char* realignmentLabel, Double_t ptMin, Double_t ptMax);
 
 
 struct JpsiValues {
@@ -297,7 +297,7 @@ struct JpsiValues {
 
 
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-JpsiValues CalculateJpsiWidth(const char* treeName, Double_t ptMin, Double_t ptMax) {
+JpsiValues CalculateJpsiWidth(const char* treeName, const char* realignmentLabel, Double_t ptMin, Double_t ptMax) {
 
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -322,7 +322,7 @@ JpsiValues CalculateJpsiWidth(const char* treeName, Double_t ptMin, Double_t ptM
     defBkgModel(wspace,"Chebychev",ptMin,ptMax);
     defCombinedModel(wspace,ptMin,ptMax);
     fitModelToData(wspace,hist,"Chebychev",ptMin,ptMax);
-    drawPlots(wspace,hist,treeName,ptMin,ptMax);
+    drawPlots(wspace,hist,treeName,realignmentLabel,ptMin,ptMax);
 
 
     JpsiValues JpsiValues;
@@ -345,6 +345,14 @@ int DiMuonMassSpectrum() {
 
 
     std::vector<const char*> vTreeNames;
+
+    // vTreeNames.push_back("AnalysisResults_LHC24am_pass1_skimmed_no_realignment_27_04_2025_Hyperloop.root");
+
+    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_no_realignment_PbPb_values_01_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_globalShiftY_PbPb_values_07_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_CH1Bshift_new_PbPb_values_12_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_realignment_PbPb_values_01_05_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new_realignment_PbPb_values_12_05_2025_Hyperloop.root");
     
     /*
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_pp_values_22_04_2025_Hyperloop.root");
@@ -353,12 +361,12 @@ int DiMuonMassSpectrum() {
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_chi_realignment_pp_values_22_04_Hyperloop.root");
     */
 
-    
+    /*
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_PbPb_values_22_04_2025_Hyperloop.root");
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_globalShiftY_PbPb_values_22_04_2025_Hyperloop.root");
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_javier_realignment_PbPb_values_22_04_2025_Hyperloop.root");
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_Hyperloop.root");
-    
+    */
 
     /*
     vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_medium_no_realignment_pp_values_18_04_2025_Hyperloop.root");
@@ -388,14 +396,20 @@ int DiMuonMassSpectrum() {
     vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_2025_Hyperloop.root");
     */
 
-    std::vector<Int_t> vLineColours = {1, 2, 4, 7};
+    std::vector<Int_t> vLineColours = {1, 2, 8, 4, 7};
+    // const char* legendTitle = "comparison";
+    // const char* legendTitle = "AnalysisResults_LHC24am_pass1_skimmed";
+    const char* legendTitle = "LHC24an + am PbPb-values";
     // const char* legendTitle = "LHC24aq + ap pp-values";
-    const char* legendTitle = "LHC24aq + ap PbPb-values";
+    // const char* legendTitle = "LHC24aq + ap PbPb-values";
     // const char* legendTitle = "LHC24aq pp-values";
     // const char* legendTitle = "LHC24aq PbPb-values";
     // const char* legendTitle = "LHC24ap pp-values";
     // const char* legendTitle = "LHC24ap PbPb-values";
-    std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
+    // std::vector<const char*> vLegendEntries = {"reference skimmed", "reference ap medium"};
+    // std::vector<const char*> vLegendEntries = {"reference", "CH1B shift", "CH1B shift new", "Javier", "Javier new"};
+    std::vector<const char*> vLegendEntries = {"reference", "new geometry"};
+    // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // Low statistics at high pT
     std::vector<std::pair<double, double>> ptBins = {
@@ -436,21 +450,25 @@ int DiMuonMassSpectrum() {
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
     globalCanvasJpsiWidths->cd(); 
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.19);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.08, 0.16);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
     globalCanvasJpsiPeaks->cd();
-    hTemplatePeaks->GetYaxis()->SetRangeUser(3.03, 3.18);
+    hTemplatePeaks->GetYaxis()->SetRangeUser(3.06, 3.15);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
     // For Upsilon: change name here
     lineJpsiPDG->Draw("same");
 
-    TLegend *legendWidths = new TLegend(0.2, 0.4);
+    TLegend *legendWidths = new TLegend(0.4, 0.6, 0.6, 0.8);
+    legendWidths->SetBorderSize(0);
     legendWidths->AddEntry((TObject*)0, legendTitle, "");
-    TLegend *legendPeaks = new TLegend(0.2, 0.4);
+    legendWidths->SetTextSize(0.02);
+    TLegend *legendPeaks = new TLegend(0.4, 0.6, 0.6, 0.8);
+    legendPeaks->SetBorderSize(0);
     legendPeaks->AddEntry((TObject*)0, legendTitle, "");
+    legendPeaks->SetTextSize(0.02);
 
 
     // Loop through different geometries
@@ -467,10 +485,11 @@ int DiMuonMassSpectrum() {
 
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++) {
-            double width = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidth;
-            double peak = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiPeak;
-            double widthError = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiWidthError;
-            double peakError = CalculateJpsiWidth(treeName, ptBins[j].first, ptBins[j].second).JpsiPeakError;
+            JpsiValues JpsiValues = CalculateJpsiWidth(treeName, vLegendEntries[i], ptBins[j].first, ptBins[j].second);
+            double width = JpsiValues.JpsiWidth;
+            double peak = JpsiValues.JpsiPeak;
+            double widthError = JpsiValues.JpsiWidthError;
+            double peakError = JpsiValues.JpsiPeakError;
             hWidths->SetBinContent(j + 1, width);
             hWidths->SetBinError(j + 1, widthError);
             // hWidths->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
@@ -504,10 +523,16 @@ int DiMuonMassSpectrum() {
         hPeaks->SetLineColor(vLineColours[i]);
         hPeaks->Draw("same PE");
         legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
+        std::cout << "vLegendEntries[i] = " << vLegendEntries[i] << std::endl;
 
-        CalculateJpsiWidth(treeName, 0, 30);
-        // Don't do this for Upsilon
+        CalculateJpsiWidth(treeName, vLegendEntries[i], 0, 30);
+
+        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
+        // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
+        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
+        // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
     }
+
 
     globalCanvasJpsiWidths->cd();
     legendWidths->Draw();
@@ -516,10 +541,6 @@ int DiMuonMassSpectrum() {
 
     // Save all outputs
     // For Upsilon: change output names
-    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
-    // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
-    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.pdf", treeName));
-    // canvasJpsiPeaks->SaveAs(Form("Plots/%s_JpsiPeaks.png", treeName));
     globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.pdf", legendTitle));
     globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.png", legendTitle));
     globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.pdf", legendTitle));
@@ -581,26 +602,36 @@ void defSigModel(RooWorkspace &ws) {
     Double_t mMax = m->getMax("fitRange");
     m->setRange("fitRange",mMin,mMax);
 
-
     // Crystal Ball for mass signal
     RooRealVar m0("m0","#mu",3.097,3.05,3.13);
     // For Upsilon: RooRealVar m0("m0","#mu",9.46,9.40,9.52);
     RooRealVar sigma("sigma","#sigma",0.08,0.05,0.12);
+
+    // For psi(2s)
+    // RooRealVar m0_psi2S("m0_psi2S","#mu_{ψ(2S)}",3.686,3.65,3.72);
+    //RooRealVar sigma_psi2S("sigma_psi2S","#sigma_{ψ(2S)}",0.08,0.05,0.12); // TODO: multiply everything by 1.05
+    RooFormulaVar m0_psi2S("m0_psi2S", "#mu_{ψ(2S)}", "m0 + 0.589", RooArgList(m0));
+    RooFormulaVar sigma_psi2S("sigma_psi2S", "#sigma_{ψ(2S)}", "sigma * 1.05", RooArgList(sigma));
+
     RooRealVar alphaL("alphaL","Alpha Left",0.883,0.5,3.0);
     alphaL.setConstant();
-    RooRealVar nL("nL","Exponent Left",9.940,5.0,20.0); 
+    RooRealVar nL("nL","Exponent Left",9.4,5.0,20.0); 
     nL.setConstant();
     RooRealVar alphaR("alphaR","Alpha Right",1.832,1.0,3.0);
     alphaR.setConstant();
     RooRealVar nR("nR","Exponent Right",15.323,5.0,25.0);  
     nR.setConstant();
-
     
-    RooCrystalBall* doubleSidedCB = new RooCrystalBall("doubleSidedCB","Double Sided Crystal Ball",
-                                                       *m,m0,sigma,alphaL,nL,alphaR,nR);
+    RooCrystalBall* doubleSidedCB_jpsi = new RooCrystalBall("doubleSidedCB_jpsi","Double Sided Crystal Ball for Jpsi",
+                                                            *m,m0,sigma,alphaL,nL,alphaR,nR);
+    RooCrystalBall* doubleSidedCB_psi2S = new RooCrystalBall("doubleSidedCB_psi2S","Crystal Ball for psi(2S)",
+                                                             *m,m0_psi2S,sigma_psi2S,
+                                                             alphaL,nL,alphaR,nR);
+
 
     ws.import(*m);
-    ws.import(*doubleSidedCB);
+    ws.import(*doubleSidedCB_jpsi);
+    ws.import(*doubleSidedCB_psi2S);
     
 
 } // void defSigModel()
@@ -634,16 +665,20 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
     RooRealVar exp0("exp0","exp_{0}",-1,-5,0.001);
 
     // Select background model (all are initialised, one is picked)
-    RooRealVar *bkgYield;
+    RooRealVar *N_jpsi;
+    RooRealVar *N_psi2S;
     RooRealVar *sigYield;
+    RooRealVar *bkgYield;
 
 
     if (BKG_model == "Chebychev") {
         BKG = new RooChebychev("BKG","Chebyshev background",*m,{a0,a1,a2,a3,a4,a5,a6,a7});
-        sigYield = new RooRealVar("sigYield","N_{sig}",20000,0.,10000000);
+        N_jpsi = new RooRealVar("N_jpsi","N_{jpsi}",20000,0.,10000000);
+        N_psi2S = new RooRealVar("N_psi2S","N_{psi2S}",200,0.,100000);
         bkgYield = new RooRealVar("bkgYield","N_{bkg}",150000,0.,100000000);
     }
 
+    // TODO: add sigYields for jpsi and psi2S below
     if (BKG_model == "Gaussian") {
         BKG = new RooGaussian("BKG","Background gaussian",*m,BKG_mean,BKG_sigma);
         sigYield = new RooRealVar("sigYield","N_{sig}",50000,0.,100000000);
@@ -669,7 +704,8 @@ void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double
     ws.import(a7);
     // Add models
     ws.import(*BKG);
-    ws.import(*sigYield);
+    ws.import(*N_jpsi);
+    ws.import(*N_psi2S);
     ws.import(*bkgYield);
 
 
@@ -681,7 +717,8 @@ void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax) {
 
     // Add signal and background models
     RooAbsPdf *model = new RooAddPdf("model", "combined mass model", 
-                                {*ws.pdf("doubleSidedCB"),*ws.pdf("BKG")},{*ws.var("sigYield"),*ws.var("bkgYield")});
+                            RooArgList(*ws.pdf("doubleSidedCB_jpsi"), *ws.pdf("doubleSidedCB_psi2S"), *ws.pdf("BKG")),
+                            RooArgList(*ws.var("N_jpsi"), *ws.var("N_psi2S"), *ws.var("bkgYield")));
 
 
     ws.import(*model);
@@ -699,7 +736,10 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
     m->setRange("fitRange",mMin,mMax);
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f",ptMin,ptMax),"Di-muon spectrum",*m,Import(*hist));
     RooAbsPdf *model = ws.pdf("model");
-    RooRealVar *sigYield = ws.var("sigYield");
+    RooRealVar *N_jpsi = ws.var("N_jpsi");
+    RooRealVar *N_psi2S = ws.var("N_psi2S");
+    RooRealVar* sigYield = new RooRealVar("sigYield_real", "Total signal yield", 0);
+    sigYield->setVal(N_jpsi->getVal()+N_psi2S->getVal());
     RooRealVar *bkgYield = ws.var("bkgYield");
 
 
@@ -752,6 +792,7 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
                 parameters[i]->setConstant(kFALSE);
                 // IntegrateBins(1e-3): integrate per bin?
                 model->fitTo(*data,Range("fitRange"),PrintLevel(-1),Extended(kTRUE),Verbose(kFALSE));
+                sigYield->setVal(N_jpsi->getVal()+N_psi2S->getVal());
                 chi2M = calculateChi2(m,hist,model,sigYield,bkgYield)/ndf;
                 std::cout<<"chi2New = "<<chi2M<<std::endl;
             }
@@ -774,7 +815,7 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
 } // void fitModelToData()
 
 
-void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin, Double_t ptMax) {
+void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, const char* realignmentLabel, Double_t ptMin, Double_t ptMax) {
 
 
     // Collect everything from workspace  
@@ -783,10 +824,12 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     Double_t mMax = m->getMax("fitRange");
     m->setRange("fitRange",mMin,mMax);
     
-    RooAbsPdf *doubleSidedCB = ws.pdf("doubleSidedCB");
+    RooAbsPdf *doubleSidedCB_jpsi = ws.pdf("doubleSidedCB_jpsi");
+    RooAbsPdf *doubleSidedCB_psi2S = ws.pdf("doubleSidedCB_psi2S");
     RooAbsPdf *BKG = ws.pdf("BKG");
     RooAbsPdf *model = ws.pdf("model");
-    RooRealVar *sigYield = ws.var("sigYield");
+    RooRealVar *N_jpsi = ws.var("N_jpsi");
+    RooRealVar *N_psi2S = ws.var("N_psi2S");
     RooRealVar *bkgYield = ws.var("bkgYield");
     RooDataHist* data = new RooDataHist(Form("data_Pt_%.0f_%.0f",ptMin,ptMax),"Di-muon spectrum",*m,Import(*hist));
 
@@ -794,11 +837,13 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     // RooPlot *frame = dynamic_cast<RooPlot*>(ws.obj("frame"));
     RooPlot *frame = m->frame();
     // RooHist *hpull = dynamic_cast<RooHist*>(ws.obj("hpull"));
+    RooRealVar* sigYield = new RooRealVar("sigYield_real", "Total signal yield", 0);
+    sigYield->setVal(N_jpsi->getVal()+N_psi2S->getVal());
     TGraphErrors *hpull = calculatePullHist(m,hist,model,sigYield,bkgYield);
     
 
-    TCanvas* canvas = new TCanvas(Form("%s_canvas_Pt_%.0f_%.0f",treeName,ptMin,ptMax), 
-                                  Form("Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",ptMin,ptMax),
+    TCanvas* canvas = new TCanvas(Form("%s_canvas_Pt_%.0f_%.0f",realignmentLabel,ptMin,ptMax), 
+                                  Form("%s_Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f",realignmentLabel,ptMin,ptMax),
                                   800,600);
     canvas->SetBottomMargin(0);
     canvas->cd();
@@ -818,11 +863,21 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     miniPad->Draw();
     
     megaPad->cd();
+    gPad->SetLogy();
     data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
     model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
-    model->plotOn(frame,Components(*doubleSidedCB),LineStyle(kDashed),LineColor(kRed),Name("signal_Model"),Range("fitRange"));
+    model->plotOn(frame,Components(*doubleSidedCB_jpsi),LineStyle(kDashed),LineColor(kRed),Name("jpsi"),Range("fitRange"));
+    model->plotOn(frame,Components(*doubleSidedCB_psi2S),LineStyle(kDashed),LineColor(kGreen),Name("psi2S"),Range("fitRange"));
    	model->plotOn(frame,Components(*BKG),LineStyle(kDashed),LineColor(kBlue),Name("bkg_Model"),Range("fitRange"));
-   	model->paramOn(frame,ShowConstants(false),Format("TE",AutoPrecision(3)));
+   	model->paramOn(
+        frame,
+        Parameters(RooArgSet(*N_jpsi, *N_psi2S)),
+        ShowConstants(false),
+        Format("NEU", AutoPrecision(3)),
+        Layout(0.55, 0.9, 0.85)
+    );
+    std::cout << "model parameters:" << std::endl;
+    model->Print("t");
     
 
     // Beautify the box displaying the parameters
@@ -849,7 +904,9 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     frame->SetMinimum(1e-1);
     frame->SetMaximum(1.5*frame->GetMaximum());
     frame->GetXaxis()->SetTitle("");
-    frame->GetXaxis()->SetLabelSize(0.035); // 0
+    frame->GetXaxis()->SetLabelSize(0.035);
+    frame->GetYaxis()->SetRangeUser(1e-1, 1e8);
+    // frame->GetYaxis()->SetRangeUser(0, 1e5);
 
 
     frame->Draw();
@@ -866,14 +923,18 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
     // For Upsilon: TLegend *legend = new TLegend(0.13,0.16,0.37,0.44);
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
+    legend->AddEntry("",Form("%s realignment",realignmentLabel),"");
     legend->AddEntry("",Form("%.0f < p_{T} < %.0f [GeV]", ptMin,ptMax),"");
     legend->AddEntry(frame->getObject(0),"Data","point");
     legend->AddEntry(frame->getObject(1),"Full model","l");
     legend->AddEntry("",Form("#chi^{2}/ndf = %.2f",ws.var("chi2M")->getVal()),"");
     Int_t ndf = (hist->FindBin(mMax)-hist->FindBin(mMin))-8;
     // legend->AddEntry("",Form("hand-made #chi^{2}/ndf = %.2f",calculateChi2(m,hist,model,sigYield,bkgYield)/ndf),"");
-    legend->AddEntry("",Form("S/B (3#sigma) = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
-    legend->AddEntry("",Form("S/#sqrt{S+B} (3#sigma) = %.2f",calculateSignificance(m,doubleSidedCB,BKG,model,sigYield,bkgYield)),"");
+    // legend->AddEntry("",Form("S/B_{jpsi} (3#sigma) = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB_jpsi,BKG,model,N_jpsi,bkgYield,"m0","sigma")),"");
+    // legend->AddEntry("",Form("S/#sqrt{S+B}_{jpsi} (3#sigma) = %.2f",calculateSignificance(m,doubleSidedCB_jpsi,BKG,model,N_jpsi,bkgYield,"m0","sigma")),"");
+    // TODO: doesn't work for RooFormulaVar with this set-up; change how arguments are given or define template function..
+    // legend->AddEntry("",Form("S/B_psi2S (3#sigma) = %.3f",calculateSigOverBkgRatio(m,hist,doubleSidedCB_psi2S,BKG,model,N_psi2S,bkgYield,"m0_psi2S","sigma_psi2S")),"");
+    // legend->AddEntry("",Form("S/#sqrt{S+B}_psi2S (3#sigma) = %.2f",calculateSignificance(m,doubleSidedCB_psi2S,BKG,model,N_psi2S,bkgYield,"m0_psi2S","sigma_psi2S")),"");
     legend->Draw();
     // check output
     std::cout<<"chi2/ndf by machine = "<<ws.var("chi2M")->getVal()<<std::endl;
@@ -923,8 +984,10 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
 
     // Save outputs
     // For Upsilon: change name
-    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
-    // canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
+
+    // Obsolete
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.png",ptMin,ptMax));
 
@@ -937,6 +1000,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, Double_t ptMin
         sumEntries += hist->GetBinContent(bin);
     }
     std::cout << "Entries in range [" << mMin << ", " << mMax << "]: " << sumEntries << std::endl;
+    sigYield->setVal(N_jpsi->getVal()+N_psi2S->getVal());
     std::cout<<"sigYield + bkgYield = "<<sigYield->getVal()+bkgYield->getVal()<<std::endl;
 
 
