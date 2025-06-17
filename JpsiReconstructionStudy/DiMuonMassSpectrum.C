@@ -334,10 +334,12 @@ int DiMuonMassSpectrum()
 
     vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_no_realignment_PbPb_values_01_05_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_globalShiftY_PbPb_values_07_05_2025_Hyperloop.root");
-    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_CH1Bshift_new_PbPb_values_12_05_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_realignment_PbPb_values_01_05_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new_realignment_PbPb_values_12_05_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new2_realignment_PbPb_values_20_05_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_CH1Bshift_new_PbPb_values_12_05_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_LHC24am_pass1_skimmed_CH1Bshift_top_bottom_by_half_PbPb_values_13_06_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_realignment_PbPb_values_01_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new_realignment_PbPb_values_12_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new2_realignment_PbPb_values_20_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new2_chi_new_PR_realignment_PbPb_values_22_05_2025_Hyperloop.root");
 
     /*
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_pp_values_22_04_2025_Hyperloop.root");
@@ -392,8 +394,9 @@ int DiMuonMassSpectrum()
     // const char* legendTitle = "LHC24ap pp-values";
     // const char* legendTitle = "LHC24ap PbPb-values";
     // std::vector<const char*> vLegendEntries = {"reference skimmed", "reference ap medium"};
-    // std::vector<const char*> vLegendEntries = {"reference", "CH1B shift", "CH1B shift new", "Javier", "Javier new"};
-    std::vector<const char *> vLegendEntries = {"reference", "javier", "javier new", "javier new2"};
+    // std::vector<const char*> vLegendEntries = {"javier new2", "javier new2 Chi PR"};
+    std::vector<const char*> vLegendEntries = {"reference", "CH1B shift full shift", "CH1B half shifts"};
+    // std::vector<const char *> vLegendEntries = {"reference", "javier", "javier new", "javier new2"};
     // std::vector<const char*> vLegendEntries = {"reference", "new geometry"};
     // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
