@@ -873,7 +873,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, const char* re
     miniPad->Draw();
     
     megaPad->cd();
-    gPad->SetLogy();
+    // gPad->SetLogy();
     data->plotOn(frame,MarkerSize(0.4),Range("fitRange"));
     model->plotOn(frame,LineColor(kBlue),Name("full_Model"),Range("fitRange"));
     model->plotOn(frame,Components(*doubleSidedCB_Y1S),LineStyle(kDashed),LineColor(kRed),Name("Y(1S)"),Range("fitRange"));
@@ -908,7 +908,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, const char* re
     frame->SetMaximum(1.5*frame->GetMaximum());
     frame->GetXaxis()->SetTitle("");
     frame->GetXaxis()->SetLabelSize(0.035);
-    frame->GetYaxis()->SetRangeUser(1e-5, 1e5);
+    // frame->GetYaxis()->SetRangeUser(1e-5, 1e5);
+    frame->GetYaxis()->SetRangeUser(0., 300);
 
 
     frame->Draw();
