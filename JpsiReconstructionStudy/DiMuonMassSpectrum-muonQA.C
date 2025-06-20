@@ -272,7 +272,8 @@ TGraphErrors *calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
 }
 
 TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax);
-TH1 *GetTH1(const char* fileName, TString histname);
+TH1 *GetTH1(const char* fileName, TString histName);
+TH1 *GetTH1FromTH2(const char* fileName, TString histName, Double_t ptMin, Double_t ptMax);
 void defSigModel(RooWorkspace &ws);
 void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
@@ -299,7 +300,7 @@ JpsiValues CalculateJpsiWidth(const char* fileName, const char *histName, const 
     RooWorkspace wspace{"myWS"};
 
     // TH1D *hist = getTree(treeName, ptMin, ptMax);
-    TH1 *hist = GetTH1(fileName, histName);
+    TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
 
     // For Upsilon: 8, 12
     Double_t mMin = 2.5;
@@ -329,154 +330,176 @@ JpsiValues CalculateJpsiWidth(const char* fileName, const char *histName, const 
 // Function is necessary to draw the pT dependence of the Jpsi widths
 int DiMuonMassSpectrum_muonQA()
 {
-
     std::vector<const char*> vTreeNames;
     // std::vector<const char*> vMuonIds; // trains are combined in Hyperloop with different configurations in the same output file
     std::vector<const char*> vHistNames;
-    const char* labelName; // saves PDF with widhts and peaks using this label name
+    const char *labelName; // saves PDF with widhts and peaks using this label name
+    const char *fAnalysisResults;
+    std::string *fMuonId; // trains are combined in Hyperloop with different configurations in the same output file
+
+    fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root";
 
     // vTreeNames.push_back("AnalysisResults_LHC24am_pass1_skimmed_no_realignment_27_04_2025_Hyperloop.root");
-    "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root"
+    // "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root"
 
     // ======================[ Reference (no realignment) ]=====================
     // Top-Bottom
     
-    /*
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TT");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TB");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_BB");
-    */
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB"};
+    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TT").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TB").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_BB").c_str());
+    
 
     // Left-Right
-
     /*
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LL");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LR");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts_RR");
+    // std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RL", "reference RR"};
+    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LL").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LR").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_RR").c_str());
     */
 
     // ======================[ Javier new2 ]=====================
     // Top-Bottom
-    /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "javier new2 TT","javier new 2 TB or BT","javier new 2 BB"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TT");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TB");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_BB");
-    */
+    
+    
+    labelName = "javier_new2_top-bottom";
+    fMuonId = "muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "javier new2 int", "javier new2 TT","javier new 2 TB or BT", "javier new 2 BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TT").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TB").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_BB").c_str());
+    
 
     // Left-Right
 
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "javier new2 LL","javier new 2 LR or RL","javier new 2 RR"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LL");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LR");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts_RR");
+    labelName = "javier_new2_left-right";
+    fMuonId = "muon-qa_id30255/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "javier new2 int", "javier new2 LL","javier new 2 LR or RL","javier new 2 RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LL").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LR").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_RR").c_str());
     */
 
     // ======================[ globalShiftY ]=====================
     // Top-Bottom
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "globalShiftY TT","globalShiftY TB or BT","globalShiftY BB"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TT");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TB");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_BB");
+    labelName = "globalShiftY_top-bottom";
+    fMuonId = "muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "globalShiftY int", "globalShiftY TT","globalShiftY TB or BT","globalShiftY BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TT").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TB").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_BB").c_str());
     */
 
     // Left-Right
 
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "globalShiftY LL","globalShiftY LR or RL","globalShiftY RR"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LL");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LR");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root");
-    vHistNames.push_back("muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts_RR");
+    labelName = "globalShiftY_left-right";
+    fMuonId = "muon-qa_id30698/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "globalShiftY int", "globalShiftY LL","globalShiftY LR or RL","globalShiftY RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LL").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LR").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_RR").c_str());
     */
 
     // ======================[ bottom only CH1 shift ]=====================
     // Top-Bottom
     
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom only shift TT","CH1 bottom only shift TB or BT","CH1 bottom only shift BB"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TT");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TB");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_BB");
+    labelName = "bottom_only_CH1_shift_top-bottom";
+    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "CH1 bottom only shift int", "CH1 bottom only shift TT","CH1 bottom only shift TB or BT","CH1 bottom only shift BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TT").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TB").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_BB").c_str());
     */
 
     // Left-Right
 
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom only shift LL","CH1 bottom only shift LR or RL","CH1 bottom only shift RR"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LL");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LR");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts_RR");
+    labelName = "bottom_only_CH1_shift_left-right";
+    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "CH1 bottom only shift int", "CH1 bottom only shift LL","CH1 bottom only shift LR or RL","CH1 bottom only shift RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LL").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LR").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_RR").c_str());
     */
 
     // ======================[ bottom and top CH1 1/2 shift ]=====================
     // Top-Bottom
     
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom and top 1/2 shift TT","CH1 bottom and top 1/2 shift TB or BT","CH1 bottom and top 1/2 shift BB"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TT");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_TB");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_BB");
+    labelName = "bottom_and_top_CH1_half_shift_top-bottom";
+    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "CH1 bottom and top 1/2 shift int", "CH1 bottom and top 1/2 shift TT","CH1 bottom and top 1/2 shift TB or BT","CH1 bottom and top 1/2 shift BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TT").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_TB").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_BB").c_str());
     */
 
     // Left-Right
 
     /*
-    std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom and top 1/2 shift LL","CH1 bottom and top 1/2 shift LR or RR","CH1 bottom and top 1/2 shift RR"};
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LL");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_LR");
-    vTreeNames.push_back("AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30619_only_bottom_shift_muonID-30620_top_and_bottom_shift_CH1_Hyperloop_16_06_2025.root");
-    vHistNames.push_back("muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts_RR");
+    labelName = "bottom_and_top_CH1_half_shift_left-right";
+    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "CH1 bottom and top 1/2 shift int", "CH1 bottom and top 1/2 shift LL","CH1 bottom and top 1/2 shift LR or RR","CH1 bottom and top 1/2 shift RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId.c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LL").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_LR").c_str());
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back((fMuonId + "_RR").c_str());
     */
 
 
@@ -535,14 +558,17 @@ int DiMuonMassSpectrum_muonQA()
     vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_2025_Hyperloop.root");
     */
 
-    std::vector<Int_t> vLineColours = {1, 2, 8, 4, 7};
+    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/JpsiPeakAndWidth_%s.root", labelName), "RECREATE");
+
+    std::vector<Int_t> vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1}; // in order to show reference everywhere..
+    std::vector<Int_t> vLineColours = {1, 1, 1, 1, 2, 8, 4, 7};
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom shift TT","CH1 bottom shift TB or BT","CH1 bottom shift BB"};
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom shift LL","CH1 bottom shift LR or RL","CH1 bottom shift RR"};
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom and top 1/2 shift TT","CH1 bottom and top 1/2 shift TB or BT","CH1 bottom and top 1/2 shift BB"};
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom and top 1/2 shift LL","CH1 bottom and top 1/2 shift LR or RR","CH1 bottom and top 1/2 shift RR"};
     // const char* legendTitle = "comparison";
     // const char* legendTitle = "AnalysisResults_LHC24am_pass1_skimmed";
-    const char *legendTitle = "LHC24an_small PbPb-values";
+    const char *legendTitle = "LHC24an PbPb-values";
     // const char* legendTitle = "LHC24aq + ap pp-values";
     // const char* legendTitle = "LHC24aq + ap PbPb-values";
     // const char* legendTitle = "LHC24aq pp-values";
@@ -562,7 +588,9 @@ int DiMuonMassSpectrum_muonQA()
     // For Upsilon: {0,20}
 
     // For muonQA: no pT stored, take just one bin
-    std::vector<std::pair<double, double>> ptBins = {{0, 50}};
+    std::vector<std::pair<double, double>> ptBins = {
+        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
+    // For Upsilon: {0,20}
 
     // Used for variable binning
     std::vector<double> binEdges;
@@ -584,8 +612,10 @@ int DiMuonMassSpectrum_muonQA()
                                      nBins, binEdges.data());
     TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
                                     nBins, binEdges.data());
+    hTemplateWidths->SetTitle(Form("%s : J/#psi width vs. p_{T} range; p_{T} (GeV/c)", labelName));
+    hTemplatePeaks->SetTitle(Form("%s : J/#psi peak vs. p_{T} range; p_{T} (GeV/c)", labelName));
 
-    TLine *lineJpsiPDG = new TLine(binEdges.front(), 3.096, binEdges.back(), 3.096);
+    TLine *lineJpsiPDG = new TLine(binEdges.front()-2, 3.096, binEdges.back()+2, 3.096);
     // For Upsilon: TLine* lineUpsilonPDG = new TLine(binEdges.front(), 9.46, binEdges.back(), 9.46);
     // and change names below
     lineJpsiPDG->SetLineStyle(2);
@@ -595,12 +625,15 @@ int DiMuonMassSpectrum_muonQA()
     TH1D *hWidths;
     TH1D *hPeaks;
 
-    TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
+    // TCanvas *dummy = new TCanvas("dummy","dummy for drawing", 800, 600);
+    // dummy->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf(", labelName)); // assumes the same data set is used for reference and for re-alignment
+
+    TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths_%s", labelName), Form("globalJpsiWidths_%s", labelName), 800, 600);
     globalCanvasJpsiWidths->cd();
     hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.11);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
-    TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
+    TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks_%s", labelName), Form("globalJpsiPeaks_%s", labelName), 800, 600);
     globalCanvasJpsiPeaks->cd();
     hTemplatePeaks->GetYaxis()->SetRangeUser(3.02, 3.17);
     hTemplatePeaks->SetStats(0);
@@ -665,6 +698,7 @@ int DiMuonMassSpectrum_muonQA()
 
         globalCanvasJpsiWidths->cd();
         hWidths->SetLineColor(vLineColours[i]);
+        hWidths->SetLineStyle(vLineStyles[i]);
         hWidths->Draw("same PE");
         legendWidths->AddEntry(hWidths, vLegendEntries[i], "l");
 
@@ -675,6 +709,7 @@ int DiMuonMassSpectrum_muonQA()
 
         globalCanvasJpsiPeaks->cd();
         hPeaks->SetLineColor(vLineColours[i]);
+        hPeaks->SetLineStyle(vLineStyles[i]);
         hPeaks->Draw("same PE");
         legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
         std::cout << "vLegendEntries[i] = " << vLegendEntries[i] << std::endl;
@@ -692,12 +727,24 @@ int DiMuonMassSpectrum_muonQA()
     globalCanvasJpsiPeaks->cd();
     legendPeaks->Draw();
 
+    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf(", labelName));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf)", labelName));
+
+    fOutput->cd();
+    globalCanvasJpsiWidths->Write();
+    globalCanvasJpsiPeaks->Write();
+    fOutput->Close();
+
+    // dummy->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf)", labelName));
+    
     // Save all outputs
     // For Upsilon: change output names
+    /*
     globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.pdf", legendTitle));
     globalCanvasJpsiWidths->SaveAs(Form("Plots/globalCanvasJpsiWidths_%s.png", legendTitle));
     globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.pdf", legendTitle));
     globalCanvasJpsiPeaks->SaveAs(Form("Plots/globalCanvasJpsiPeaks_%s.png", legendTitle));
+    */
 
     return 0;
 }
@@ -738,14 +785,33 @@ TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax)
 } // void getTree()
 
 // Use this one for the dimuon spectra from Andrea/Chi's code
-TH1* GetTH1(const char* fileName, TString histname)
+TH1* GetTH1(const char* fileName, TString histName)
 {
     TFile *f = new TFile(fileName, "READ");
-    std::cout << "Reading " << histname << " from TFile" << std::endl;
-    TH1* hist = (TH1*)f->Get(histname);
+    std::cout << "Reading " << histName << " from TFile" << std::endl;
+    TH1* hist = (TH1*)f->Get(histName);
     if (hist == nullptr) { std::cout << ">> error retrieving histogram" << std::endl; }
     else { std::cout << ">> histogram sucessfully read from TFile" << std::endl; }
     return hist;
+}
+
+// Use this one for the dimuon spectra from Andrea/Chi's code
+// When getting TH2 (mass, pT) and making the projection
+TH1* GetTH1FromTH2(const char* fileName, TString histName, Double_t ptMin, Double_t ptMax)
+{
+    TFile *f = new TFile(fileName, "READ");
+    std::cout << "Reading " << histName << " from TFile" << std::endl;
+    TH2 *hist = (TH2*)f->Get(histName);
+    if (hist == nullptr) { std::cout << ">> error retrieving histogram" << std::endl; }
+    else { std::cout << ">> histogram sucessfully read from TFile" << std::endl; }
+    std::cout << "here then" << std::endl;
+    TH2 *hMass_Pt = (TH2*)hist->Clone();
+    std::cout << "maybe here" << std::endl;
+    hMass_Pt->GetYaxis()->SetRangeUser(ptMin, ptMax);
+    std::cout << "also not here" << std::endl;
+    TH1 *hDiMuonMass_PtCut = hMass_Pt->ProjectionX("hDiMuonMass_PtCut");
+    std::cout << "didn't break here yet" << std::endl;
+    return hDiMuonMass_PtCut;
 }
 
 void defSigModel(RooWorkspace &ws)
