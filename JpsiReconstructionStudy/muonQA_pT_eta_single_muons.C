@@ -228,16 +228,35 @@ void makePlots()
     // Top-Bottom
     /*
     labelName = "GeometryAlignedShiftY_top-bottom";
-    fMuonId = "muon-qa_id30991/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
+    fMuonId = "muon-qa_id30991/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
     // Left-Right
@@ -245,47 +264,104 @@ void makePlots()
     /*
     labelName = "GeometryAlignedShiftY_left-right";
     fMuonId = "muon-qa_id30991/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
+    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
     */
 
     // ======================[ GeometryAlignedFix110Fix15New2T5ShiftY: globalShiftY + javier new2 ]=====================
     // Top-Bottom
     /*
     labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_top-bottom";
-    fMuonId = "muon-qa_id30993/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
+    fMuonId = "muon-qa_id30993/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
     // Left-Right
 
     /*
     labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_left-right";
-    fMuonId = "muon-qa_id30993/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
+    fMuonId = "muon-qa_id30993/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
     */
 
     // ======================[ GeometryAlignedFix10Fix15ShiftCh1BNew2: bottom only CH1 shift ]=====================
@@ -294,31 +370,69 @@ void makePlots()
     /*
     labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_top-bottom";
     fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
+    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
     // Left-Right
 
     /*
     labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_left-right";
-    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
+    fMuonId = "muon-qa_id30619/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
     */
 
     // ======================[ GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount ]=====================
@@ -328,16 +442,35 @@ void makePlots()
     fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
     labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
     // fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
+    fMuonId = "muon-qa/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
     // Left-Right
@@ -345,16 +478,35 @@ void makePlots()
     /*
     fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
     labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_left-right";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
+    fMuonId = "muon-qa/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
     */
 
     // ======================[ GeometryAlignedFix10Fix15ShiftCh1TBNew2: bottom and top CH1 1/2 shift ]=====================
@@ -362,33 +514,73 @@ void makePlots()
 
     /*
     labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_top-bottom";
-    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
+    fMuonId = "muon-qa_id30620/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
     // Left-Right
 
     /*
     labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_left-right";
-    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
+    fMuonId = "muon-qa_id30620/muons/";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L"","new geometry R"};
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
+    vTreeNamesEtaPos.push_back(fAnalysisResults);
+    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
+    //
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
+    vTreeNamesEtaNeg.push_back(fAnalysisResults);
+    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
+    //
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
+    vTreeNamesPtPos.push_back(fAnalysisResults);
+    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
+    //
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
+    vTreeNamesPtNeg.push_back(fAnalysisResults);
+    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
+
+   TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.root", fAnalysisResults, labelName), "RECREATE");
 
     std::vector<Int_t> vLineStyles = {1, 2, 6, 1, 1, 1}; // in order to show reference everywhere..
     std::vector<Int_t> vLineColours = {1, 1, 1, 2, 8, 7};
@@ -399,11 +591,47 @@ void makePlots()
     TCanvas *cPtPos = new TCanvas("cPtPos", "cPtPos", 800, 600);
     TCanvas *cPtNeg = new TCanvas("cPtNeg", "cPtNeg", 800, 600);
 
+    // for drawing the templates
+    double maxEtaPos = 0, maxEtaNeg = 0, maxPtPos = 0, maxPtNeg = 0;
+    for (Int_t i = 0; i < vTreeNamesEtaPos.size(); i++)
+    {
+        TH1 *hEtaPos = GetTH1(vTreeNamesEtaPos[i], vHistNamesEtaPos[i]);
+        TH1 *hEtaNeg = GetTH1(vTreeNamesEtaNeg[i], vHistNamesEtaNeg[i]);
+        TH1 *hPtPos = GetTH1FromTH2(vTreeNamesPtPos[i], vHistNamesPtPos[i], -4, 4);
+        TH1 *hPtNeg = GetTH1FromTH2(vTreeNamesPtNeg[i], vHistNamesPtNeg[i], -4, 4);
+        maxEtaPos = std::max(maxEtaPos, hEtaPos->GetMaximum());
+        maxEtaNeg = std::max(maxEtaNeg, hEtaNeg->GetMaximum());
+        maxPtPos  = std::max(maxPtPos,  hPtPos->GetMaximum());
+        maxPtNeg  = std::max(maxPtNeg,  hPtNeg->GetMaximum());
+    }
+
     // make templates
-    // TODO!!
+    TH1F *hTemplateEtaPos = new TH1F("hTemplateEtaPos", Form("#eta for #mu^{+}: %s", labelName), 80, -5, -1);
+    TH1F *hTemplateEtaNeg = new TH1F("hTemplateEtaNeg", Form("#eta for #mu^{-}: %s", labelName), 80, -5, -1);
+    TH1F *hTemplatePtPos  = new TH1F("hTemplatePtPos",  Form("p_{T} for #mu^{+}: %s", labelName), 100, 0, 10);
+    TH1F *hTemplatePtNeg  = new TH1F("hTemplatePtNeg",  Form("p_{T} for #mu^{-}: %s", labelName), 100, 0, 10);
+    // set max y-axis range
+    double margin = 1.1;
+    hTemplateEtaPos->SetMaximum(margin * maxEtaPos);
+    hTemplateEtaNeg->SetMaximum(margin * maxEtaNeg);
+    hTemplatePtPos->SetMaximum(margin * maxPtPos);
+    hTemplatePtNeg->SetMaximum(margin * maxPtNeg);
+
+    cEtaPos->cd();
+    hTemplateEtaPos->SetStats(0);
+    hTemplateEtaPos->Draw();
+    cEtaNeg->cd();
+    hTemplateEtaNeg->SetStats(0);
+    hTemplateEtaNeg->Draw();
+    cPtPos->cd();
+    hTemplatePtPos->SetStats(0);
+    hTemplatePtPos->Draw();
+    cPtNeg->cd();
+    hTemplatePtNeg->SetStats(0);
+    hTemplatePtNeg->Draw();
 
     // make legends
-    TLegend *l = new TLegend(0.2, 0.6, 0.4, 0.8);
+    TLegend *l = new TLegend(0.15, 0.65, 0.35, 0.85);
     l->SetBorderSize(0);
     l->SetTextSize(0.02);
 
@@ -418,9 +646,13 @@ void makePlots()
         std::string hNamePtPos = vHistNamesPtPos[i];
         std::string hNamePtNeg = vHistNamesPtNeg[i];
         TH1 *hEtaPos = GetTH1(fNameEtaPos, hNameEtaPos);
+        hPtNeg = (TH1*)hEtaPos->Clone(Form("hEtaPos_clone_%d", i));
         TH1 *hEtaNeg = GetTH1(fNameEtaNeg, hNameEtaNeg);
+        hEtaNeg = (TH1*)hEtaNeg->Clone(Form("hEtaNeg_clone_%d", i));
         TH1 *hPtPos = GetTH1FromTH2(fNamePtPos, hNamePtPos, -4, 4);
+        hPtPos = (TH1*)hPtPos->Clone(Form("hPtPos_clone_%d", i));
         TH1 *hPtNeg = GetTH1FromTH2(fNamePtNeg, hNamePtNeg, -4, 4);
+        hPtNeg = (TH1*)hPtNeg->Clone(Form("hPtNeg_clone_%d", i));
         hEtaPos->SetLineStyle(vLineStyles[i]);
         hEtaNeg->SetLineStyle(vLineStyles[i]);
         hPtPos->SetLineStyle(vLineStyles[i]);
@@ -448,6 +680,18 @@ void makePlots()
     l->Draw();
     cPtNeg->cd();
     l->Draw();
+
+    cEtaPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf(", fAnalysisResults, labelName));
+    cEtaNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
+    cPtPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
+    cPtNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf)", fAnalysisResults, labelName));
+
+    fOutput->cd();
+    cEtaPos->Write();
+    cEtaNeg->Write();
+    cPtPos->Write();
+    cPtNeg->Write();
+    fOutput->Close();
 }
 
 int muonQA_pT_eta_single_muons()
