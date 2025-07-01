@@ -304,8 +304,8 @@ JpsiValues CalculateJpsiWidth(const char* fileName, std::string histName, const 
     TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
 
     // For Upsilon: 8, 12
-    Double_t mMin = 2.5;
-    Double_t mMax = 4.5;
+    Double_t mMin = 8;
+    Double_t mMax = 12;
     RooRealVar *m = new RooRealVar("m", "M_{#mu^{+}#mu^{-}}", mMin, mMax, "GeV/c2");
     wspace.import(*m);
 
@@ -355,7 +355,7 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     // Top-Bottom
     
     // std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB"};
-    /*
+    
     fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId);
@@ -365,10 +365,10 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     vHistNames.push_back(fMuonId + "_TB");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_BB");
-    */
+    
 
     // Left-Right
-    
+    /*
     // std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RL", "reference RR"};
     fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     vTreeNames.push_back(fAnalysisResults);
@@ -379,7 +379,7 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     vHistNames.push_back(fMuonId + "_LR");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_RR");
-    
+    */    
 
     // ======================[ GeometryAlignedFix110Fix15New2T5: Javier new2 ]=====================
     // Top-Bottom
@@ -400,7 +400,7 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
 
     // Left-Right
 
-    
+    /*
     labelName = "GeometryAlignedFix110Fix15New2T5_left-right";
     fMuonId = "muon-qa_id30992/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
@@ -412,7 +412,7 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     vHistNames.push_back(fMuonId + "_LR");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_RR");
-    
+    */
 
     // ======================[ GeometryAlignedShiftY: globalShiftY ]=====================
     // Top-Bottom
@@ -500,6 +500,41 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     /*
     labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_left-right";
     fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LL");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LR");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_RR");
+    */
+
+   // ======================[ GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount ]=====================
+    // Top-Bottom
+    
+    
+    fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TT");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TB");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_BB");
+    
+
+    // Left-Right
+
+    /*
+    fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_left-right";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId);
@@ -600,7 +635,7 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     vTreeNames.push_back("AnalysisResults_LHC24ap_pass1_medium_chi_realignment_PbPb_values_22_04_2025_Hyperloop.root");
     */
 
-    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/YPeakAndWidth_%s.root", labelName), "RECREATE");
+    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants_Upsilon_ptIntegrated/YPeakAndWidth_%s.root", labelName), "RECREATE");
 
     std::vector<Int_t> vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1}; // in order to show reference everywhere..
     std::vector<Int_t> vLineColours = {1, 1, 1, 1, 2, 8, 4, 7};
@@ -630,9 +665,13 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     // For Upsilon: {0,20}
 
     // For muonQA: no pT stored, take just one bin
+    // Low statistics at high pT
+    //std::vector<std::pair<double, double>> ptBins = {
+    //    {0,3}, {3,6}, {6,15}
+    //ß};
     std::vector<std::pair<double, double>> ptBins = {
-        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
-    // For Upsilon: {0,20}
+        {0,30}
+    };
 
     // Used for variable binning
     std::vector<double> binEdges;
@@ -672,12 +711,12 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalYWidths_%s", labelName), Form("globalYWidths_%s", labelName), 800, 600);
     globalCanvasJpsiWidths->cd();
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.11);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.009, 0.30);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalYPeaks_%s", labelName), Form("globalYPeaks_%s", labelName), 800, 600);
     globalCanvasJpsiPeaks->cd();
-    hTemplatePeaks->GetYaxis()->SetRangeUser(3.02, 3.17);
+    hTemplatePeaks->GetYaxis()->SetRangeUser(8.5, 10.5);
     hTemplatePeaks->SetStats(0);
     hTemplatePeaks->Draw("PE");
     // For Upsilon: change name here
@@ -769,8 +808,8 @@ int DiMuonMassSpectrum_muonQA_Ypsilon()
     globalCanvasJpsiPeaks->cd();
     legendPeaks->Draw();
 
-    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants_Upsilon/%s.pdf(", labelName));
-    globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants_Upsilon/%s.pdf)", labelName));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants_Upsilon_pTIntegrated/%s.pdf(", labelName));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants_Upsilon_pTIntegrated/%s.pdf)", labelName));
 
     fOutput->cd();
     globalCanvasJpsiWidths->Write();
@@ -1180,7 +1219,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char* treeName, const char* re
     frame->GetXaxis()->SetTitle("");
     frame->GetXaxis()->SetLabelSize(0.035);
     // frame->GetYaxis()->SetRangeUser(1e-5, 1e5);
-    frame->GetYaxis()->SetRangeUser(0., 300);
+    // frame->GetYaxis()->SetRangeUser(0., 300);
 
 
     frame->Draw();

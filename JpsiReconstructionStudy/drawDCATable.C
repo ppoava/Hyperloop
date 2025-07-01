@@ -34,6 +34,7 @@ using ResultMap = std::map<std::string, std::map<std::string, std::map<std::stri
 
 int drawDCATable() {
 
+    /*
     const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_6_geometries.root";
     const char *histName;
 
@@ -54,6 +55,19 @@ int drawDCATable() {
         {"muon-qa_id30992", "GeometryAlignedFix110Fix15New2T5"},
         {"muon-qa_id30993", "GeometryAlignedFix110Fix15New2T5ShiftY"}
     };
+    */
+
+    const char *fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    const char *histName;
+
+    // Using the following geometries and (fixed) MCH parameters, according to muon-qa root file structure:
+    std::vector<const char*> vGeometries = {
+            "muon-qa", // GeometryAlignedFix10Fix15Shift04Ch1BNew2
+    };
+    std::map<std::string, std::string> geometryNames = {
+        {"muon-qa", "GeometryAlignedFix10Fix15Shift04Ch1BNew2"},
+    };
+
     std::array<const char*, 4> arrQuadrants = { "Q0", "Q1", "Q2", "Q3"};
     std::array<const char*, 2> arrXY = { "x", "y"};
     std::array<const char*, 2> arrPosNeg = { "pos", "neg"};

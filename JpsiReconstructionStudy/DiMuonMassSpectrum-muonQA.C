@@ -342,6 +342,7 @@ int DiMuonMassSpectrum_muonQA()
     fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_6_geometries.root";
     // Description of muon IDs:
     // --- muon-qa_id30619: GeometryAlignedFix10Fix15ShiftCh1BNew2 (bottom only shift)
+    // --- muon-qa_id31157: GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount
     // --- muon-qa_id30620: GeometryAlignedFix10Fix15ShiftCh1TBNew2 (top and bottom half shift)
     // --- muon-qa_id30697: GeometryAligned (reference)
     // --- muon-qa_id30991: GeometryAlignedShiftY (global shift Y)
@@ -354,9 +355,43 @@ int DiMuonMassSpectrum_muonQA()
     // ======================[ GeometryAligned: Reference (no realignment) ]=====================
     // Top-Bottom
     
-    // std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB"};
-    /*
+    
+    labelName = "LHC24an_pass1_skimmed_no_realignment_top-bottom";
+    std::vector<const char*> vLegendEntries = {"integrated", "top-top","top-bottom/bottom-top", "bottom-bottom"};
     fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TT");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TB");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_BB");
+    
+
+    // Left-Right
+    /*
+    labelName = "LHC24an_pass1_skimmed_no_realignment_left-right";
+    std::vector<const char*> vLegendEntries = {"integrated", "left-left","left-right/right-left", "right-right"};
+    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LL");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LR");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_RR");
+    */
+
+   // ======================[ GeometryAligned: Reference 2025 (no realignment) ]=====================
+    // Top-Bottom
+    
+    /*
+    labelName = "LHC25ac_vs_LHC24an_no_realignment_pT_integrated_top-bottom";
+    std::vector<const char*> vLegendEntries = {"reference 2024 int", "reference 2024 TT","reference TB or BT 2024", "reference BB 2024", "reference 2025 int", "reference 2025 TT","reference 2025 TB or BT", "reference 2025 BB"};
+    fAnalysisResults = "AnalysisResults_LHC25ac_muon_qa_no_realignment_Hyperloop_24_06_2025.root";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId);
     vTreeNames.push_back(fAnalysisResults);
@@ -368,9 +403,11 @@ int DiMuonMassSpectrum_muonQA()
     */
 
     // Left-Right
-    
-    // std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RL", "reference RR"};
-    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    /*
+    labelName = "LHC25ac_vs_LHC24an_no_realignment_pT_integrated_left-right";
+    std::vector<const char*> vLegendEntries = {"reference 2024 int", "reference 2024 LL","reference 2024 LR or RL", "reference 2024 RR", "reference 2025 int", "reference 2025 LL","reference LR or RL 2025", "reference RR 2025"};
+    fAnalysisResults = "AnalysisResults_LHC25ac_muon_qa_no_realignment_Hyperloop_24_06_2025.root";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId);
     vTreeNames.push_back(fAnalysisResults);
@@ -379,7 +416,7 @@ int DiMuonMassSpectrum_muonQA()
     vHistNames.push_back(fMuonId + "_LR");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_RR");
-    
+    */
 
     // ======================[ GeometryAlignedFix110Fix15New2T5: Javier new2 ]=====================
     // Top-Bottom
@@ -511,6 +548,43 @@ int DiMuonMassSpectrum_muonQA()
     vHistNames.push_back(fMuonId + "_RR");
     */
 
+    // ======================[ GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount ]=====================
+    // Top-Bottom
+
+    /*
+    fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
+    // fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TT");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_TB");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_BB");
+    */
+
+    // Left-Right
+
+    /*
+    fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_left-right";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId);
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LL");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_LR");
+    vTreeNames.push_back(fAnalysisResults);
+    vHistNames.push_back(fMuonId + "_RR");
+    */
+
+
     // ======================[ GeometryAlignedFix10Fix15ShiftCh1TBNew2: bottom and top CH1 1/2 shift ]=====================
     // Top-Bottom
     
@@ -610,7 +684,7 @@ int DiMuonMassSpectrum_muonQA()
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom and top 1/2 shift LL","CH1 bottom and top 1/2 shift LR or RR","CH1 bottom and top 1/2 shift RR"};
     // const char* legendTitle = "comparison";
     // const char* legendTitle = "AnalysisResults_LHC24am_pass1_skimmed";
-    const char *legendTitle = "LHC24an PbPb-values";
+    const char *legendTitle = "PbPb-values";
     // const char* legendTitle = "LHC24aq + ap pp-values";
     // const char* legendTitle = "LHC24aq + ap PbPb-values";
     // const char* legendTitle = "LHC24aq pp-values";
@@ -624,14 +698,14 @@ int DiMuonMassSpectrum_muonQA()
     // std::vector<const char*> vLegendEntries = {"reference", "new geometry"};
     // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
-    // Low statistics at high pT
-    // std::vector<std::pair<double, double>> ptBins = {
-    //    {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
-    // For Upsilon: {0,20}
-
     // For muonQA: no pT stored, take just one bin
     std::vector<std::pair<double, double>> ptBins = {
-        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
+        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}
+    };
+    // For muonQA: no pT stored, take just one bin
+    // std::vector<std::pair<double, double>> ptBins = {
+    //     {0, 20}
+    // };
     // For Upsilon: {0,20}
 
     // Used for variable binning
@@ -650,12 +724,12 @@ int DiMuonMassSpectrum_muonQA()
     // nBins, 0, nBins);
     // TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}",
     // nBins, 0, nBins);
-    TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+    TH1D *hTemplateWidths = new TH1D("hTemplateWidths", "J/#psi width; p_{T} (GeV/c); GeV/c^{2}",
                                      nBins, binEdges.data());
-    TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+    TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak; p_{T} (GeV/c); GeV/c^{2}",
                                     nBins, binEdges.data());
-    hTemplateWidths->SetTitle(Form("%s : J/#psi width vs. p_{T} range; p_{T} (GeV/c)", labelName));
-    hTemplatePeaks->SetTitle(Form("%s : J/#psi peak vs. p_{T} range; p_{T} (GeV/c)", labelName));
+    hTemplateWidths->SetTitle(Form("%s : J/#psi width; p_{T} (GeV/c)", labelName));
+    hTemplatePeaks->SetTitle(Form("%s : J/#psi peak; p_{T} (GeV/c)", labelName));
 
     TLine *lineJpsiPDG = new TLine(binEdges.front()-2, 3.096, binEdges.back()+2, 3.096);
     // For Upsilon: TLine* lineUpsilonPDG = new TLine(binEdges.front(), 9.46, binEdges.back(), 9.46);
@@ -706,14 +780,15 @@ int DiMuonMassSpectrum_muonQA()
         // nBins, 0, nBins);
         // hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}",
         // nBins, 0, nBins);
-        hWidths = new TH1D(Form("hWidths_%s", fileName), "J/#psi width vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+        hWidths = new TH1D(Form("hWidths_%s", fileName), "J/ψ width; p_{T} (GeV/c); GeV/c^{2}",
                            nBins, binEdges.data());
-        hPeaks = new TH1D(Form("hPeaks_%s", fileName), "J/#psi peak vs. p_{T} range; p_{T} (GeV/c); GeV/c^{2}",
+        hPeaks = new TH1D(Form("hPeaks_%s", fileName), "J/ψ peak; p_{T} (GeV/c); GeV/c^{2}",
                           nBins, binEdges.data());
 
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++)
         {
+            std::cout << "pT range = [" << ptBins[j].first << " , " << ptBins[j].second << "]" << std::endl;
             JpsiValues JpsiValues = CalculateJpsiWidth(fileName, histName, vLegendEntries[i], ptBins[j].first, ptBins[j].second);
             double width = JpsiValues.JpsiWidth;
             double peak = JpsiValues.JpsiPeak;
