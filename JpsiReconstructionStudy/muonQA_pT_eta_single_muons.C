@@ -586,10 +586,12 @@ void makePlots()
     TCanvas *cEtaNeg = new TCanvas("cEtaNeg", "cEtaNeg", 800, 600);
     TCanvas *cEtaRatio = new TCanvas("cEtaRatio", "cEtaRatio", 800, 600);
     TCanvas *cEtaSpecRatio = new TCanvas("cEtaMuPTop/MuMBottom", "cEtaMuPTop/MuMBottom", 800, 600); // mu+Top/mu-Bottom
+    TCanvas *cEtaSpecRatioInv = new TCanvas("cEtaMuMTop/MuPBottom", "cEtaMuMTop/MuPBottom", 800, 600); // mu-Top/mu+Bottom
     TCanvas *cPtPos = new TCanvas("cPtPos", "cPtPos", 800, 600);
     TCanvas *cPtNeg = new TCanvas("cPtNeg", "cPtNeg", 800, 600);
     TCanvas *cPtRatio = new TCanvas("cPtRatio", "cPtRatio", 800, 600);
     TCanvas *cPtSpecRatio = new TCanvas("cPtMuPTop/MuMBottom", "cPtMuPTop/MuMBottom", 800, 600);
+    TCanvas *cPtSpecRatioInv = new TCanvas("cPtMuMTop/MuPBottom", "cPtMuMTop/MuPBottom", 800, 600);
 
     // for drawing the templates
     double maxEtaPos = 0, maxEtaNeg = 0, maxPtPos = 0, maxPtNeg = 0;
@@ -610,20 +612,24 @@ void makePlots()
     TH1F *hTemplateEtaNeg = new TH1F("hTemplateEtaNeg", Form("#eta for #mu^{-}: %s", labelName), 80, -5, -1);
     TH1F *hTemplateEtaRatio = new TH1F("hTemplateEtaRatio", Form("#eta for #mu^{+}/#mu^{-}: %s", labelName), 80, -5, -1);
     TH1F *hTemplateEtaSpecRatio = new TH1F("hTemplateEtaSpecRatio", Form("#eta for #mu^{+}Top/#mu^{-}Bottom: %s", labelName), 80, -5, -1);
+    TH1F *hTemplateEtaSpecRatioInv = new TH1F("hTemplateEtaSpecRatioInv", Form("#eta for #mu^{-}Top/#mu^{+}Bottom: %s", labelName), 80, -5, -1);
     TH1F *hTemplatePtPos = new TH1F("hTemplatePtPos", Form("p_{T} for #mu^{+}: %s", labelName), 100, 0, 10);
     TH1F *hTemplatePtNeg = new TH1F("hTemplatePtNeg", Form("p_{T} for #mu^{-}: %s", labelName), 100, 0, 10);
     TH1F *hTemplatePtRatio = new TH1F("hTemplatePtRatio", Form("p_{T} for #mu^{+}/#mu^{-}: %s", labelName), 100, 0, 10);
     TH1F *hTemplatePtSpecRatio = new TH1F("hTemplatePtSpecRatio", Form("p_{T} for #mu^{+}Top/#mu^{-}Bottom: %s", labelName), 100, 0, 10);
+    TH1F *hTemplatePtSpecRatioInv = new TH1F("hTemplatePtSpecRatioInv", Form("p_{T} for #mu^{-}Top/#mu^{+}Bottom: %s", labelName), 100, 0, 10);
     // set max y-axis range
     double margin = 1.1;
     hTemplateEtaPos->SetMaximum(margin * maxEtaPos);
     hTemplateEtaNeg->SetMaximum(margin * maxEtaNeg);
     hTemplateEtaRatio->SetMinimum(1 - 1), hTemplateEtaRatio->SetMaximum(1 + 1);
     hTemplateEtaSpecRatio->SetMinimum(1 - 1), hTemplateEtaSpecRatio->SetMaximum(1 + 5);
+    hTemplateEtaSpecRatioInv->SetMinimum(1 - 1), hTemplateEtaSpecRatioInv->SetMaximum(1 + 5);
     hTemplatePtPos->SetMaximum(margin * maxPtPos);
     hTemplatePtNeg->SetMaximum(margin * maxPtNeg);
     hTemplatePtRatio->SetMinimum(1 - 0.5), hTemplatePtRatio->SetMaximum(1 + 0.5);
     hTemplatePtSpecRatio->SetMinimum(1 - 0.5), hTemplatePtSpecRatio->SetMaximum(1 + 0.5);
+    hTemplatePtSpecRatioInv->SetMinimum(1 - 0.5), hTemplatePtSpecRatioInv->SetMaximum(1 + 0.5);
 
     cEtaPos->cd();
     hTemplateEtaPos->SetStats(0);
@@ -637,6 +643,9 @@ void makePlots()
     cEtaSpecRatio->cd();
     hTemplateEtaSpecRatio->SetStats(0);
     hTemplateEtaSpecRatio->Draw();
+    cEtaSpecRatioInv->cd();
+    hTemplateEtaSpecRatioInv->SetStats(0);
+    hTemplateEtaSpecRatioInv->Draw();
     //
     cPtPos->cd();
     gPad->SetLogy();
@@ -652,6 +661,9 @@ void makePlots()
     cPtSpecRatio->cd();
     hTemplatePtSpecRatio->SetStats(0);
     hTemplatePtSpecRatio->Draw();
+    cPtSpecRatioInv->cd();
+    hTemplatePtSpecRatioInv->SetStats(0);
+    hTemplatePtSpecRatioInv->Draw();
 
     // make legends
     TLegend *l = new TLegend(0.60, 0.65, 0.80, 0.85);
@@ -725,6 +737,8 @@ void makePlots()
     l->Draw();
     cEtaSpecRatio->cd();
     lSpecRatio->Draw();
+    cEtaSpecRatioInv->cd();
+    lSpecRatio->Draw();
     //
     cPtPos->cd();
     l->Draw();
@@ -733,6 +747,8 @@ void makePlots()
     cPtRatio->cd();
     l->Draw();
     cPtSpecRatio->cd();
+    lSpecRatio->Draw();
+    cPtSpecRatioInv->cd();
     lSpecRatio->Draw();
 
     // hard-coded mu+Top/mu-Bottom
@@ -755,6 +771,27 @@ void makePlots()
     hEtaSpecRatioRef->Divide(hEtaNegBottomRef);
     hEtaSpecRatio->Divide(hEtaNegBottom);
 
+    // hard-coded mu-Top/mu+Bottom (inv)
+    TH1 *hEtaNegTopInvRef = GetTH1(vTreeNamesEtaNeg[0], vHistNamesEtaNeg[1]);
+    std::cout << "opening " << vTreeNamesEtaNeg[0] << " and " << vHistNamesEtaNeg[1] << std::endl;
+    hEtaNegTopInvRef = (TH1 *)hEtaNegTopInvRef->Clone("hEtaNegTopInvRef_clone");
+    TH1 *hEtaPosBottomInvRef = GetTH1(vTreeNamesEtaPos[0], vHistNamesEtaPos[2]);
+    std::cout << "opening " << vTreeNamesEtaPos[0] << " and " << vHistNamesEtaPos[2] << std::endl;
+    hEtaPosBottomInvRef = (TH1 *)hEtaPosBottomInvRef->Clone("hEtaPosBottomInvRef_clone");
+    TH1 *hEtaSpecRatioInvRef = (TH1 *)hEtaNegTopInvRef->Clone("hEtaSpecRatioInvRef_clone");
+
+    TH1 *hEtaNegTopInv = GetTH1(vTreeNamesEtaNeg[3], vHistNamesEtaNeg[4]);
+    std::cout << "opening " << vTreeNamesEtaNeg[3] << " and " << vHistNamesEtaNeg[4] << std::endl;
+    hEtaNegTopInv = (TH1 *)hEtaNegTopInv->Clone("hEtaNegTopInv_clone");
+    TH1 *hEtaPosBottomInv = GetTH1(vTreeNamesEtaPos[3], vHistNamesEtaPos[5]);
+    std::cout << "opening " << vTreeNamesEtaPos[3] << " and " << vHistNamesEtaPos[5] << std::endl;
+    hEtaPosBottomInv = (TH1 *)hEtaPosBottomInv->Clone("hEtaPosBottomInv_clone");
+    TH1 *hEtaSpecRatioInv = (TH1 *)hEtaNegTopInv->Clone("hEtaSpecRatioInv_clone");
+
+    hEtaSpecRatioInvRef->Divide(hEtaPosBottomInvRef);
+    hEtaSpecRatioInv->Divide(hEtaPosBottomInv);
+
+    // hard-coded mu+Top/mu-Bottom
     TH1 *hPtPosTopRef = GetTH1FromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[1], -4, 4);
     std::cout << "opening " << vTreeNamesPtPos[0] << " and " << vHistNamesPtPos[1] << std::endl;
     hPtPosTopRef = (TH1 *)hPtPosTopRef->Clone("hPtPosTopRef_clone");
@@ -774,43 +811,78 @@ void makePlots()
     hPtSpecRatio->Divide(hPtNegBottom);
     hPtSpecRatioRef->Divide(hPtNegBottomRef);
 
+    // hard-coded mu-Top/mu+Bottom (inv)
+    TH1 *hPtNegTopInvRef = GetTH1FromTH2(vTreeNamesPtNeg[0], vHistNamesPtNeg[1], -4, 4);
+    std::cout << "opening " << vTreeNamesPtNeg[0] << " and " << vHistNamesPtNeg[1] << std::endl;
+    hPtNegTopInvRef = (TH1 *)hPtNegTopInvRef->Clone("hPtNegTopInvRef_clone");
+    TH1 *hPtPosBottomInvRef = GetTH1FromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[2], -4, 4);
+    std::cout << "opening " << vTreeNamesPtPos[0] << " and " << vHistNamesPtPos[2] << std::endl;
+    hPtPosBottomInvRef = (TH1 *)hPtPosBottomInvRef->Clone("hPtPosBottomInvRef_clone");
+    TH1 *hPtSpecRatioInvRef = (TH1 *)hPtNegTopInvRef->Clone("hPtSpecRatioInvRef_clone");
+
+    TH1 *hPtNegTopInv = GetTH1FromTH2(vTreeNamesPtNeg[3], vHistNamesPtNeg[4], -4, 4);
+    std::cout << "opening " << vTreeNamesPtNeg[3] << " and " << vHistNamesPtNeg[4] << std::endl;
+    hPtNegTopInv = (TH1 *)hPtNegTopInv->Clone("hPtNegTopInv_clone");
+    TH1 *hPtPosBottomInv = GetTH1FromTH2(vTreeNamesPtPos[3], vHistNamesPtPos[5], -4, 4);
+    std::cout << "opening " << vTreeNamesPtPos[3] << " and " << vHistNamesPtPos[5] << std::endl;
+    hPtPosBottomInv = (TH1 *)hPtPosBottomInv->Clone("hPtPosBottomInv_clone");
+    TH1 *hPtSpecRatioInv = (TH1 *)hPtNegTopInv->Clone("hPtSpecRatioInv_clone");
+
+    hPtSpecRatioInv->Divide(hPtPosBottomInv);
+    hPtSpecRatioInvRef->Divide(hPtPosBottomInvRef);
+
     cEtaSpecRatio->cd();
     hEtaSpecRatio->SetLineColor(kRed);
     hEtaSpecRatioRef->SetLineColor(kBlack);
     hEtaSpecRatioRef->Draw("SAME HIST");
     hEtaSpecRatio->Draw("SAME HIST");
+    cEtaSpecRatioInv->cd();
+    hEtaSpecRatioInv->SetLineColor(kRed);
+    hEtaSpecRatioInvRef->SetLineColor(kBlack);
+    hEtaSpecRatioInvRef->Draw("SAME HIST");
+    hEtaSpecRatioInv->Draw("SAME HIST");
+    //
     cPtSpecRatio->cd();
     hPtSpecRatio->SetLineColor(kRed);
     hPtSpecRatioRef->SetLineColor(kBlack);
     hPtSpecRatioRef->Draw("SAME HIST");
     hPtSpecRatio->Draw("SAME HIST");
+    cPtSpecRatioInv->cd();
+    hPtSpecRatioInv->SetLineColor(kRed);
+    hPtSpecRatioInvRef->SetLineColor(kBlack);
+    hPtSpecRatioInvRef->Draw("SAME HIST");
+    hPtSpecRatioInv->Draw("SAME HIST");
 
     lSpecRatio->AddEntry(hEtaSpecRatioRef, "reference geometry", "l");
     lSpecRatio->AddEntry(hEtaSpecRatio, "new geometry", "l");
 
-    cEtaSpecRatio->cd();
-    lSpecRatio->Draw();
-    cPtSpecRatio->cd();
-    lSpecRatio->Draw();
+    // cEtaSpecRatio->cd();
+    // lSpecRatio->Draw();
+    // cPtSpecRatio->cd();
+    // lSpecRatio->Draw();
 
     cEtaPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf(", fAnalysisResults, labelName));
     cEtaNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
     cEtaRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
     cEtaSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
+    cEtaSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
     cPtPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
     cPtNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
     cPtRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf)", fAnalysisResults, labelName));
+    cPtSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
+    cPtSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf)", fAnalysisResults, labelName));
 
     fOutput->cd();
     cEtaPos->Write();
     cEtaNeg->Write();
     cEtaRatio->Write();
     cEtaSpecRatio->Write();
+    cEtaSpecRatioInv->Write();
     cPtPos->Write();
     cPtNeg->Write();
     cPtRatio->Write();
     cPtSpecRatio->Write();
+    cPtSpecRatioInv->Write();
     fOutput->Close();
 }
 
