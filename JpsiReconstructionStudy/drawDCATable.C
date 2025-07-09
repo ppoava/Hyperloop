@@ -57,7 +57,8 @@ int drawDCATable() {
     };
     */
 
-    const char *fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    // const char *fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
+    const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
     const char *histName;
 
     // Using the following geometries and (fixed) MCH parameters, according to muon-qa root file structure:
@@ -65,7 +66,7 @@ int drawDCATable() {
             "muon-qa", // GeometryAlignedFix10Fix15Shift04Ch1BNew2
     };
     std::map<std::string, std::string> geometryNames = {
-        {"muon-qa", "GeometryAlignedFix10Fix15Shift04Ch1BNew2"},
+        {"muon-qa", "GeometryAlignedFix110Fix19NewIST7"},
     };
 
     std::array<const char*, 4> arrQuadrants = { "Q0", "Q1", "Q2", "Q3"};

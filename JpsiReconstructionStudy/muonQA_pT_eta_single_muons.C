@@ -576,6 +576,25 @@ void makePlots()
     vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
     */
 
+   // ======================[ GeometryAlignedFix110Fix19NewIST7: changes? ]=====================
+    // Top-Bottom
+    
+    /*
+    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
+    labelName = "GeometryAlignedFix110Fix19NewIST7_top-bottom";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
+    */
+
+    // Left-Right
+
+    /*
+    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
+    labelName = "GeometryAlignedFix110Fix19NewIST7_left-right";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
+    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
+    */
+
     TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.root", fAnalysisResults, labelName), "RECREATE");
 
     std::vector<Int_t> vLineStyles = {1, 2, 6, 1, 1, 1}; // in order to show reference everywhere..
