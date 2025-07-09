@@ -370,13 +370,14 @@ int DiMuonMassSpectrum_muonQA()
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_BB");
     */
+    /*
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_TB");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_TPBN");
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_TNBP");
-    
+    */
 
     // Left-Right
     /*
@@ -682,6 +683,8 @@ int DiMuonMassSpectrum_muonQA()
     vHistNames.push_back(fMuonId + "_BB");
     */
     /*
+    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
+    fMuonId = "muon-qa_id31157/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_TB");
@@ -787,6 +790,9 @@ int DiMuonMassSpectrum_muonQA()
     vHistNames.push_back(fMuonId + "_BB");
     */
     /*
+    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
+    labelName = "GeometryAlignedFix110Fix19NewIST7_top-bottom";
+    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
     std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_TB");
@@ -955,7 +961,7 @@ int DiMuonMassSpectrum_muonQA()
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths_%s", labelName), Form("globalJpsiWidths_%s", labelName), 800, 600);
     globalCanvasJpsiWidths->cd();
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.11);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.15);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks_%s", labelName), Form("globalJpsiPeaks_%s", labelName), 800, 600);
