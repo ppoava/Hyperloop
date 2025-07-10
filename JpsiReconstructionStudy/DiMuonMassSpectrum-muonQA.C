@@ -271,14 +271,14 @@ TGraphErrors *calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
     return pullPlot;
 }
 
-TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax);
-TH1 *GetTH1(const char *fileName, std::string histName);
-TH1 *GetTH1FromTH2(const char *fileName, std::string histName, Double_t ptMin, Double_t ptMax);
+TH1D *getTree(std::string fileName, Double_t ptMin, Double_t ptMax);
+TH1 *GetTH1(std::string fileName, std::string histName);
+TH1 *GetTH1FromTH2(std::string fileName, std::string histName, Double_t ptMin, Double_t ptMax);
 void defSigModel(RooWorkspace &ws);
 void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
 void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t ptMin, Double_t ptMax);
-void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *realignmentLabel, Double_t ptMin, Double_t ptMax);
+void drawPlots(RooWorkspace &ws, TH1 *hist, std::string treeName, std::string realignmentLabel, Double_t ptMin, Double_t ptMax);
 
 struct JpsiValues
 {
@@ -289,7 +289,7 @@ struct JpsiValues
 };
 
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-JpsiValues CalculateJpsiWidth(const char *fileName, std::string histName, const char *realignmentLabel, Double_t ptMin, Double_t ptMax)
+JpsiValues CalculateJpsiWidth(std::string fileName, std::string histName, std::string realignmentLabel, Double_t ptMin, Double_t ptMax)
 {
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -334,11 +334,12 @@ JpsiValues CalculateJpsiWidth(const char *fileName, std::string histName, const 
 // --- drawOpt = {draw_generic, draw_specific}
 // --- drawHalfOpt = {top-bottom, left-right}
 // const char *labelName, const char *drawOpt, const char *drawHalfOpt, const char *fAnalysisResultsRef, std::string fMuonIdRef, const char *fAnalysisResultsNew, std::string fMuonIdNew
-int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, const char *drawOpt, const char *fAnalysisResultsRef, std::string fMuonIdRef, const char *fAnalysisResultsNew, std::string fMuonIdNew)
+int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, const char *drawOpt, std::string fAnalysisResultsRef, std::string fMuonIdRef, std::string fAnalysisResultsNew, std::string fMuonIdNew)
 {
-    std::vector<const char *> vTreeNames;
+    // TODO: CHANGE EVERYTHING TO STRINGS
+    std::vector<std::string> vTreeNames;
     std::vector<std::string> vHistNames;
-    std::vector<const char *> vLegendEntries;
+    std::vector<std::string> vLegendEntries;
     // const char *labelName; // saves PDF with widhts and peaks using this label name
     // const char *fAnalysisResults;
     // std::string fMuonId; // trains are combined in Hyperloop with different configurations in the same output file
@@ -1004,23 +1005,24 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
     vTreeNames.push_back(fAnalysisResults);
     vHistNames.push_back(fMuonId + "_LNRP");
     */
-
-    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/JpsiPeakAndWidth_%s_%s_%s.root", labelName, drawOpt, drawHalfOpt), "RECREATE");
+    std::cout << "are we crashing?" << std::endl;
+    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/JpsiPeakAndWidth_%s_%s_%s.root", labelName.c_str(), drawOpt, drawHalfOpt), "RECREATE");
+    std::cout << "nope, not crashing (yet)" << std::endl;
 
     std::vector<Int_t> vLineStyles;
     std::vector<Int_t> vLineColours;
 
-    if (strcmp(drawOpt, "draw generic") == 0)
+    if (strcmp(drawOpt, "draw_generic") == 0)
     {
         vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1};
         vLineColours = {1, 1, 1, 1, 2, 8, 4, 7};
     }
     else if (strcmp(drawOpt, "draw_specific") == 0)
     {
-        vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1};
+        vLineStyles = {1, 2, 3, 1, 2, 3};
         vLineColours = {1, 1, 1, 4, 4, 4};
-        ;
     }
+    else { std::cout << "ERROR: did not set line styles and/or colours" << std::endl; }
 
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom shift TT","CH1 bottom shift TB or BT","CH1 bottom shift BB"};
     // std::vector<const char*> vLegendEntries = {"Integrated", "CH1 bottom shift LL","CH1 bottom shift LR or RL","CH1 bottom shift RR"};
@@ -1071,8 +1073,8 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
                                      nBins, binEdges.data());
     TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "J/#psi peak; p_{T} (GeV/c); GeV/c^{2}",
                                     nBins, binEdges.data());
-    hTemplateWidths->SetTitle(Form("%s : J/#psi width; p_{T} (GeV/c)", labelName));
-    hTemplatePeaks->SetTitle(Form("%s : J/#psi peak; p_{T} (GeV/c)", labelName));
+    hTemplateWidths->SetTitle(Form("%s : J/#psi width; p_{T} (GeV/c)", labelName.c_str()));
+    hTemplatePeaks->SetTitle(Form("%s : J/#psi peak; p_{T} (GeV/c)", labelName.c_str()));
 
     TLine *lineJpsiPDG = new TLine(binEdges.front() - 2, 3.096, binEdges.back() + 2, 3.096);
     // For Upsilon: TLine* lineUpsilonPDG = new TLine(binEdges.front(), 9.46, binEdges.back(), 9.46);
@@ -1087,12 +1089,12 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
     // TCanvas *dummy = new TCanvas("dummy","dummy for drawing", 800, 600);
     // dummy->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf(", labelName)); // assumes the same data set is used for reference and for re-alignment
 
-    TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths_%s", labelName), Form("globalJpsiWidths_%s", labelName), 800, 600);
+    TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths_%s", labelName.c_str()), Form("globalJpsiWidths_%s", labelName.c_str()), 800, 600);
     globalCanvasJpsiWidths->cd();
     hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.15);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
-    TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks_%s", labelName), Form("globalJpsiPeaks_%s", labelName), 800, 600);
+    TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks_%s", labelName.c_str()), Form("globalJpsiPeaks_%s", labelName.c_str()), 800, 600);
     globalCanvasJpsiPeaks->cd();
     hTemplatePeaks->GetYaxis()->SetRangeUser(3.02, 3.17);
     hTemplatePeaks->SetStats(0);
@@ -1112,20 +1114,26 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
     // std::vector<std::string> vTopBottom;
     // vTopBottom.push_back{"TT", "TB", "BT", "BB"};
 
+    std::cout << "vTreeNames.size() = " << vTreeNames.size() << std::endl;
+
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++)
     {
-        const char *fileName = vTreeNames[i];
+        std::cout << "crash again?" << std::endl;
+        std::string fileName = vTreeNames[i];
         std::string histName = vHistNames[i];
+        std::cout << "iteration i = " << i << std::endl;
+        std::cout << "fileName = " << fileName << std::endl;
+        std::cout << "histName = " << histName << std::endl;
         // TODO: add top/bottom here, easiest to loop over vector with the names...
         // std::string histName = std::string(vMuonIds[i]) + "/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
         // hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}",
         // nBins, 0, nBins);
         // hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}",
         // nBins, 0, nBins);
-        hWidths = new TH1D(Form("hWidths_%s", fileName), "J/ψ width; p_{T} (GeV/c); GeV/c^{2}",
+        hWidths = new TH1D(Form("hWidths_%s", fileName.c_str()), "J/ψ width; p_{T} (GeV/c); GeV/c^{2}",
                            nBins, binEdges.data());
-        hPeaks = new TH1D(Form("hPeaks_%s", fileName), "J/ψ peak; p_{T} (GeV/c); GeV/c^{2}",
+        hPeaks = new TH1D(Form("hPeaks_%s", fileName.c_str()), "J/ψ peak; p_{T} (GeV/c); GeV/c^{2}",
                           nBins, binEdges.data());
 
         // Loop through bins and calculate Jpsi width
@@ -1146,23 +1154,28 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
             // hPeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
             // hTemplatePeaks->GetXaxis()->SetBinLabel(j + 1, Form("%.0f-%.0f", ptBins[j].first, ptBins[j].second));
         }
-
+        
         // Correct bin labels
         // hWidths->LabelsOption("h", "X");
         // hPeaks->LabelsOption("h", "X");
-
-        TCanvas *canvasJpsiWidths = new TCanvas(Form("cJpsiWidths_%s", fileName), Form("cJpsiWidths_%s", fileName), 800, 600);
+std::cout << "the crash is here 1 " << std::endl;
+        TCanvas *canvasJpsiWidths = new TCanvas(Form("cJpsiWidths_%s", fileName.c_str()), Form("cJpsiWidths_%s", fileName.c_str()), 800, 600);
         canvasJpsiWidths->cd();
         hWidths->SetStats(0);
         hWidths->Draw("PE");
-
+std::cout << "the crash is here 2" << std::endl;
         globalCanvasJpsiWidths->cd();
+    std::cout << "the crash is here 3" << std::endl;
         hWidths->SetLineColor(vLineColours[i]);
+        std::cout << "the crash is here 4" << std::endl;
         hWidths->SetLineStyle(vLineStyles[i]);
+        std::cout << "the crash is here 5" << std::endl;
         hWidths->Draw("SAME PE");
-        legendWidths->AddEntry(hWidths, vLegendEntries[i], "l");
+        std::cout << "the crash is here 6" << std::endl;
+        legendWidths->AddEntry(hWidths, vLegendEntries[i].c_str(), "l");
+        std::cout << "the crash is here 7" << std::endl;
 
-        TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", fileName), Form("cJpsiPeaks_%s", fileName), 800, 600);
+        TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", fileName.c_str()), Form("cJpsiPeaks_%s", fileName.c_str()), 800, 600);
         canvasJpsiPeaks->cd();
         hPeaks->SetStats(0);
         hPeaks->Draw("PE");
@@ -1171,10 +1184,13 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
         hPeaks->SetLineColor(vLineColours[i]);
         hPeaks->SetLineStyle(vLineStyles[i]);
         hPeaks->Draw("SAME PE");
-        legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
+
+        legendPeaks->AddEntry(hPeaks, vLegendEntries[i].c_str(), "l");
+
         std::cout << "vLegendEntries[i] = " << vLegendEntries[i] << std::endl;
 
         CalculateJpsiWidth(fileName, histName, vLegendEntries[i], 0, 30);
+        std::cout << "crashing maybe?" << std::endl;
 
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
@@ -1187,8 +1203,8 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
     globalCanvasJpsiPeaks->cd();
     legendPeaks->Draw();
 
-    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf(", labelName, drawOpt, drawHalfOpt));
-    globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf)", labelName, drawOpt, drawHalfOpt));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf(", labelName.c_str(), drawOpt, drawHalfOpt));
+    globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf)", labelName.c_str(), drawOpt, drawHalfOpt));
 
     fOutput->cd();
     globalCanvasJpsiWidths->Write();
@@ -1209,7 +1225,7 @@ int DiMuonMassSpectrum_muonQA(const char *labelName, const char *drawHalfOpt, co
     return 0;
 }
 
-TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax)
+TH1D *getTree(std::string fileName, Double_t ptMin, Double_t ptMax)
 {
 
     // **********************************************
@@ -1220,7 +1236,7 @@ TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax)
     TList *subListDiMuon;
     TH2F *hMass_Pt;
 
-    TFile *fDiMuon = new TFile(fileName, "READ");
+    TFile *fDiMuon = new TFile(fileName.c_str(), "READ");
     listDiMuon = (THashList *)fDiMuon->Get("analysis-same-event-pairing/output");
     // NAME DEPENDS ON CUT USED
     // PairsMuonSEPM_muonLowPt510SigmaPDCA
@@ -1245,9 +1261,9 @@ TH1D *getTree(const char *fileName, Double_t ptMin, Double_t ptMax)
 } // void getTree()
 
 // Use this one for the dimuon spectra from Andrea/Chi's code
-TH1 *GetTH1(const char *fileName, std::string histName)
+TH1 *GetTH1(std::string fileName, std::string histName)
 {
-    TFile *f = new TFile(fileName, "READ");
+    TFile *f = new TFile(fileName.c_str(), "READ");
     std::cout << "Reading " << histName.c_str() << " from TFile" << std::endl;
     if (!f || f->IsZombie())
     {
@@ -1269,9 +1285,9 @@ TH1 *GetTH1(const char *fileName, std::string histName)
 
 // Use this one for the dimuon spectra from Andrea/Chi's code
 // When getting TH2 (mass, pT) and making the projection
-TH1 *GetTH1FromTH2(const char *fileName, std::string histName, Double_t ptMin, Double_t ptMax)
+TH1 *GetTH1FromTH2(std::string fileName, std::string histName, Double_t ptMin, Double_t ptMax)
 {
-    TFile *f = new TFile(fileName, "READ");
+    TFile *f = new TFile(fileName.c_str(), "READ");
     std::cout << "Reading " << histName.c_str() << " from TFile" << std::endl;
     TH2 *hist = (TH2 *)f->Get(histName.c_str());
     if (hist == nullptr)
@@ -1509,7 +1525,7 @@ void fitModelToData(RooWorkspace &ws, TH1 *hist, std::string BKG_model, Double_t
 
 } // void fitModelToData()
 
-void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *realignmentLabel, Double_t ptMin, Double_t ptMax)
+void drawPlots(RooWorkspace &ws, TH1 *hist, std::string treeName, std::string realignmentLabel, Double_t ptMin, Double_t ptMax)
 {
 
     // Collect everything from workspace
@@ -1534,8 +1550,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *re
     sigYield->setVal(N_jpsi->getVal() + N_psi2S->getVal());
     TGraphErrors *hpull = calculatePullHist(m, hist, model, sigYield, bkgYield);
 
-    TCanvas *canvas = new TCanvas(Form("%s_canvas_Pt_%.0f_%.0f", realignmentLabel, ptMin, ptMax),
-                                  Form("%s_Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f", realignmentLabel, ptMin, ptMax),
+    TCanvas *canvas = new TCanvas(Form("%s_canvas_Pt_%.0f_%.0f", realignmentLabel.c_str(), ptMin, ptMax),
+                                  Form("%s_Double Sided Crystal Ball Fit %.0f < p_{T} < %.0f", realignmentLabel.c_str(), ptMin, ptMax),
                                   800, 600);
     canvas->SetBottomMargin(0);
     canvas->cd();
@@ -1609,7 +1625,7 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *re
     // For Upsilon: TLegend *legend = new TLegend(0.13,0.16,0.37,0.44);
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
-    legend->AddEntry("", Form("%s realignment", realignmentLabel), "");
+    legend->AddEntry("", Form("%s realignment", realignmentLabel.c_str()), "");
     legend->AddEntry("", Form("%.0f < p_{T} < %.0f [GeV]", ptMin, ptMax), "");
     legend->AddEntry(frame->getObject(0), "Data", "point");
     legend->AddEntry(frame->getObject(1), "Full model", "l");
@@ -1667,8 +1683,8 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *re
 
     // Save outputs
     // For Upsilon: change name
-    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName, ptMin, ptMax));
-    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName, ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].pdf", treeName.c_str(), ptMin, ptMax));
+    canvas->SaveAs(Form("Plots/JPsiFit_%s_[%.0f_%.0f].png", treeName.c_str(), ptMin, ptMax));
 
     // Obsolete
     // canvas->SaveAs(Form("Plots/SimpleJpsiFitting/pTRange_[%.0f,%.0f]_JpsiSingleMuonCut1GeV.pdf",ptMin,ptMax));
@@ -1685,5 +1701,6 @@ void drawPlots(RooWorkspace &ws, TH1 *hist, const char *treeName, const char *re
     std::cout << "Entries in range [" << mMin << ", " << mMax << "]: " << sumEntries << std::endl;
     sigYield->setVal(N_jpsi->getVal() + N_psi2S->getVal());
     std::cout << "sigYield + bkgYield = " << sigYield->getVal() + bkgYield->getVal() << std::endl;
+    std::cout << "do we crash here?" << std::endl;
 
 } // void drawPlots()
