@@ -16,9 +16,9 @@
 #include "TPad.h"
 #include "TLine.h"
 
-TH1 *GetTH1(const char *fileName, std::string histName)
+TH1 *GetTH1(std::string fileName, std::string histName)
 {
-    TFile *f = new TFile(fileName, "READ");
+    TFile *f = new TFile(fileName.c_str(), "READ");
     std::cout << "FUNCTION: Reading " << histName.c_str() << " from TFile" << std::endl;
     TH1 *hist = (TH1 *)f->Get(histName.c_str());
     if (hist == nullptr)
@@ -34,9 +34,9 @@ TH1 *GetTH1(const char *fileName, std::string histName)
 
 // Use this one for the dimuon spectra from Andrea/Chi's code
 // When getting TH2 (mass, pT) and making the projection
-TH1 *GetTH1FromTH2(const char *fileName, std::string histName, Double_t etaMin, Double_t etaMax)
+TH1 *GetTH1FromTH2(std::string fileName, std::string histName, Double_t etaMin, Double_t etaMax)
 {
-    TFile *f = new TFile(fileName, "READ");
+    TFile *f = new TFile(fileName.c_str(), "READ");
     std::cout << "FUNCTION: Reading " << histName.c_str() << " from TFile" << std::endl;
     TH2 *hist = (TH2 *)f->Get(histName.c_str());
     if (hist == nullptr)
@@ -67,9 +67,10 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     std::vector<std::string> vHistNamesEtaNeg;
     std::vector<std::string> vHistNamesPtPos;
     std::vector<std::string> vHistNamesPtNeg;
-    std::string labelName; // saves PDF with widhts and peaks using this label name
-    std::string fAnalysisResults;
-    std::string fMuonId; // trains are combined in Hyperloop with different configurations in the same output file
+    std::vector<std::string> vLegendEntries;
+    // std::string labelName; // saves PDF with widhts and peaks using this label name
+    // std::string fAnalysisResults;
+    // std::string fMuonId; // trains are combined in Hyperloop with different configurations in the same output file
 
     // fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_muonID-30697_no_realignment_muonID-30255_javier_new2_muon_ID-30698_globalShiftY_Hyperloop_17_06_2025.root";
     // fAnalysisResults = "AnalysisResults_LHC24am_pass1_skimmed_muon-QA_Hyperloop_02_07_2025.root";
@@ -90,7 +91,6 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
 
     if (strcmp(drawHalfOpt, "top-bottom") == 0)
     {
-
         vTreeNamesEtaPos.push_back(fAnalysisResultsRef);
         vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos");
         vTreeNamesEtaPos.push_back(fAnalysisResultsRef);
@@ -118,9 +118,9 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_T");
         vTreeNamesPtNeg.push_back(fAnalysisResultsRef);
         vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_B");
-        
+
         // ----- new geometry -----
-        std::vector<std::string> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
+        vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
         vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos");
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
@@ -183,7 +183,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_B");
 
         // ----- new geometry -----
-        std::vector<std::string> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
+        vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
         vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos");
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
@@ -214,6 +214,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     }
 
     // BELOW IS LEGACY !!!!
+    /*
 
     // ======================[ GeometryAligned: Reference (no realignment) ]=====================
     // Top-Bottom
@@ -250,7 +251,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
 
     // Left-Right
-    /*
+
     // labelName = "LHC24an_pass1_skimmed_no_realignment_left-right";
     // std::vector<const char*> vLegendEntries = {"integrated", "left", "right"};
     fMuonId = "muon-qa_id30697/muons/";
@@ -285,7 +286,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
 
     // ======================[ GeometryAlignedFix110Fix15New2T5: Javier new2 ]=====================
     // Top-Bottom
-
+    /*
     labelName = "GeometryAlignedFix110Fix15New2T5_top-bottom";
     fMuonId = "muon-qa_id30992/muons/";
     std::vector<const char *> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
@@ -319,7 +320,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
 
     // Left-Right
 
-    /*
+
     labelName = "GeometryAlignedFix110Fix15New2T5_left-right";
     fMuonId = "muon-qa_id30992/muons/";
     std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
@@ -725,7 +726,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
     */
 
-    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.root", fAnalysisResults, labelName), "RECREATE");
+    TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.root", fAnalysisResultsNew.c_str(), labelName.c_str()), "RECREATE");
 
     std::vector<Int_t> vLineStyles = {1, 2, 6, 1, 1, 1}; // in order to show reference everywhere..
     std::vector<Int_t> vLineColours = {1, 1, 1, 2, 8, 7};
@@ -757,16 +758,16 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     }
 
     // make templates
-    TH1F *hTemplateEtaPos = new TH1F("hTemplateEtaPos", Form("#eta for #mu^{+}: %s", labelName), 80, -5, -1);
-    TH1F *hTemplateEtaNeg = new TH1F("hTemplateEtaNeg", Form("#eta for #mu^{-}: %s", labelName), 80, -5, -1);
-    TH1F *hTemplateEtaRatio = new TH1F("hTemplateEtaRatio", Form("#eta for #mu^{+}/#mu^{-}: %s", labelName), 80, -5, -1);
-    TH1F *hTemplateEtaSpecRatio = new TH1F("hTemplateEtaSpecRatio", Form("#eta for #mu^{+}Top/#mu^{-}Bottom: %s", labelName), 80, -5, -1);
-    TH1F *hTemplateEtaSpecRatioInv = new TH1F("hTemplateEtaSpecRatioInv", Form("#eta for #mu^{-}Top/#mu^{+}Bottom: %s", labelName), 80, -5, -1);
-    TH1F *hTemplatePtPos = new TH1F("hTemplatePtPos", Form("p_{T} for #mu^{+}: %s", labelName), 100, 0, 10);
-    TH1F *hTemplatePtNeg = new TH1F("hTemplatePtNeg", Form("p_{T} for #mu^{-}: %s", labelName), 100, 0, 10);
-    TH1F *hTemplatePtRatio = new TH1F("hTemplatePtRatio", Form("p_{T} for #mu^{+}/#mu^{-}: %s", labelName), 100, 0, 10);
-    TH1F *hTemplatePtSpecRatio = new TH1F("hTemplatePtSpecRatio", Form("p_{T} for #mu^{+}Top/#mu^{-}Bottom: %s", labelName), 100, 0, 10);
-    TH1F *hTemplatePtSpecRatioInv = new TH1F("hTemplatePtSpecRatioInv", Form("p_{T} for #mu^{-}Top/#mu^{+}Bottom: %s", labelName), 100, 0, 10);
+    TH1F *hTemplateEtaPos = new TH1F("hTemplateEtaPos", Form("#eta for #mu^{+}: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaNeg = new TH1F("hTemplateEtaNeg", Form("#eta for #mu^{-}: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaRatio = new TH1F("hTemplateEtaRatio", Form("#eta for #mu^{+}/#mu^{-}: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaSpecRatio = new TH1F("hTemplateEtaSpecRatio", Form("#eta for #mu^{+}Top/#mu^{-}Bottom: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaSpecRatioInv = new TH1F("hTemplateEtaSpecRatioInv", Form("#eta for #mu^{-}Top/#mu^{+}Bottom: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplatePtPos = new TH1F("hTemplatePtPos", Form("p_{T} for #mu^{+}: %s", labelName.c_str()), 100, 0, 10);
+    TH1F *hTemplatePtNeg = new TH1F("hTemplatePtNeg", Form("p_{T} for #mu^{-}: %s", labelName.c_str()), 100, 0, 10);
+    TH1F *hTemplatePtRatio = new TH1F("hTemplatePtRatio", Form("p_{T} for #mu^{+}/#mu^{-}: %s", labelName.c_str()), 100, 0, 10);
+    TH1F *hTemplatePtSpecRatio = new TH1F("hTemplatePtSpecRatio", Form("p_{T} for #mu^{+}Top/#mu^{-}Bottom: %s", labelName.c_str()), 100, 0, 10);
+    TH1F *hTemplatePtSpecRatioInv = new TH1F("hTemplatePtSpecRatioInv", Form("p_{T} for #mu^{-}Top/#mu^{+}Bottom: %s", labelName.c_str()), 100, 0, 10);
     // set max y-axis range
     double margin = 1.1;
     hTemplateEtaPos->SetMaximum(margin * maxEtaPos);
@@ -825,10 +826,10 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
 
     for (Int_t i = 0; i < vTreeNamesEtaPos.size(); i++)
     {
-        const char *fNameEtaPos = vTreeNamesEtaPos[i];
-        const char *fNameEtaNeg = vTreeNamesEtaNeg[i];
-        const char *fNamePtPos = vTreeNamesPtPos[i];
-        const char *fNamePtNeg = vTreeNamesPtNeg[i];
+        std::string fNameEtaPos = vTreeNamesEtaPos[i];
+        std::string fNameEtaNeg = vTreeNamesEtaNeg[i];
+        std::string fNamePtPos = vTreeNamesPtPos[i];
+        std::string fNamePtNeg = vTreeNamesPtNeg[i];
         std::string hNameEtaPos = vHistNamesEtaPos[i];
         std::string hNameEtaNeg = vHistNamesEtaNeg[i];
         std::string hNamePtPos = vHistNamesPtPos[i];
@@ -875,7 +876,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         hPtNeg->Draw("SAME HIST E");
         cPtRatio->cd();
         hPtRatio->Draw("SAME HIST");
-        l->AddEntry(hEtaPos, vLegendEntries[i], "l");
+        l->AddEntry(hEtaPos, vLegendEntries[i].c_str(), "l");
     }
 
     cEtaPos->cd();
@@ -1010,16 +1011,16 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     // cPtSpecRatio->cd();
     // lSpecRatio->Draw();
 
-    cEtaPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf(", fAnalysisResults, labelName));
-    cEtaNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cEtaRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cEtaSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cEtaSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResults, labelName));
-    cPtSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf)", fAnalysisResults, labelName));
+    cEtaPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf(", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cPtPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cPtNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cPtRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cPtSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cPtSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf)", fAnalysisResultsNew.c_str(), labelName.c_str()));
 
     fOutput->cd();
     cEtaPos->Write();
@@ -1035,8 +1036,8 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     fOutput->Close();
 }
 
-int muonQA_pT_eta_single_muons(std::string labelName, const char *drawHalfOpt, const char *drawOpt, std::string fAnalysisResultsRef, std::string fMuonIdRef, std::string fAnalysisResultsNew, std::string fMuonIdNew))
+int muonQA_pT_eta_single_muons(std::string labelName, const char *drawHalfOpt, const char *drawOpt, std::string fAnalysisResultsRef, std::string fMuonIdRef, std::string fAnalysisResultsNew, std::string fMuonIdNew)
 {
-    makePlots(std::string labelName, const char *drawHalfOpt, const char *drawOpt, std::string fAnalysisResultsRef, std::string fMuonIdRef, std::string fAnalysisResultsNew, std::string fMuonIdNew);
+    makePlots(labelName, drawHalfOpt, drawOpt, fAnalysisResultsRef, fMuonIdRef, fAnalysisResultsNew, fMuonIdNew);
     return 0;
 }
