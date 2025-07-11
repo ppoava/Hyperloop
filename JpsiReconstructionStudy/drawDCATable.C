@@ -58,14 +58,25 @@ int drawDCATable() {
     */
 
     // const char *fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
-    const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
+    // const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
+    const char *fAnalysisResults = "AnalysisResults-muonQA_merged_LHC24an_LHC24am_all_geometries_Hyperloop_11_07_2025.root";
     const char *histName;
 
     // Using the following geometries and (fixed) MCH parameters, according to muon-qa root file structure:
     std::vector<const char*> vGeometries = {
+            //"muon-qa_id30697",
+            //"muon-qa_id30619",
+            //"muon-qa_id31157",
+            "muon-qa_id30992",
+            "muon-qa_id30993",
             "muon-qa", // GeometryAlignedFix10Fix15Shift04Ch1BNew2
     };
     std::map<std::string, std::string> geometryNames = {
+        //{"muon-qa_id30697", "reference"},
+        //{"muon-qa_id30619", "GeometryAlignedFix10Fix15ShiftCh1BNew2"},
+        //{"muon-qa_id31157", "GeometryAlignedFix10Fix15Shift04Ch1BNew2"},
+        {"muon-qa_id30992", "GeometryAlignedFix110Fix15New2T5"},
+        {"muon-qa_id30993", "GeometryAlignedFix110Fix15New2T5ShiftY"},
         {"muon-qa", "GeometryAlignedFix110Fix19NewIST7"},
     };
 
