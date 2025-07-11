@@ -157,60 +157,60 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vTreeNamesEtaPos.push_back(fAnalysisResultsRef);
         vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos");
         vTreeNamesEtaPos.push_back(fAnalysisResultsRef);
-        vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos_T");
+        vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos_L");
         vTreeNamesEtaPos.push_back(fAnalysisResultsRef);
-        vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos_B");
+        vHistNamesEtaPos.push_back(fMuonIdRef + "TrackEtaPos_R");
         //
         vTreeNamesEtaNeg.push_back(fAnalysisResultsRef);
         vHistNamesEtaNeg.push_back(fMuonIdRef + "TrackEtaNeg");
         vTreeNamesEtaNeg.push_back(fAnalysisResultsRef);
-        vHistNamesEtaNeg.push_back(fMuonIdRef + "TrackEtaNeg_T");
+        vHistNamesEtaNeg.push_back(fMuonIdRef + "TrackEtaNeg_L");
         vTreeNamesEtaNeg.push_back(fAnalysisResultsRef);
-        vHistNamesEtaNeg.push_back(fMuonIdRef + "TrackEtaNeg_B");
+        vHistNamesEtaNeg.push_back(fMuonIdRef + "TrackEtaNeg_R");
         //
         vTreeNamesPtPos.push_back(fAnalysisResultsRef);
         vHistNamesPtPos.push_back(fMuonIdRef + "TrackPt_TrackEtaPos");
         vTreeNamesPtPos.push_back(fAnalysisResultsRef);
-        vHistNamesPtPos.push_back(fMuonIdRef + "TrackPt_TrackEtaPos_T");
+        vHistNamesPtPos.push_back(fMuonIdRef + "TrackPt_TrackEtaPos_L");
         vTreeNamesPtPos.push_back(fAnalysisResultsRef);
-        vHistNamesPtPos.push_back(fMuonIdRef + "TrackPt_TrackEtaPos_B");
+        vHistNamesPtPos.push_back(fMuonIdRef + "TrackPt_TrackEtaPos_R");
         //
         vTreeNamesPtNeg.push_back(fAnalysisResultsRef);
         vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg");
         vTreeNamesPtNeg.push_back(fAnalysisResultsRef);
-        vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_T");
+        vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_L");
         vTreeNamesPtNeg.push_back(fAnalysisResultsRef);
-        vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_B");
+        vHistNamesPtNeg.push_back(fMuonIdRef + "TrackPt_TrackEtaNeg_R");
 
         // ----- new geometry -----
-        vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
+        vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L", "new geometry R"};
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
         vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos");
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
-        vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos_T");
+        vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos_L");
         vTreeNamesEtaPos.push_back(fAnalysisResultsNew);
-        vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos_B");
+        vHistNamesEtaPos.push_back(fMuonIdNew + "TrackEtaPos_R");
         //
         vTreeNamesEtaNeg.push_back(fAnalysisResultsNew);
         vHistNamesEtaNeg.push_back(fMuonIdNew + "TrackEtaNeg");
         vTreeNamesEtaNeg.push_back(fAnalysisResultsNew);
-        vHistNamesEtaNeg.push_back(fMuonIdNew + "TrackEtaNeg_T");
+        vHistNamesEtaNeg.push_back(fMuonIdNew + "TrackEtaNeg_L");
         vTreeNamesEtaNeg.push_back(fAnalysisResultsNew);
-        vHistNamesEtaNeg.push_back(fMuonIdNew + "TrackEtaNeg_B");
+        vHistNamesEtaNeg.push_back(fMuonIdNew + "TrackEtaNeg_R");
         //
         vTreeNamesPtPos.push_back(fAnalysisResultsNew);
         vHistNamesPtPos.push_back(fMuonIdNew + "TrackPt_TrackEtaPos");
         vTreeNamesPtPos.push_back(fAnalysisResultsNew);
-        vHistNamesPtPos.push_back(fMuonIdNew + "TrackPt_TrackEtaPos_T");
+        vHistNamesPtPos.push_back(fMuonIdNew + "TrackPt_TrackEtaPos_L");
         vTreeNamesPtPos.push_back(fAnalysisResultsNew);
-        vHistNamesPtPos.push_back(fMuonIdNew + "TrackPt_TrackEtaPos_B");
+        vHistNamesPtPos.push_back(fMuonIdNew + "TrackPt_TrackEtaPos_R");
         //
         vTreeNamesPtNeg.push_back(fAnalysisResultsNew);
         vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg");
         vTreeNamesPtNeg.push_back(fAnalysisResultsNew);
-        vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg_T");
+        vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg_L");
         vTreeNamesPtNeg.push_back(fAnalysisResultsNew);
-        vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg_B");
+        vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg_R");
     }
 
     // BELOW IS LEGACY !!!!
