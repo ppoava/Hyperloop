@@ -1,0 +1,6 @@
+*.root
+*.tar
+**/*.root
+**/*.tar
+*.pdf
+*.png
