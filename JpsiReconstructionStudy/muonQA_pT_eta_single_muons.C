@@ -51,9 +51,38 @@ TH1 *GetTH1FromTH2(std::string fileName, std::string histName, Double_t etaMin, 
     hist->GetYaxis()->SetRangeUser(etaMin, etaMax);
     hist->GetXaxis()->SetRangeUser(0, 10);
     std::cout << "problem with projection?" << std::endl;
+    if (!hist) {
+        std::cout << "big problem" << std::endl;
+    }
     TH1 *hPt_EtaCut = hist->ProjectionX("hPt_EtaCut");
     std::cout << "no problem with projection" << std::endl;
     return hPt_EtaCut;
+}
+
+// Same as above but projection in other coordinate
+TH1 *GetEtaFromTH2(std::string fileName, std::string histName, Double_t ptMin, Double_t ptMax)
+{
+    TFile *f = new TFile(fileName.c_str(), "READ");
+    std::cout << "FUNCTION: Reading " << histName.c_str() << " from TFile" << std::endl;
+    TH2 *hist = (TH2 *)f->Get(histName.c_str());
+    if (hist == nullptr)
+    {
+        std::cout << ">> error retrieving histogram" << std::endl;
+    }
+    else
+    {
+        std::cout << ">> histogram sucessfully read from TFile" << std::endl;
+    }
+    // TH2 *hMass_Pt = (TH2*)hist->Clone();
+    hist->GetXaxis()->SetRangeUser(ptMin, ptMax);
+    hist->GetYaxis()->SetRangeUser(-5, -1);
+    std::cout << "problem with projection?" << std::endl;
+    if (!hist) {
+        std::cout << "big problem" << std::endl;
+    }
+    TH1 *hEta_PtCut = hist->ProjectionY("hEta_PtCut");
+    std::cout << "no problem with projection" << std::endl;
+    return hEta_PtCut;
 }
 
 void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawOpt, std::string fAnalysisResultsRef, std::string fMuonIdRef, std::string fAnalysisResultsNew, std::string fMuonIdNew)
@@ -213,519 +242,6 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vHistNamesPtNeg.push_back(fMuonIdNew + "TrackPt_TrackEtaNeg_R");
     }
 
-    // BELOW IS LEGACY !!!!
-    /*
-
-    // ======================[ GeometryAligned: Reference (no realignment) ]=====================
-    // Top-Bottom
-
-    // labelName = "LHC24an_pass1_skimmed_no_realignment_top-bottom";
-    // std::vector<const char *> vLegendEntries = {"integrated", "top", "bottom"};
-    fMuonId = "muon-qa_id30697/muons/";
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-
-    // Left-Right
-
-    // labelName = "LHC24an_pass1_skimmed_no_realignment_left-right";
-    // std::vector<const char*> vLegendEntries = {"integrated", "left", "right"};
-    fMuonId = "muon-qa_id30697/muons/";
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedFix110Fix15New2T5: Javier new2 ]=====================
-    // Top-Bottom
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5_top-bottom";
-    fMuonId = "muon-qa_id30992/muons/";
-    std::vector<const char *> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T", "new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-
-    // Left-Right
-
-
-    labelName = "GeometryAlignedFix110Fix15New2T5_left-right";
-    fMuonId = "muon-qa_id30992/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedShiftY: globalShiftY ]=====================
-    // Top-Bottom
-    /*
-    labelName = "GeometryAlignedShiftY_top-bottom";
-    fMuonId = "muon-qa_id30991/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedShiftY_left-right";
-    fMuonId = "muon-qa_id30991/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedFix110Fix15New2T5ShiftY: globalShiftY + javier new2 ]=====================
-    // Top-Bottom
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_top-bottom";
-    fMuonId = "muon-qa_id30993/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_left-right";
-    fMuonId = "muon-qa_id30993/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedFix10Fix15ShiftCh1BNew2: bottom only CH1 shift ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_top-bottom";
-    fMuonId = "muon-qa_id30619/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_left-right";
-    fMuonId = "muon-qa_id30619/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
-    // fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    fMuonId = "muon-qa_id31157/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_left-right";
-    fMuonId = "muon-qa_id31157/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_L");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_R");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_L");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_R");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_L");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_R");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_L");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_R");
-    */
-
-    // ======================[ GeometryAlignedFix10Fix15ShiftCh1TBNew2: bottom and top CH1 1/2 shift ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_top-bottom";
-    fMuonId = "muon-qa_id30620/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference T", "reference B", "new geometry int", "new geometry T","new geometry B"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_left-right";
-    fMuonId = "muon-qa_id30620/muons/";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference L", "reference R", "new geometry int", "new geometry L"","new geometry R"};
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_T");
-    vTreeNamesEtaPos.push_back(fAnalysisResults);
-    vHistNamesEtaPos.push_back(fMuonId + "TrackEtaPos_B");
-    //
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_T");
-    vTreeNamesEtaNeg.push_back(fAnalysisResults);
-    vHistNamesEtaNeg.push_back(fMuonId + "TrackEtaNeg_B");
-    //
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_T");
-    vTreeNamesPtPos.push_back(fAnalysisResults);
-    vHistNamesPtPos.push_back(fMuonId + "TrackPt_TrackEtaPos_B");
-    //
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_T");
-    vTreeNamesPtNeg.push_back(fAnalysisResults);
-    vHistNamesPtNeg.push_back(fMuonId + "TrackPt_TrackEtaNeg_B");
-    */
-
-    // ======================[ GeometryAlignedFix110Fix19NewIST7: changes? ]=====================
-    // Top-Bottom
-
-    /*
-    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
-    labelName = "GeometryAlignedFix110Fix19NewIST7_top-bottom";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    */
-
-    // Left-Right
-
-    /*
-    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
-    labelName = "GeometryAlignedFix110Fix19NewIST7_left-right";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    */
-
     TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.root", fAnalysisResultsNew.c_str(), labelName.c_str()), "RECREATE");
 
     std::vector<Int_t> vLineStyles = {1, 2, 6, 1, 1, 1}; // in order to show reference everywhere..
@@ -735,8 +251,11 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     TCanvas *cEtaPos = new TCanvas("cEtaPos", "cEtaPos", 800, 600);
     TCanvas *cEtaNeg = new TCanvas("cEtaNeg", "cEtaNeg", 800, 600);
     TCanvas *cEtaRatio = new TCanvas("cEtaRatio", "cEtaRatio", 800, 600);
-    TCanvas *cEtaSpecRatio = new TCanvas("cEtaMuPTop/MuMBottom", "cEtaMuPTop/MuMBottom", 800, 600);    // mu+Top/mu-Bottom
-    TCanvas *cEtaSpecRatioInv = new TCanvas("cEtaMuMTop/MuPBottom", "cEtaMuMTop/MuPBottom", 800, 600); // mu-Top/mu+Bottom
+    TCanvas *cEtaRatioPtDiff = new TCanvas("cEtaRatioPtDiff", "cEtaRatioPtDiff", 800, 600);
+    TCanvas *cEtaSpecRatio = new TCanvas("cEtaMuPTop/MuMBottom", "cEtaMuPTop/MuMBottom", 800, 600);                      // mu+Top/mu-Bottom
+    TCanvas *cEtaSpecRatioPtDiff = new TCanvas("cEtaMuPTop/MuMBottomPtDiff", "cEtaMuPTop/MuMBottomPtDiff", 800, 600);    // mu+Top/mu-Bottom
+    TCanvas *cEtaSpecRatioInv = new TCanvas("cEtaMuMTop/MuPBottom", "cEtaMuMTop/MuPBottom", 800, 600);                   // mu-Top/mu+Bottom
+    TCanvas *cEtaSpecRatioInvPtDiff = new TCanvas("cEtaMuMTop/MuPBottomPtDiff", "cEtaMuMTop/MuPBottomPtDiff", 800, 600); // mu-Top/mu+Bottom
     TCanvas *cPtPos = new TCanvas("cPtPos", "cPtPos", 800, 600);
     TCanvas *cPtNeg = new TCanvas("cPtNeg", "cPtNeg", 800, 600);
     TCanvas *cPtRatio = new TCanvas("cPtRatio", "cPtRatio", 800, 600);
@@ -761,8 +280,11 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     TH1F *hTemplateEtaPos = new TH1F("hTemplateEtaPos", Form("#eta for #mu^{+}: %s", labelName.c_str()), 80, -5, -1);
     TH1F *hTemplateEtaNeg = new TH1F("hTemplateEtaNeg", Form("#eta for #mu^{-}: %s", labelName.c_str()), 80, -5, -1);
     TH1F *hTemplateEtaRatio = new TH1F("hTemplateEtaRatio", Form("#eta for #mu^{+}/#mu^{-}: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaRatioPtDiff = new TH1F("hTemplateEtaRatioPtDiff", Form("#eta for #mu^{+}/#mu^{-}: %s", labelName.c_str()), 80, -5, -1);
     TH1F *hTemplateEtaSpecRatio = new TH1F("hTemplateEtaSpecRatio", Form("#eta for #mu^{+}Top/#mu^{-}Bottom: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaSpecRatioPtDiff = new TH1F("hTemplateEtaSpecRatioPtDiff", Form("#eta for #mu^{+}Top/#mu^{-}Bottom: %s", labelName.c_str()), 80, -5, -1);
     TH1F *hTemplateEtaSpecRatioInv = new TH1F("hTemplateEtaSpecRatioInv", Form("#eta for #mu^{-}Top/#mu^{+}Bottom: %s", labelName.c_str()), 80, -5, -1);
+    TH1F *hTemplateEtaSpecRatioInvPtDiff = new TH1F("hTemplateEtaSpecRatioInvPtDiff", Form("#eta for #mu^{-}Top/#mu^{+}Bottom: %s", labelName.c_str()), 80, -5, -1);
     TH1F *hTemplatePtPos = new TH1F("hTemplatePtPos", Form("p_{T} for #mu^{+}: %s", labelName.c_str()), 100, 0, 10);
     TH1F *hTemplatePtNeg = new TH1F("hTemplatePtNeg", Form("p_{T} for #mu^{-}: %s", labelName.c_str()), 100, 0, 10);
     TH1F *hTemplatePtRatio = new TH1F("hTemplatePtRatio", Form("p_{T} for #mu^{+}/#mu^{-}: %s", labelName.c_str()), 100, 0, 10);
@@ -773,8 +295,11 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     hTemplateEtaPos->SetMaximum(margin * maxEtaPos);
     hTemplateEtaNeg->SetMaximum(margin * maxEtaNeg);
     hTemplateEtaRatio->SetMinimum(1 - 1), hTemplateEtaRatio->SetMaximum(1 + 1);
-    hTemplateEtaSpecRatio->SetMinimum(1 - 1), hTemplateEtaSpecRatio->SetMaximum(1 + 5);
-    hTemplateEtaSpecRatioInv->SetMinimum(1 - 1), hTemplateEtaSpecRatioInv->SetMaximum(1 + 5);
+    hTemplateEtaRatioPtDiff->SetMinimum(1 - 1), hTemplateEtaRatioPtDiff->SetMaximum(1 + 1);
+    hTemplateEtaSpecRatio->SetMinimum(1 - 1), hTemplateEtaSpecRatio->SetMaximum(1 + 1);
+    hTemplateEtaSpecRatioPtDiff->SetMinimum(1 - 1), hTemplateEtaSpecRatioPtDiff->SetMaximum(1 + 1);
+    hTemplateEtaSpecRatioInv->SetMinimum(1 - 1), hTemplateEtaSpecRatioInv->SetMaximum(1 + 1);
+    hTemplateEtaSpecRatioInvPtDiff->SetMinimum(1 - 1), hTemplateEtaSpecRatioInvPtDiff->SetMaximum(1 + 1);
     hTemplatePtPos->SetMaximum(margin * maxPtPos);
     hTemplatePtNeg->SetMaximum(margin * maxPtNeg);
     hTemplatePtRatio->SetMinimum(1 - 0.5), hTemplatePtRatio->SetMaximum(1 + 0.5);
@@ -790,12 +315,21 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     cEtaRatio->cd();
     hTemplateEtaRatio->SetStats(0);
     hTemplateEtaRatio->Draw();
+    cEtaRatioPtDiff->cd();
+    hTemplateEtaRatioPtDiff->SetStats(0);
+    hTemplateEtaRatioPtDiff->Draw();
     cEtaSpecRatio->cd();
     hTemplateEtaSpecRatio->SetStats(0);
     hTemplateEtaSpecRatio->Draw();
+    cEtaSpecRatioPtDiff->cd();
+    hTemplateEtaSpecRatioPtDiff->SetStats(0);
+    hTemplateEtaSpecRatioPtDiff->Draw();
     cEtaSpecRatioInv->cd();
     hTemplateEtaSpecRatioInv->SetStats(0);
     hTemplateEtaSpecRatioInv->Draw();
+    cEtaSpecRatioInvPtDiff->cd();
+    hTemplateEtaSpecRatioInvPtDiff->SetStats(0);
+    hTemplateEtaSpecRatioInvPtDiff->Draw();
     //
     cPtPos->cd();
     gPad->SetLogy();
@@ -824,6 +358,10 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     lSpecRatio->SetBorderSize(0);
     lSpecRatio->SetTextSize(0.02);
 
+    TLegend *lRatioPtDiff = new TLegend(0.60, 0.65, 0.80, 0.85);
+    lRatioPtDiff->SetBorderSize(0);
+    lRatioPtDiff->SetTextSize(0.02);
+
     for (Int_t i = 0; i < vTreeNamesEtaPos.size(); i++)
     {
         std::string fNameEtaPos = vTreeNamesEtaPos[i];
@@ -840,6 +378,56 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         hEtaNeg = (TH1 *)hEtaNeg->Clone(Form("hEtaNeg_clone_%d", i));
         TH1 *hEtaRatio = (TH1 *)hEtaPos->Clone(Form("hEtaRatio_%d", i));
         hEtaRatio->Divide(hEtaNeg);
+        //
+        if (i == 0) // Reference: hNamePt stores the 2D eta and pT histograms..
+        {
+            TH1 *hEtaPosLowPt = GetEtaFromTH2(fNamePtPos, hNamePtPos, 0, 3);
+            hEtaPosLowPt = (TH1 *)hEtaPosLowPt->Clone(Form("hEtaPosLowPt_clone_%d", i));
+            TH1 *hEtaPosHighPt = GetEtaFromTH2(fNamePtPos, hNamePtPos, 3, 50);
+            hEtaPosHighPt = (TH1 *)hEtaPosHighPt->Clone(Form("hEtaPosHighPt_clone_%d", i));
+            TH1 *hEtaNegLowPt = GetEtaFromTH2(fNamePtNeg, hNamePtNeg, 0, 3);
+            hEtaNegLowPt = (TH1 *)hEtaNegLowPt->Clone(Form("hEtaNegLowPt_clone_%d", i));
+            TH1 *hEtaNegHighPt = GetEtaFromTH2(fNamePtNeg, hNamePtNeg, 3, 50);
+            hEtaNegHighPt = (TH1 *)hEtaNegHighPt->Clone(Form("hEtaNegHighPt_clone_%d", i));
+            TH1 *hEtaRatioLowPt = (TH1 *)hEtaPosLowPt->Clone(Form("hEtaLowPtRatio_%d", i));
+            TH1 *hEtaRatioHighPt = (TH1 *)hEtaPosHighPt->Clone(Form("hEtaHighPtRatio_%d", i));
+            hEtaRatioLowPt->Divide(hEtaNegLowPt);
+            hEtaRatioHighPt->Divide(hEtaNegHighPt);
+            hEtaRatioLowPt->SetLineColor(kBlack);
+            hEtaRatioHighPt->SetLineColor(kBlack);
+            hEtaRatioLowPt->SetLineStyle(0);
+            hEtaRatioHighPt->SetLineStyle(2);
+            cEtaRatioPtDiff->cd();
+            hEtaRatioLowPt->Draw("SAME HIST");
+            hEtaRatioHighPt->Draw("SAME HIST");
+            lRatioPtDiff->AddEntry(hEtaRatioLowPt, "reference, pT < 3 GeV ", "l");
+            lRatioPtDiff->AddEntry(hEtaRatioHighPt, "reference, pT > 3 GeV ", "l");
+        }
+        if (i == 3) // New geometry: hNamePt stores the 2D eta and pT histograms..
+        {
+            TH1 *hEtaPosLowPt = GetEtaFromTH2(fNamePtPos, hNamePtPos, 0, 3);
+            hEtaPosLowPt = (TH1 *)hEtaPosLowPt->Clone(Form("hEtaPosLowPt_clone_%d", i));
+            TH1 *hEtaPosHighPt = GetEtaFromTH2(fNamePtPos, hNamePtPos, 3, 50);
+            hEtaPosHighPt = (TH1 *)hEtaPosHighPt->Clone(Form("hEtaPosHighPt_clone_%d", i));
+            TH1 *hEtaNegLowPt = GetEtaFromTH2(fNamePtNeg, hNamePtNeg, 0, 3);
+            hEtaNegLowPt = (TH1 *)hEtaNegLowPt->Clone(Form("hEtaNegLowPt_clone_%d", i));
+            TH1 *hEtaNegHighPt = GetEtaFromTH2(fNamePtNeg, hNamePtNeg, 3, 50);
+            hEtaNegHighPt = (TH1 *)hEtaNegHighPt->Clone(Form("hEtaNegHighPt_clone_%d", i));
+            TH1 *hEtaRatioLowPt = (TH1 *)hEtaPosLowPt->Clone(Form("hEtaLowPtRatio_%d", i));
+            TH1 *hEtaRatioHighPt = (TH1 *)hEtaPosHighPt->Clone(Form("hEtaHighPtRatio_%d", i));
+            hEtaRatioLowPt->Divide(hEtaNegLowPt);
+            hEtaRatioHighPt->Divide(hEtaNegHighPt);
+            hEtaRatioLowPt->SetLineColor(kRed);
+            hEtaRatioHighPt->SetLineColor(kRed);
+            hEtaRatioLowPt->SetLineStyle(0);
+            hEtaRatioHighPt->SetLineStyle(2);
+            cEtaRatioPtDiff->cd();
+            hEtaRatioLowPt->Draw("SAME HIST");
+            hEtaRatioHighPt->Draw("SAME HIST");
+            lRatioPtDiff->AddEntry(hEtaRatioLowPt, "new geometry, pT < 3 GeV ", "l");
+            lRatioPtDiff->AddEntry(hEtaRatioHighPt, "new geometry, pT > 3 GeV ", "l");
+        }
+        //
         TH1 *hPtPos = GetTH1FromTH2(fNamePtPos, hNamePtPos, -4, 4);
         hPtPos = (TH1 *)hPtPos->Clone(Form("hPtPos_clone_%d", i));
         TH1 *hPtNeg = GetTH1FromTH2(fNamePtNeg, hNamePtNeg, -4, 4);
@@ -885,10 +473,16 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     l->Draw();
     cEtaRatio->cd();
     l->Draw();
+    cEtaRatioPtDiff->cd();
+    lRatioPtDiff->Draw();
     cEtaSpecRatio->cd();
     lSpecRatio->Draw();
+    cEtaSpecRatioPtDiff->cd();
+    lRatioPtDiff->Draw();
     cEtaSpecRatioInv->cd();
     lSpecRatio->Draw();
+    cEtaSpecRatioInvPtDiff->cd();
+    lRatioPtDiff->Draw();
     //
     cPtPos->cd();
     l->Draw();
@@ -903,43 +497,115 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
 
     // hard-coded mu+Top/mu-Bottom
     TH1 *hEtaPosTopRef = GetTH1(vTreeNamesEtaPos[0], vHistNamesEtaPos[1]);
-    std::cout << "opening " << vTreeNamesEtaPos[0] << " and " << vHistNamesEtaPos[1] << std::endl;
     hEtaPosTopRef = (TH1 *)hEtaPosTopRef->Clone("hEtaPosTopRef_clone");
     TH1 *hEtaNegBottomRef = GetTH1(vTreeNamesEtaNeg[0], vHistNamesEtaNeg[2]);
-    std::cout << "opening " << vTreeNamesEtaNeg[0] << " and " << vHistNamesEtaNeg[2] << std::endl;
     hEtaNegBottomRef = (TH1 *)hEtaNegBottomRef->Clone("hEtaNegBottomRef_clone");
     TH1 *hEtaSpecRatioRef = (TH1 *)hEtaPosTopRef->Clone("hEtaSpecRatioRef_clone");
 
     TH1 *hEtaPosTop = GetTH1(vTreeNamesEtaPos[3], vHistNamesEtaPos[4]);
-    std::cout << "opening " << vTreeNamesEtaPos[3] << " and " << vHistNamesEtaPos[4] << std::endl;
     hEtaPosTop = (TH1 *)hEtaPosTop->Clone("hEtaPosTop_clone");
     TH1 *hEtaNegBottom = GetTH1(vTreeNamesEtaNeg[3], vHistNamesEtaNeg[5]);
-    std::cout << "opening " << vTreeNamesEtaNeg[3] << " and " << vHistNamesEtaNeg[5] << std::endl;
     hEtaNegBottom = (TH1 *)hEtaNegBottom->Clone("hEtaNegBottom_clone");
     TH1 *hEtaSpecRatio = (TH1 *)hEtaPosTop->Clone("hEtaSpecRatio_clone");
 
     hEtaSpecRatioRef->Divide(hEtaNegBottomRef);
     hEtaSpecRatio->Divide(hEtaNegBottom);
 
+    // hard-coded mu+Top/mu-Bottom
+    // pT differential
+    TH1 *hEtaPosTopRefLowPt = GetEtaFromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[1], 0, 3);
+    hEtaPosTopRefLowPt = (TH1 *)hEtaPosTopRefLowPt->Clone("hEtaPosTopRefLowPt_clone");
+    TH1 *hEtaNegBottomRefLowPt = GetEtaFromTH2(vTreeNamesPtNeg[0], vHistNamesPtNeg[2], 0, 3);
+    hEtaNegBottomRefLowPt = (TH1 *)hEtaNegBottomRefLowPt->Clone("hEtaNegBottomRefLowPt_clone");
+    TH1 *hEtaSpecRatioRefLowPt = (TH1 *)hEtaPosTopRefLowPt->Clone("hEtaSpecRatioRefLowPt_clone");
+
+    TH1 *hEtaPosTopRefHighPt = GetEtaFromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[1], 3, 50);
+    hEtaPosTopRefHighPt = (TH1 *)hEtaPosTopRefHighPt->Clone("hEtaPosTopRefHighPt_clone");
+    TH1 *hEtaNegBottomRefHighPt = GetEtaFromTH2(vTreeNamesPtNeg[0], vHistNamesPtNeg[2], 3, 50);
+    hEtaNegBottomRefHighPt = (TH1 *)hEtaNegBottomRefHighPt->Clone("hEtaNegBottomRefHighPt_clone");
+    TH1 *hEtaSpecRatioRefHighPt = (TH1 *)hEtaPosTopRefHighPt->Clone("hEtaSpecRatioRefHighPt_clone");
+
+    TH1 *hEtaPosTopLowPt = GetEtaFromTH2(vTreeNamesPtPos[3], vHistNamesPtPos[4], 0, 3);
+    hEtaPosTopLowPt = (TH1 *)hEtaPosTopLowPt->Clone("hEtaPosTopLowPt_clone");
+    TH1 *hEtaNegBottomLowPt = GetEtaFromTH2(vTreeNamesPtNeg[3], vHistNamesPtNeg[5], 0, 3);
+    hEtaNegBottomLowPt = (TH1 *)hEtaNegBottomLowPt->Clone("hEtaNegBottomLowPt_clone");
+    TH1 *hEtaSpecRatioLowPt = (TH1 *)hEtaPosTopLowPt->Clone("hEtaSpecRatioLowPt_clone");
+
+    TH1 *hEtaPosTopHighPt = GetEtaFromTH2(vTreeNamesPtPos[3], vHistNamesPtPos[4], 3, 50);
+    hEtaPosTopHighPt = (TH1 *)hEtaPosTopHighPt->Clone("hEtaPosTopHighPt_clone");
+    TH1 *hEtaNegBottomHighPt = GetEtaFromTH2(vTreeNamesPtNeg[3], vHistNamesPtNeg[5], 3, 50);
+    hEtaNegBottomHighPt = (TH1 *)hEtaNegBottomHighPt->Clone("hEtaNegBottomHighPt_clone");
+    TH1 *hEtaSpecRatioHighPt = (TH1 *)hEtaPosTopHighPt->Clone("hEtaSpecRatioHighPt_clone");
+
+    hEtaSpecRatioRefLowPt->Divide(hEtaNegBottomRefLowPt);
+    hEtaSpecRatioLowPt->Divide(hEtaNegBottomLowPt);
+    hEtaSpecRatioRefHighPt->Divide(hEtaNegBottomRefHighPt);
+    hEtaSpecRatioHighPt->Divide(hEtaNegBottomHighPt);
+    //
+    hEtaSpecRatioRefLowPt->SetLineColor(kBlack);
+    hEtaSpecRatioRefHighPt->SetLineColor(kBlack);
+    hEtaSpecRatioLowPt->SetLineColor(kRed);
+    hEtaSpecRatioHighPt->SetLineColor(kRed);
+    hEtaSpecRatioRefLowPt->SetLineStyle(0);
+    hEtaSpecRatioRefHighPt->SetLineStyle(2);
+    hEtaSpecRatioLowPt->SetLineStyle(0);
+    hEtaSpecRatioHighPt->SetLineStyle(2);
+
     // hard-coded mu-Top/mu+Bottom (inv)
     TH1 *hEtaNegTopInvRef = GetTH1(vTreeNamesEtaNeg[0], vHistNamesEtaNeg[1]);
-    std::cout << "opening " << vTreeNamesEtaNeg[0] << " and " << vHistNamesEtaNeg[1] << std::endl;
     hEtaNegTopInvRef = (TH1 *)hEtaNegTopInvRef->Clone("hEtaNegTopInvRef_clone");
     TH1 *hEtaPosBottomInvRef = GetTH1(vTreeNamesEtaPos[0], vHistNamesEtaPos[2]);
-    std::cout << "opening " << vTreeNamesEtaPos[0] << " and " << vHistNamesEtaPos[2] << std::endl;
     hEtaPosBottomInvRef = (TH1 *)hEtaPosBottomInvRef->Clone("hEtaPosBottomInvRef_clone");
     TH1 *hEtaSpecRatioInvRef = (TH1 *)hEtaNegTopInvRef->Clone("hEtaSpecRatioInvRef_clone");
 
     TH1 *hEtaNegTopInv = GetTH1(vTreeNamesEtaNeg[3], vHistNamesEtaNeg[4]);
-    std::cout << "opening " << vTreeNamesEtaNeg[3] << " and " << vHistNamesEtaNeg[4] << std::endl;
     hEtaNegTopInv = (TH1 *)hEtaNegTopInv->Clone("hEtaNegTopInv_clone");
     TH1 *hEtaPosBottomInv = GetTH1(vTreeNamesEtaPos[3], vHistNamesEtaPos[5]);
-    std::cout << "opening " << vTreeNamesEtaPos[3] << " and " << vHistNamesEtaPos[5] << std::endl;
     hEtaPosBottomInv = (TH1 *)hEtaPosBottomInv->Clone("hEtaPosBottomInv_clone");
     TH1 *hEtaSpecRatioInv = (TH1 *)hEtaNegTopInv->Clone("hEtaSpecRatioInv_clone");
 
     hEtaSpecRatioInvRef->Divide(hEtaPosBottomInvRef);
     hEtaSpecRatioInv->Divide(hEtaPosBottomInv);
+
+    // hard-coded mu-Top/mu+Bottom (inv)
+    // pT differential
+    TH1 *hEtaNegTopInvRefLowPt = GetEtaFromTH2(vTreeNamesPtNeg[0], vHistNamesPtNeg[1], 0, 3);
+    hEtaNegTopInvRefLowPt = (TH1 *)hEtaNegTopInvRefLowPt->Clone("hEtaNegTopInvRefLowPt_clone");
+    TH1 *hEtaPosBottomInvRefLowPt = GetEtaFromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[2], 0, 3);
+    hEtaPosBottomInvRefLowPt = (TH1 *)hEtaPosBottomInvRefLowPt->Clone("hEtaPosBottomInvRefLowPt_clone");
+    TH1 *hEtaSpecRatioInvRefLowPt = (TH1 *)hEtaNegTopInvRefLowPt->Clone("hEtaSpecRatioInvRefLowPt_clone");
+
+    TH1 *hEtaNegTopInvRefHighPt = GetEtaFromTH2(vTreeNamesPtNeg[0], vHistNamesPtNeg[1], 3, 50);
+    hEtaNegTopInvRefHighPt = (TH1 *)hEtaNegTopInvRefHighPt->Clone("hEtaNegTopInvRefHighPt_clone");
+    TH1 *hEtaPosBottomInvRefHighPt = GetEtaFromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[2], 3, 50);
+    hEtaPosBottomInvRefHighPt = (TH1 *)hEtaPosBottomInvRefHighPt->Clone("hEtaPosBottomInvRefHighPt_clone");
+    TH1 *hEtaSpecRatioInvRefHighPt = (TH1 *)hEtaNegTopInvRefHighPt->Clone("hEtaSpecRatioInvRefHighPt_clone");
+
+    TH1 *hEtaNegTopInvLowPt = GetEtaFromTH2(vTreeNamesPtNeg[3], vHistNamesPtNeg[4], 0, 3);
+    hEtaNegTopInvLowPt = (TH1 *)hEtaNegTopInvLowPt->Clone("hEtaNegTopInvLowPt_clone");
+    TH1 *hEtaPosBottomInvLowPt = GetEtaFromTH2(vTreeNamesPtPos[3], vHistNamesPtPos[5], 0, 3);
+    hEtaPosBottomInvLowPt = (TH1 *)hEtaPosBottomInvLowPt->Clone("hEtaPosBottomInvLowPt_clone");
+    TH1 *hEtaSpecRatioInvLowPt = (TH1 *)hEtaNegTopInvLowPt->Clone("hEtaSpecRatioInvLowPt_clone");
+
+    TH1 *hEtaNegTopInvHighPt = GetEtaFromTH2(vTreeNamesPtNeg[3], vHistNamesPtNeg[4], 3, 50);
+    hEtaNegTopInvHighPt = (TH1 *)hEtaNegTopInvHighPt->Clone("hEtaNegTopInvHighPt_clone");
+    TH1 *hEtaPosBottomInvHighPt = GetEtaFromTH2(vTreeNamesPtPos[3], vHistNamesPtPos[5], 3, 50);
+    hEtaPosBottomInvHighPt = (TH1 *)hEtaPosBottomInvHighPt->Clone("hEtaPosBottomInvHighPt_clone");
+    TH1 *hEtaSpecRatioInvHighPt = (TH1 *)hEtaNegTopInvHighPt->Clone("hEtaSpecRatioInvHighPt_clone");
+
+    hEtaSpecRatioInvRefLowPt->Divide(hEtaPosBottomInvRefLowPt);
+    hEtaSpecRatioInvLowPt->Divide(hEtaPosBottomInvLowPt);
+    hEtaSpecRatioInvRefHighPt->Divide(hEtaPosBottomInvRefHighPt);
+    hEtaSpecRatioInvHighPt->Divide(hEtaPosBottomInvHighPt);
+    //
+    hEtaSpecRatioInvRefLowPt->SetLineColor(kBlack);
+    hEtaSpecRatioInvRefHighPt->SetLineColor(kBlack);
+    hEtaSpecRatioInvLowPt->SetLineColor(kRed);
+    hEtaSpecRatioInvHighPt->SetLineColor(kRed);
+    hEtaSpecRatioInvRefLowPt->SetLineStyle(0);
+    hEtaSpecRatioInvRefHighPt->SetLineStyle(2);
+    hEtaSpecRatioInvLowPt->SetLineStyle(0);
+    hEtaSpecRatioInvHighPt->SetLineStyle(2);
 
     // hard-coded mu+Top/mu-Bottom
     TH1 *hPtPosTopRef = GetTH1FromTH2(vTreeNamesPtPos[0], vHistNamesPtPos[1], -4, 4);
@@ -986,11 +652,21 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     hEtaSpecRatioRef->SetLineColor(kBlack);
     hEtaSpecRatioRef->Draw("SAME HIST");
     hEtaSpecRatio->Draw("SAME HIST");
+    cEtaSpecRatioPtDiff->cd();
+    hEtaSpecRatioRefLowPt->Draw("SAME HIST");
+    hEtaSpecRatioLowPt->Draw("SAME HIST");
+    hEtaSpecRatioRefHighPt->Draw("SAME HIST");
+    hEtaSpecRatioHighPt->Draw("SAME HIST");
     cEtaSpecRatioInv->cd();
     hEtaSpecRatioInv->SetLineColor(kRed);
     hEtaSpecRatioInvRef->SetLineColor(kBlack);
     hEtaSpecRatioInvRef->Draw("SAME HIST");
     hEtaSpecRatioInv->Draw("SAME HIST");
+    cEtaSpecRatioInvPtDiff->cd();
+    hEtaSpecRatioInvRefLowPt->Draw("SAME HIST");
+    hEtaSpecRatioInvLowPt->Draw("SAME HIST");
+    hEtaSpecRatioInvRefHighPt->Draw("SAME HIST");
+    hEtaSpecRatioInvHighPt->Draw("SAME HIST");
     //
     cPtSpecRatio->cd();
     hPtSpecRatio->SetLineColor(kRed);
@@ -1014,8 +690,11 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     cEtaPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf(", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cEtaNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cEtaRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaRatioPtDiff->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cEtaSpecRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaSpecRatioPtDiff->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cEtaSpecRatioInv->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+    cEtaSpecRatioInvPtDiff->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cPtPos->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cPtNeg->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
     cPtRatio->SaveAs(Form("Plots_MCH_Quadrants/singleMuonKinematics_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
@@ -1026,8 +705,11 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     cEtaPos->Write();
     cEtaNeg->Write();
     cEtaRatio->Write();
+    cEtaRatioPtDiff->Write();
     cEtaSpecRatio->Write();
+    cEtaSpecRatioPtDiff->Write();
     cEtaSpecRatioInv->Write();
+    cEtaSpecRatioInvPtDiff->Write();
     cPtPos->Write();
     cPtNeg->Write();
     cPtRatio->Write();
