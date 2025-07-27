@@ -101,4 +101,4 @@
 # # root -l -q -b 'muonQA_pT_eta_single_muons.C("merged_LHC24al_LHC24an_left-right_GeometryAlignedFix110Fix19NewIST7", "left-right", "draw_generic", "AnalysisResults-muonQA_merged_LHC24al_LHC24an_all_geometries_Hyperloop_15_07_2025.root", "muon-qa_id30697/muons/", "AnalysisResults-muonQA_merged_LHC24al_LHC24an_all_geometries_Hyperloop_15_07_2025.root", "muon-qa_id32007/muons/")'
 
 # testing
-root -l 'muonQA_pT_eta_single_muons.C("3D histos test", "NONE", "draw_dimuons", "AnalysisResults_3Dhistos_test.root", "muon-qa/dimuon/same-event/single-muon-dimuon-correlations/", "AnalysisResults_3Dhistos_test.root", "muon-qa/dimuon/same-event/single-muon-dimuon-correlations/")'
+root -l 'muonQA_pT_eta_single_muons.C("3D histos test", "NONE", "draw_dimuons", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_3D_histo_test_Hyperloop_27_07_2025.root", "muon-qa_id30697/dimuon/same-event/single-muon-dimuon-correlations/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_3D_histo_test_Hyperloop_27_07_2025.root", "muon-qa_id30255/dimuon/same-event/single-muon-dimuon-correlations/")'

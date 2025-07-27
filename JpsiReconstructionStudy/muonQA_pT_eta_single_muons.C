@@ -104,14 +104,26 @@ TH1 *GetTH1FromTH3(std::string fileName, std::string histName, Double_t minDimuo
         std::cout << ">> histogram successfully read from TFile" << std::endl;
     }
 
-    // Set axis ranges (mass, pT)
-    hist->GetXaxis()->SetRangeUser(minDimuonMass, maxDimuonMass); // mass
-    hist->GetYaxis()->SetRangeUser(minDimuonPt, maxDimuonPt);     // pT
+    std::cout << "Axis titles: "
+              << hist->GetXaxis()->GetTitle() << ", "
+              << hist->GetYaxis()->GetTitle() << ", "
+              << hist->GetZaxis()->GetTitle() << std::endl;
 
-    // Optional Z cut (var: eta, DCA, etc.)
+    // Set axis ranges (mass, pT)
+    // hist->GetXaxis()->SetRangeUser(minDimuonMass, maxDimuonMass); // mass
+    // hist->GetYaxis()->SetRangeUser(minDimuonPt, maxDimuonPt);     // pT
+    int binXMin = hist->GetXaxis()->FindBin(minDimuonMass);
+    int binXMax = hist->GetXaxis()->FindBin(maxDimuonMass) - 1; // exclusive upper limit
+    int binYMin = hist->GetYaxis()->FindBin(minDimuonPt);
+    int binYMax = hist->GetYaxis()->FindBin(maxDimuonPt) - 1; // exclusive upper limit
+    // hist->GetXaxis()->SetRange(binXMin, binXMax);
+    // hist->GetYaxis()->SetRange(binYMin, binYMax);
+
     if (minVar != -999 && maxVar != -999)
     {
-        hist->GetZaxis()->SetRangeUser(minVar, maxVar);
+        int binZMin = hist->GetZaxis()->FindBin(minVar);
+        int binZMax = hist->GetZaxis()->FindBin(maxVar);
+        hist->GetZaxis()->SetRange(binZMin, binZMax);
     }
 
     std::cout << "problem with projection?" << std::endl;
@@ -121,7 +133,8 @@ TH1 *GetTH1FromTH3(std::string fileName, std::string histName, Double_t minDimuo
     }
 
     // Project the Z-axis
-    TH1 *hVar_MassPtCut = hist->ProjectionZ("hVar_MassPtCut");
+    // TH1 *hVar_MassPtCut = hist->ProjectionZ("hVar_MassPtCut");
+    TH1 *hVar_MassPtCut = hist->ProjectionZ("hVar_MassPtCut", binXMin, binXMax, binYMin, binYMax);
     std::cout << "no problem with projection" << std::endl;
 
     return hVar_MassPtCut;
@@ -780,15 +793,10 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsPos.push_back(fMuonIdRef + "invariantMass_pT_MuPosPhi_MuonKine_MuonCuts");
 
-        vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegPt_MuonKine_MuonCuts");
-        vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegEta_MuonKine_MuonCuts");
-        vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegRabs_MuonKine_MuonCuts");
-        vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegDca_MuonKine_MuonCuts");
-        vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegPhi_MuonKine_MuonCuts");
 
         // new geometry
@@ -803,49 +811,106 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vTreeNamesNewDimuons.push_back(fAnalysisResultsRef);
         vHistNamesDimuonsPos.push_back(fMuonIdRef + "invariantMass_pT_MuPosPhi_MuonKine_MuonCuts");
 
-        vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegPt_MuonKine_MuonCuts");
-        vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegEta_MuonKine_MuonCuts");
-        vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegRabs_MuonKine_MuonCuts");
-        vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegDca_MuonKine_MuonCuts");
-        vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
         vHistNamesDimuonsNeg.push_back(fMuonIdRef + "invariantMass_pT_MuNegPhi_MuonKine_MuonCuts");
 
         // TODO:
-        // - add mu- plots
         // - add ratio plots for mu+ mu- (in the same style as the Jpsi peaks and widths plots)
         // - add larger simulation output from Hyperloop
         // - add new geometry plots
         // - do checks whether pT bins are correctly plotted
+        // - add legend with cuts in projections (dimuon invariant mass) and reference/new
+
+        TFile *fDimuonOutput = new TFile(Form("Plots_MCH_Quadrants/dimuonSingleMuonCorrelations_%s_%s.root", fAnalysisResultsNew.c_str(), labelName.c_str()), "RECREATE");
+        TCanvas c_dummy("dummy", "dummy", 800, 600);
+        c_dummy.SaveAs(Form("Plots_MCH_Quadrants/dimuonSingleMuonMuonCorrelations_%s_%s.pdf(", fAnalysisResultsNew.c_str(), labelName.c_str()));
 
         std::vector<std::pair<double, double>> ptBinsFull = {
-            {0,30}, {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
+            {0, 30}, {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
 
         for (int i = 0; i < vTreeNamesRefDimuons.size(); i++)
         {
             std::string fNameRef = vTreeNamesRefDimuons[i];
             std::string fNameNew = vTreeNamesNewDimuons[i];
             std::string histNamePos = vHistNamesDimuonsPos[i];
-            std::string histNamesNeg = vHistNamesDimuonsNeg[i];
+            std::string histNameNeg = vHistNamesDimuonsNeg[i];
             Double_t mMinJpsi = 2.5;
             Double_t mMaxJpsi = 4.0;
-            TCanvas *c_overview = new TCanvas(Form("c_overview_%i", i), Form("c_overview_%i", i), 800, 600); 
-            c_overview->Divide(8);
+            TCanvas *c_overview_1 = new TCanvas(Form("c_overview_1_%s", histNamePos.c_str()), Form("c_overview_1_%s", histNamePos.c_str()), 800, 600);
+            TCanvas *c_overview_2 = new TCanvas(Form("c_overview_2_%s", histNamePos.c_str()), Form("c_overview_2_%s", histNamePos.c_str()), 800, 600);
+            c_overview_1->Divide(4);
+            c_overview_2->Divide(4);
+
+            // Optional cut on z-axis (DCA, Rabs, phi, etc.)
+            Double_t minVar;
+            Double_t maxVar;
+            if (i == 3) // DCA cut (DCA a bit useless in these plots...)
+            {
+                minVar = 0.;
+                maxVar = 1.;
+            } 
+            else
+            {
+                minVar = -999;
+                maxVar = -999;
+            }
 
             for (int j = 0; j < ptBinsFull.size(); j++)
             {
-                std::cout << "segmentation fault1" << std::endl;
                 std::pair<double, double> ptBinFull = ptBinsFull[j];
-                TH1 *histRefPos = GetTH1FromTH3(fNameRef, histNamePos, mMinJpsi, mMaxJpsi, ptBinFull.first, ptBinFull.second, -999, -999);
+                TH1 *histRefPos = GetTH1FromTH3(fNameRef, histNamePos, mMinJpsi, mMaxJpsi, ptBinFull.first, ptBinFull.second, minVar, maxVar);
                 histRefPos = (TH1 *)histRefPos->Clone(Form("histRefPos_clone_%s_%f_%f", histNamePos.c_str(), ptBinFull.first, ptBinFull.second));
-                c_overview->cd(j+1);
+                TH1 *histRefNeg = GetTH1FromTH3(fNameRef, histNameNeg, mMinJpsi, mMaxJpsi, ptBinFull.first, ptBinFull.second, minVar, maxVar);
+                histRefNeg = (TH1 *)histRefNeg->Clone(Form("histRefNeg_clone_%s_%f_%f", histNameNeg.c_str(), ptBinFull.first, ptBinFull.second));
+                TH1 *histRefRatio = (TH1 *)histRefPos->Clone(Form("histRefRatio_clone_%s_%f_%f", histNamePos.c_str(), ptBinFull.first, ptBinFull.second));
+                histRefRatio->Divide(histRefNeg);
+
+                std::cout << "Integral for pt bin [" << ptBinFull.first << ", " << ptBinFull.second << "] = "
+                          << histRefPos->Integral() << std::endl;
+
+                if (j < 4)
+                {
+                    c_overview_1->cd(j + 1);
+                }
+                else if (j > 3)
+                {
+                    c_overview_2->cd(j - 4 + 1);
+                }
                 histRefPos->Draw("HIST");
+                histRefNeg->Draw("SAME HIST");
+                histRefPos->SetLineColor(kBlack);
+                histRefNeg->SetLineColor(kBlack);
+                histRefPos->SetLineStyle(0);
+                histRefNeg->SetLineStyle(2);
                 histRefPos->SetTitle(Form("dimuon p_{T} in [%.1f, %.1f]", ptBinFull.first, ptBinFull.second));
+                TCanvas *c_binned = new TCanvas(Form("c_binned_%s_%f_%f", histNamePos.c_str(), ptBinFull.first, ptBinFull.second), Form("c_binned_%s_%f_%f", histNamePos.c_str(), ptBinFull.first, ptBinFull.second), 800, 600);
+                c_binned->cd();
+                histRefPos->Draw("HIST");
+                histRefNeg->Draw("SAME HIST");
+                histRefPos->SetLineColor(kBlack);
+                histRefNeg->SetLineColor(kBlack);
+                histRefPos->SetLineStyle(0);
+                histRefNeg->SetLineStyle(2);
+                histRefPos->SetTitle(Form("dimuon p_{T} in [%.1f, %.1f]", ptBinFull.first, ptBinFull.second));
+
+                fDimuonOutput->cd();
+                c_overview_1->Write();
+                c_overview_2->Write();
+
+                if (j == 3)
+                {
+                    c_overview_1->SaveAs(Form("Plots_MCH_Quadrants/dimuonSingleMuonMuonCorrelations_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+                }
+                if (j == 7)
+                {
+                    c_overview_2->SaveAs(Form("Plots_MCH_Quadrants/dimuonSingleMuonMuonCorrelations_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+                }
             }
         }
+        c_dummy.SaveAs(Form("Plots_MCH_Quadrants/dimuonSingleMuonMuonCorrelations_%s_%s.pdf)", fAnalysisResultsNew.c_str(), labelName.c_str()));
     }
 }
 
