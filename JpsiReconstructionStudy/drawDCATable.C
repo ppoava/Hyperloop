@@ -52,6 +52,7 @@ int drawDCATable()
             "muon-qa_id30991", // GeometryAlignedShiftY (global shift Y)
             "muon-qa_id30992", // GeometryAlignedFix110Fix15New2T5 (better javier new2)
             "muon-qa_id30993"  // GeometryAlignedFix110Fix15New2T5ShiftY (better javier new2 + shift)
+            "muon-qa_id34687" // GeometryAlignedLHC24adap3maFix110Shift10OP1
     };
     std::map<std::string, std::string> geometryNames = {
         {"muon-qa_id30619", "GeometryAlignedFix10Fix15ShiftCh1BNew2"},
@@ -60,6 +61,7 @@ int drawDCATable()
         {"muon-qa_id30991", "GeometryAlignedShiftY"},
         {"muon-qa_id30992", "GeometryAlignedFix110Fix15New2T5"},
         {"muon-qa_id30993", "GeometryAlignedFix110Fix15New2T5ShiftY"}
+        {"muon-qa_id34687", "GeometryAlignedLHC24adap3maFix110Shift10OP1"
     };
     */
 
@@ -69,7 +71,8 @@ int drawDCATable()
     // const char *fAnalysisResults = "AnalysisResults-muonQA_merged_LHC24an_LHC24am_all_geometries_Hyperloop_11_07_2025.root";
     // const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24al_pass1_skimmed_GeometryAlignedFix110Fix19alnNewadSU1_Hyperloop_18_07_2025.root";
     // const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_GeometryAlignedFix110Fix19alnNewadSU1_Hyperloop_22_07_2025.root";
-    const char *fAnalysisResults = "AnalysisResults-muonQA_merged_LHC24an_LHC24al_pass1_merged_all_geometries_Hyperloop_22_07_2025.root";
+    // const char *fAnalysisResults = "AnalysisResults-muonQA_merged_LHC24an_LHC24al_pass1_merged_all_geometries_Hyperloop_22_07_2025.root";
+    const char *fAnalysisResults = "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root";
     const char *histName;
 
     // Using the following geometries and (fixed) MCH parameters, according to muon-qa root file structure:
@@ -93,10 +96,10 @@ int drawDCATable()
     */
 
    std::vector<const char *> vGeometries = {
-        "muon-qa_id32943",
+        "muon-qa_id34687",
     };
     std::map<std::string, std::string> geometryNames = {
-        {"muon-qa_id32943", "GeometryAlignedFix110Fix19alnNewadSU1"},
+        {"muon-qa_id34687", "GeometryAlignedLHC24adap3maFix110Shift10OP1"},
     };
 
     std::array<const char *, 4> arrQuadrants = {"Q0", "Q1", "Q2", "Q3"};
