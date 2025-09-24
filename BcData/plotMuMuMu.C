@@ -16,7 +16,7 @@
 #include "TPad.h"
 #include "TLine.h"
 
-TH1* GetTH1(std::string fileName, std::string histName)
+TH1* GetTH1(std::string fileName, std::string histListName, std::string histName)
 {
     TFile* f = TFile::Open(fileName.c_str(), "READ");
     if (!f || f->IsZombie()) {
@@ -41,11 +41,12 @@ TH1* GetTH1(std::string fileName, std::string histName)
     }
 
     // Get the TList with histograms
-    TList* histList = dynamic_cast<TList*>(outputList->FindObject("DileptonTrack_muonQualityCuts_muonQualityCuts"));
+    // --- matchedQualityCuts for GLOBAL MUON tracks
+    // --- muonQualityCuts for MUON tracks
+
+    TList* histList = dynamic_cast<TList*>(outputList->FindObject(histListName.c_str()));
     if (!histList) {
-        std::cerr << ">> TList 'DileptonTrack_muonQualityCuts_muonQualityCuts' not found." << std::endl;
-        f->Close();
-        return nullptr;
+        std::cerr << ">> TList " << histListName << " not found." << std::endl;
     }
 
     // Find histogram by name
@@ -61,6 +62,8 @@ TH1* GetTH1(std::string fileName, std::string histName)
     histClone->SetDirectory(nullptr);
 
     f->Close(); // Close the file
+
+    std::cout << "successful (?)" << std::endl;
 
     return histClone; // Return the cloned histogram
 }
@@ -173,11 +176,19 @@ TH1 *GetTH1FromTH3(std::string fileName, std::string histName, Double_t minDimuo
     return hVar_MassPtCut;
 }
 
-void drawMuMuMuTH1(std::string fAnalysisResults, std::string histName) {
-    TCanvas *c = new TCanvas(Form("c_%s_%s", fAnalysisResults.c_str(), histName.c_str()), Form("c_%s_%s", fAnalysisResults.c_str(), histName.c_str()), 800, 600);
-    TH1 *hMuMuMu = GetTH1(fAnalysisResults, histName);
+void drawMuMuMuTH1(std::string fAnalysisResults, std::string histListName, std::string fAnalysisResults_global, std::string histListName_global, std::string histName) {
+    TCanvas *c = new TCanvas(Form("c_%s_%s_%s", fAnalysisResults.c_str(), histName.c_str(), histListName.c_str()), Form("c_%s_%s_%s", fAnalysisResults.c_str(), histName.c_str(), histListName.c_str()), 800, 600);
+    TH1 *hMuMuMu = GetTH1(fAnalysisResults, histListName, histName);
+    TH1 *hMuMuMu_global = GetTH1(fAnalysisResults_global, histListName_global, histName);
     c->cd();
+    // hMuMuMu->GetXaxis()->SetRangeUser(0, 8);
+    hMuMuMu->GetYaxis()->SetRangeUser(0, 0.050);
+    hMuMuMu->GetYaxis()->SetTitle("entries / total entries");
+    hMuMuMu_global->SetLineColor(kRed);
+    hMuMuMu->Scale(1/hMuMuMu->GetEntries());
+    hMuMuMu_global->Scale(1/hMuMuMu_global->GetEntries());
     hMuMuMu->Draw("HIST E");
+    hMuMuMu_global->Draw("SAME HIST E");
 }
 
 
@@ -187,9 +198,17 @@ void drawMuMuMuTH1(std::string fAnalysisResults, std::string histName) {
 
 int plotMuMuMu() {
 
-    std::string fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Bc_pp_Hyperloop_02_08_2025.root";
+    // 22_09_2025: correct MFT acceptance for both MUON and global
+    std::string fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Bc_Hyperloop_22_09_2025.root";
+    std::string fAnalysisResults_global = "AnalysisResults_LHC24an_pass1_skimmed_Bc_global_Hyperloop_22_09_2025.root";
+    std::string histListName = "DileptonTrack_muonQualityCuts_muonQualityCuts";
+    std::string histListName_global = "DileptonTrack_matchedQualityCuts_matchedQualityCuts";
     std::string hMassName = "Mass";
-    drawMuMuMuTH1(fAnalysisResults, hMassName);
+    drawMuMuMuTH1(fAnalysisResults, histListName, fAnalysisResults_global, histListName_global, hMassName);
+
+    histListName = "DileptonsSelected_muonQualityCuts";
+    histListName_global = "DileptonsSelected_matchedQualityCuts";
+    drawMuMuMuTH1(fAnalysisResults, histListName, fAnalysisResults_global, histListName_global, hMassName);
 
     return 0;
 }
