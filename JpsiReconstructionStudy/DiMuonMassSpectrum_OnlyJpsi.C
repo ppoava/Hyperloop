@@ -348,11 +348,19 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 
     // vTreeNames.push_back("AnalysisResults_LHC24am_pass1_skimmed_no_realignment_27_04_2025_Hyperloop.root");
 
-    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_no_realignment_PbPb_values_01_05_2025_Hyperloop.root");
+    vTreeNames.push_back("AnalysisResults_MUON_ref_MFT_one_run_Hyperloop_07_10_2025.root");
+    vTreeNames.push_back("AnalysisResults_global_ref_MFT_one_run_Hyperloop_07_10_2025.root");
+    vTreeNames.push_back("AnalysisResults_MUON_new_MFT_one_run_Hyperloop_07_10_2025.root");
+    vTreeNames.push_back("AnalysisResults_global_new_MFT_one_run_Hyperloop_07_10_2025.root");
+
+    // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_small_Hyperloop_27_09_2025.root");
+    // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_muon_matching_QC1_Hyperloop_27_09_2025.root");
+
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_no_realignment_PbPb_values_01_05_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_globalShiftY_PbPb_values_07_05_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_CH1Bshift_new_PbPb_values_12_05_2025_Hyperloop.root");
     // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_realignment_PbPb_values_01_05_2025_Hyperloop.root");
-    vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new_realignment_PbPb_values_12_05_2025_Hyperloop.root");
+    // vTreeNames.push_back("AnalysisResults_merged_LHC24an_LHC24am_pass1_javier_new_realignment_PbPb_values_12_05_2025_Hyperloop.root");
     
     /*
     vTreeNames.push_back("AnalysisResults_merged_LHC24aq_LHC24ap_pass1_medium_no_realignment_pp_values_22_04_2025_Hyperloop.root");
@@ -399,21 +407,26 @@ int DiMuonMassSpectrum_OnlyJpsi() {
     std::vector<Int_t> vLineColours = {1, 2, 8, 4, 7};
     // const char* legendTitle = "comparison";
     // const char* legendTitle = "AnalysisResults_LHC24am_pass1_skimmed";
-    const char* legendTitle = "LHC24an + am PbPb-values";
+    // const char* legendTitle = "LHC24an + am PbPb-values";
     // const char* legendTitle = "LHC24aq + ap pp-values";
     // const char* legendTitle = "LHC24aq + ap PbPb-values";
     // const char* legendTitle = "LHC24aq pp-values";
-    // const char* legendTitle = "LHC24aq PbPb-values";
+    const char* legendTitle = "LHC24aq PbPb-values";
     // const char* legendTitle = "LHC24ap pp-values";
     // const char* legendTitle = "LHC24ap PbPb-values";
     // std::vector<const char*> vLegendEntries = {"reference skimmed", "reference ap medium"};
     // std::vector<const char*> vLegendEntries = {"reference", "CH1B shift", "CH1B shift new", "Javier", "Javier new"};
-    std::vector<const char*> vLegendEntries = {"reference", "new geometry"};
+    std::vector<const char*> vLegendEntries = {"ref MUON", "ref GLOBAL", "new MUON", "new GLOBAL"};
     // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // Low statistics at high pT
+    /*
     std::vector<std::pair<double, double>> ptBins = {
         {0,2}, {2,4}, {4,6}, {6,8}, {8,10}, {10,12}, {12, 20}
+    };
+    */
+    std::vector<std::pair<double, double>> ptBins = {
+        {0,30}
     };
     // For Upsilon: {0,20}
 
@@ -450,7 +463,7 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths"), Form("globalJpsiWidths"), 800, 600);
     globalCanvasJpsiWidths->cd(); 
-    hTemplateWidths->GetYaxis()->SetRangeUser(0.05, 0.19);
+    hTemplateWidths->GetYaxis()->SetRangeUser(0, 0.19);
     hTemplateWidths->SetStats(0);
     hTemplateWidths->Draw("PE");
     TCanvas *globalCanvasJpsiPeaks = new TCanvas(Form("globalJpsiPeaks"), Form("globalJpsiPeaks"), 800, 600);
@@ -572,7 +585,9 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
     // PairsMuonSEPM_muonQualityCuts
     // For Jpsi: PairsMuonSEPM_muonLowPt510SigmaPDCA
     // For Y(1S): PairsMuonSEPM_muonLowPt610SigmaPDCA
-    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonLowPt510SigmaPDCA");
+    // For global: PairsMuonSEPM_matchedQualityCuts
+    subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_matchedQualityCuts");
+    if (!subListDiMuon) { subListDiMuon = (TList*)listDiMuon->FindObject("PairsMuonSEPM_muonQualityCuts"); }
     hMass_Pt = (TH2F*)subListDiMuon->FindObject("Mass_Pt");
 
 
