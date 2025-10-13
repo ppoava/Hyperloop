@@ -16,7 +16,7 @@ The three most useful scripts are the following:
   The two bash scripts should work as-is, but theory and practice do not always coincide.  
   - They both call other macros to do the work. One for dimuons (producing the TT, TB, BB plots, as well as the Jpsi fitting and retrieving the width and peak), the other for single muons (producing T+B-, B-T+ and single muon distributions for several variables, within Jpsi range and for different Jpsi pT).  
     - For dimuons: `run_DiMuonMassSpectrum-muonQA.sh` → `DiMuonMassSpectrum-muonQA.C`  
-    - For single muons: `run_muonQA_pT_eta_single_muons.sh` → `muonQA_pT_eta_single_muons.C`  
+    - For single muons (although also used for dimuons): `run_muonQA_pT_eta_single_muons.sh` → `muonQA_pT_eta_single_muons.C`  
   - The structure for both bash scripts is very similar, so I will describe them in one go.  
     - For example, for dimuons, the command is:  
       ```bash
@@ -24,6 +24,9 @@ The three most useful scripts are the following:
       ```
       - The easiest is to copy the relevant previous line (e.g. for a certain data taking period) and then modify appropriately the things that change — usually the name, the input file for the new geometry, and the muon_id.  
       - In particular, the last one (`muon_id`) can have a slightly unusual structure, so it's easiest to copy it from an existing example.
+  - The second argument "top-bottom/left-right" is obvious in what it does. For the `run_muonQA_pT_eta_single_muons.sh`, however, there are more features:
+      - draw_dimuons -> draws plots of single muon properties for single muons that are part of a coupled dimuon pair. This is done so that a cut on the J/psi mass range can be applied, as well as the dimuon pT.
+      - draw_dimuonDCA -> draws dimuon DCAs for dimuon pairs within J/psi range. Everything is drawn with the structure mu+ - mu- and is automatically done for top-bottom combinations. The code can be extended to left-right as well, though as of right now (13 oct 2025), this is not possible.
 
 ## Note on Hyperloop trains
 To run a Hyperloop train on a new geometry, it’s easiest to copy an already existing wagon in the **MCH-MFT relative alignment** page ([link](https://alimonitor.cern.ch/hyperloop/view-analysis/51136)). Take one with the name `muon-qa-realign-etc-etc`. You can change the name to include the new geometry for clarity.  
