@@ -199,8 +199,11 @@ void drawMuMuMuTH1(std::string fAnalysisResults, std::string histListName, std::
 int plotMuMuMu() {
 
     // 22_09_2025: correct MFT acceptance for both MUON and global
-    std::string fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Bc_Hyperloop_22_09_2025.root";
-    std::string fAnalysisResults_global = "AnalysisResults_LHC24an_pass1_skimmed_Bc_global_Hyperloop_22_09_2025.root";
+    // 14_10_2025: only save best matching candidate
+    std::string fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Bc_Hyperloop_14_10_2025.root";
+    std::string fAnalysisResults_global = "AnalysisResults_LHC24an_pass1_skimmed_Bc_global_Hyperloop_14_10_2025.root";
+    // std::string fAnalysisResults = "AnalysisResults_muon_minbias_Hyperloop_06_10_2025.root";
+    // std::string fAnalysisResults_global = "AnalysisResults_global_minbias_Hyperloop_06_10_2025.root";
     std::string histListName = "DileptonTrack_muonQualityCuts_muonQualityCuts";
     std::string histListName_global = "DileptonTrack_matchedQualityCuts_matchedQualityCuts";
     std::string hMassName = "Mass";

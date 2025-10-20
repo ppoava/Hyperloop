@@ -52,17 +52,17 @@
 ##### LHC24an_pass1_skimmed #####
 # top-bottom
 # --- generic
-root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "top-bottom", "draw_generic", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
+# root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "top-bottom", "draw_generic", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
 
 # # --- specific
-root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "top-bottom", "draw_specific", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
+# root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "top-bottom", "draw_specific", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
 
 # # left-right
 # # --- generic
-root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "left-right", "draw_generic", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
+# root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "left-right", "draw_generic", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
 
 # --- specific
-root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "left-right", "draw_specific", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
+# root -l -q -b 'DiMuonMassSpectrum-muonQA.C("LHC24an_small_GeometryAlignedLHC24adap3maFix110Shift10OP1", "left-right", "draw_specific", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_11_07_2025.root", "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_Hyperloop_09_08_2025.root", "muon-qa_id34687/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts")'
 
 ##### LHC24am_pass1_skimmed #####
 # top-bottom

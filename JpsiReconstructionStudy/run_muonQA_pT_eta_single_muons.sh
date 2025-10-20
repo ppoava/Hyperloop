@@ -10,6 +10,8 @@
 # (***) muon-qa_id30993: GeometryAlignedFix110Fix15New2T5ShiftY (better javier new2 + shift)
 # (***) muon-qa OR muon-qa_id32007 (for newer versions): GeometryAlignedFix110Fix19NewIST7
 # (***) muon-qa_id32943: GeometryAlignedFix110Fix19alnNewadSU1
+# muon-qa_id30255: GeometryAlignedFix10Fix15New2 ('better' reference)
+# muon-qa_id34687: GeometryAlignedLHC24adap3maFix110Shift10OP1 (with Boff)
 
 # ##### LHC24an_pass1_skimmed #####
 # # top-bottom
@@ -126,9 +128,10 @@
 # root -l -q -b 'muonQA_pT_eta_single_muons.C("merged_LHC24al_LHC24an_dimuon-muon_GeometryAlignedFix110Fix19alnNewadSU1", "NONE", "draw_dimuons", "AnalysisResults-muonQA_merged_LHC24an_LHC24al_pass1_skimmed_all_geometries_Hyperloop_29_07_2025.root", "muon-qa_id30697/dimuon/same-event/single-muon-dimuon-correlations/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_all_geometries_Hyperloop_29_07_2025.root", "muon-qa_id32943/dimuon/same-event/single-muon-dimuon-correlations/")'
 
 # --- dimuon DCAs
-root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedFix10Fix15ShiftCh1BNew2", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_dimuonDCA_Hyperloop_11_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_dimuonDCA_Hyperloop_11_10_2025.root", "muon-qa_id30619/dimuon/")'
-root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedFix10Fix15Shift04Ch1BNew2", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_dimuonDCA_Hyperloop_11_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_dimuonDCA_Hyperloop_11_10_2025.root", "muon-qa_id31157/dimuon/")'
-
+root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedFix10Fix15ShiftCh1BNew2", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30619/dimuon/")'
+root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedFix10Fix15Shift04Ch1BNew2", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id31157/dimuon/")'
+root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedFix10Fix15New2", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30255/dimuon/")'
+root -l -q -b 'muonQA_pT_eta_single_muons.C("LHC24an_dimuonDCA_GeometryAlignedLHC24adap3maFix110Shift10OP1", "NONE", "draw_dimuonDCA", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id30697/dimuon/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_medium_dimuonDCA_Hyperloop_17_10_2025.root", "muon-qa_id34687/dimuon/")'
 
 # testing
 # root -l 'muonQA_pT_eta_single_muons.C("3D histos test", "NONE", "draw_dimuons", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_3D_histo_test_Hyperloop_27_07_2025.root", "muon-qa_id30697/dimuon/same-event/single-muon-dimuon-correlations/", "AnalysisResults-muonQA_LHC24an_pass1_skimmed_small_3D_histo_test_Hyperloop_27_07_2025.root", "muon-qa_id30255/dimuon/same-event/single-muon-dimuon-correlations/")'

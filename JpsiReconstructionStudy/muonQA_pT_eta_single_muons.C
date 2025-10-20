@@ -977,8 +977,6 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
     // In addition, the comparison is made with the 'reference' geometry.
     if (strcmp(drawOpt, "draw_dimuonDCA") == 0)
     {
-        // Bash structure gives muon-qa_id30697/dimuon/
-
         // AnalysisResults files
         std::vector<std::string> vTreeNamesRefDimuons;
         std::vector<std::string> vTreeNamesNewDimuons;
@@ -1026,18 +1024,37 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
         vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
 
-        // TODO: mixed events
+        // mixed events
+        // --- reference geometry
+        vMixedHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+
+        vMixedHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "mixed-event/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+
+        // --- new geometry
+        vMixedHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+
+        vMixedHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vMixedHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "mixed-event/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
 
         // Just so that everything is drawn in this order: x -> all ptBins, then y -> all ptBins
-        std::vector<std::vector<std::string>> vSameHistNamesRefDimuonDCAxy = {vSameHistNamesRefDimuonDCAx, vSameHistNamesRefDimuonDCAy};
-        std::vector<std::vector<std::string>> vSameHistNamesNewDimuonDCAxy = {vSameHistNamesNewDimuonDCAx, vSameHistNamesNewDimuonDCAy};
+        //std::vector<std::vector<std::string>> vSameHistNamesRefDimuonDCAxy = {vSameHistNamesRefDimuonDCAx, vSameHistNamesRefDimuonDCAy};
+        //std::vector<std::vector<std::string>> vSameHistNamesNewDimuonDCAxy = {vSameHistNamesNewDimuonDCAx, vSameHistNamesNewDimuonDCAy};
         const char *vxy[] = {"x", "y"};
         std::vector<std::string> vDCAspecs = {"DCA(mu+T) - DCA(mu-T)", "DCA(mu+T) - DCA(mu-B)", "DCA(mu+B) - DCA(mu-T)", "DCA(mu+B) - DCA(mu-B)"};
 
         // Dummy canvas for labelling (not to overcrowd the plots)
         TCanvas *c_dummy_label = new TCanvas(Form("c_dummy_label_%s", fAnalysisResultsNew.c_str()), Form("c_dummy_label_%s", fAnalysisResultsNew.c_str()), 800, 600);
-        TCanvas c_dummy_save("dummy_save", "dummy_save", 800, 600);
-        c_dummy_save.SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf(", fAnalysisResultsNew.c_str(), labelName.c_str()));
 
         // Drawing settings (to be consistent with previous plots)
         std::vector<int> vLineStylesRef = {2, 3, 4, 6};
@@ -1051,132 +1068,165 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         // For average DCA plot
         TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "hTemplatePeaks", ptBinsFull.size(), 0, ptBinsFull.size());
         hTemplatePeaks->SetStats(0);
-        hTemplatePeaks->SetTitle("average DCA")
+        hTemplatePeaks->SetTitle("average DCA");
         hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu+) - DCA(mu-)");
-        hTemplatePeaks->GetYaxis()->SetRangeUser(-2, 2);
-        for (int ibin = 0; ibin < ptBinsFull.size(); ibin++) {
-            hTemplatePeaks->GetXaxis()->SetBinLabel(ibin+1, Form("[%.1f, %.1f]", ptBinsFull[ibin].first, ptBinsFull[ibin].second));
+        hTemplatePeaks->GetYaxis()->SetRangeUser(-3, 3);
+        for (int ibin = 0; ibin < ptBinsFull.size(); ibin++)
+        {
+            hTemplatePeaks->GetXaxis()->SetBinLabel(ibin + 1, Form("[%.1f, %.1f]", ptBinsFull[ibin].first, ptBinsFull[ibin].second));
         }
 
-        for (int k = 0; k < vSameHistNamesRefDimuonDCAxy.size(); k++)
+        std::vector<std::string> eventTypes = {"same", "mixed"};
+
+        for (const auto &eventType : eventTypes)
         {
-            // DCAx or DCAy
-            std::cout << "j = " << k << std::endl;
-            std::vector<std::string> vSameHistNamesRefDimuonDCA = vSameHistNamesRefDimuonDCAxy[k];
-            std::vector<std::string> vSameHistNamesNewDimuonDCA = vSameHistNamesNewDimuonDCAxy[k];
+            // Bash structure gives muon-qa_id30697/dimuon/
 
-            TCanvas *c_overview_1 = new TCanvas(Form("c_overview_1_%s", vxy[k]), Form("c_overview_1_%s", vxy[k]), 800, 600);
-            TCanvas *c_overview_2 = new TCanvas(Form("c_overview_2_%s", vxy[k]), Form("c_overview_2_%s", vxy[k]), 800, 600);
-            c_overview_1->Divide(2, 2);
-            c_overview_2->Divide(2, 2);
+            bool isSame = (eventType == "same");
 
-            // Create TLatex for text drawing
-            c_dummy_label->cd();
-            TLegend *l_dummy = new TLegend(0.1, 0.1, 0.9, 0.9);
-            l_dummy->SetBorderSize(0);
-            l_dummy->SetFillStyle(0);
-            l_dummy->SetTextSize(0.025);
+            std::vector<std::vector<std::string>> vHistNamesRefDimuonDCAxy;
+            std::vector<std::vector<std::string>> vHistNamesNewDimuonDCAxy;
 
-            // Plot with average DCAs
-            TCanvas *cPeaks = new TCanvas(Form("cPeaks_%s", vxy[k]), Form("cPeaks_%s", vxy[k]), 800, 600);
-            cPeaks->cd();
-            hTemplatePeaks->Draw();
-
-            for (int i = 0; i < vTreeNamesRefDimuons.size(); i++)
+            if (isSame)
             {
-                std::cout << "i = " << i << std::endl;
-                std::string fNameRef = vTreeNamesRefDimuons[i];
-                std::string fNameNew = vTreeNamesNewDimuons[i];
-                std::string histSameNameRefDCAspec = vSameHistNamesRefDimuonDCA[i];
-                std::string histSameNameNewDCAspec = vSameHistNamesNewDimuonDCA[i];
+                vHistNamesRefDimuonDCAxy = {vSameHistNamesRefDimuonDCAx, vSameHistNamesRefDimuonDCAy};
+                vHistNamesNewDimuonDCAxy = {vSameHistNamesNewDimuonDCAx, vSameHistNamesNewDimuonDCAy};
+            }
+            else
+            {
+                vHistNamesRefDimuonDCAxy = {vMixedHistNamesRefDimuonDCAx, vMixedHistNamesRefDimuonDCAy};
+                vHistNamesNewDimuonDCAxy = {vMixedHistNamesNewDimuonDCAx, vMixedHistNamesNewDimuonDCAy};
+            }
 
-                // Create dummy histogram to set DCA peak position values (for x and y seperately)
-                TH1D *hRefPeaks = new TH1D(Form("hRefPeaks_%i_%i", i, k), "ref peak per pT bin", ptBinsFull.size(), 0, ptBinsFull.size());
-                TH1D *hNewPeaks = new TH1D(Form("hNewPeaks_%i_%i", i, k), "new peak per pT bin", ptBinsFull.size(), 0, ptBinsFull.size());
+            // Print which event type is processed
+            std::cout << "Processing " << eventType << "-event dimuon DCA plots..." << std::endl;
 
-                for (int j = 0; j < ptBinsFull.size(); j++)
+            TCanvas c_dummy_save("dummy_save", "dummy_save", 800, 600);
+            c_dummy_save.SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf(", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
+
+            for (int k = 0; k < vHistNamesRefDimuonDCAxy.size(); k++)
+            {
+                // DCAx or DCAy
+                std::cout << "j = " << k << std::endl;
+                std::vector<std::string> vHistNamesRefDimuonDCA = vHistNamesRefDimuonDCAxy[k];
+                std::vector<std::string> vHistNamesNewDimuonDCA = vHistNamesNewDimuonDCAxy[k];
+
+                TCanvas *c_overview_1 = new TCanvas(Form("c_overview_1_%s", vxy[k]), Form("c_overview_1_%s", vxy[k]), 800, 600);
+                TCanvas *c_overview_2 = new TCanvas(Form("c_overview_2_%s", vxy[k]), Form("c_overview_2_%s", vxy[k]), 800, 600);
+                c_overview_1->Divide(2, 2);
+                c_overview_2->Divide(2, 2);
+
+                // Create TLatex for text drawing
+                c_dummy_label->cd();
+                TLegend *l_dummy = new TLegend(0.1, 0.1, 0.9, 0.9);
+                l_dummy->SetBorderSize(0);
+                l_dummy->SetFillStyle(0);
+                l_dummy->SetTextSize(0.025);
+
+                // Plot with average DCAs
+                TCanvas *cPeaks = new TCanvas(Form("cPeaks_%s", vxy[k]), Form("cPeaks_%s", vxy[k]), 800, 600);
+                cPeaks->cd();
+                hTemplatePeaks->Draw();
+
+                for (int i = 0; i < vTreeNamesRefDimuons.size(); i++)
                 {
-                    std::pair<double, double> ptBinFull = ptBinsFull[j];
-                    // Look at function definition, doesn't give "eta" per se..
-                    TH1 *histSameRefDCAspec = GetEtaFromTH2(fNameRef, histSameNameRefDCAspec, ptBinFull.first, ptBinFull.second);
-                    histSameRefDCAspec = (TH1 *)histSameRefDCAspec->Clone(Form("histSameRefDCAspec_clone_%s_%f_%f", histSameNameRefDCAspec.c_str(), ptBinFull.first, ptBinFull.second));
-                    histSameRefDCAspec->Scale(1. / histSameRefDCAspec->GetEntries());
-                    //
-                    TH1 *histSameNewDCAspec = GetEtaFromTH2(fNameNew, histSameNameNewDCAspec, ptBinFull.first, ptBinFull.second);
-                    histSameNewDCAspec = (TH1 *)histSameNewDCAspec->Clone(Form("histSameNewDCAspec_clone_%s_%f_%f", histSameNameNewDCAspec.c_str(), ptBinFull.first, ptBinFull.second));
-                    histSameNewDCAspec->Scale(1. / histSameNewDCAspec->GetEntries());
+                    std::cout << "i = " << i << std::endl;
+                    std::string fNameRef = vTreeNamesRefDimuons[i];
+                    std::string fNameNew = vTreeNamesNewDimuons[i];
+                    std::string histNameRefDCAspec = vHistNamesRefDimuonDCA[i];
+                    std::string histNameNewDCAspec = vHistNamesNewDimuonDCA[i];
 
-                    hRefPeaks->SetBinContent(j+1, histSameRefDCAspec->GetMean());
-                    hNewPeaks->SetBinContent(j+1, histSameNewDCAspec->GetMean());
-                    hRefPeaks->SetBinError(j+1, histSameRefDCAspec->GetMeanError());
-                    hNewPeaks->SetBinError(j+1, histSameNewDCAspec->GetMeanError());
+                    // Create dummy histogram to set DCA peak position values (for x and y seperately)
+                    TH1D *hRefPeaks = new TH1D(Form("hRefPeaks_%i_%i", i, k), "ref peak per pT bin", ptBinsFull.size(), 0, ptBinsFull.size());
+                    TH1D *hNewPeaks = new TH1D(Form("hNewPeaks_%i_%i", i, k), "new peak per pT bin", ptBinsFull.size(), 0, ptBinsFull.size());
 
-                    if (j < 4)
+                    for (int j = 0; j < ptBinsFull.size(); j++)
                     {
-                        c_overview_1->cd(j + 1);
-                    }
-                    else if (j > 3)
-                    {
-                        c_overview_2->cd(j - 4 + 1);
-                    }
+                        std::pair<double, double> ptBinFull = ptBinsFull[j];
+                        // Look at function definition, doesn't give "eta" per se..
+                        TH1 *histRefDCAspec = GetEtaFromTH2(fNameRef, histNameRefDCAspec, ptBinFull.first, ptBinFull.second);
+                        histRefDCAspec = (TH1 *)histRefDCAspec->Clone(Form("histRefDCAspec_clone_%s_%f_%f", histNameRefDCAspec.c_str(), ptBinFull.first, ptBinFull.second));
+                        histRefDCAspec->Scale(1. / histRefDCAspec->GetEntries());
+                        //
+                        TH1 *histNewDCAspec = GetEtaFromTH2(fNameNew, histNameNewDCAspec, ptBinFull.first, ptBinFull.second);
+                        histNewDCAspec = (TH1 *)histNewDCAspec->Clone(Form("histNewDCAspec_clone_%s_%f_%f", histNameNewDCAspec.c_str(), ptBinFull.first, ptBinFull.second));
+                        histNewDCAspec->Scale(1. / histNewDCAspec->GetEntries());
 
-                    if (i == 0)
-                    {
-                        histSameNewDCAspec->GetYaxis()->SetTitle("count/total counts");
-                        if (j == 0)
+                        hRefPeaks->SetBinContent(j + 1, histRefDCAspec->GetMean());
+                        hNewPeaks->SetBinContent(j + 1, histNewDCAspec->GetMean());
+                        hRefPeaks->SetBinError(j + 1, histRefDCAspec->GetMeanError());
+                        hNewPeaks->SetBinError(j + 1, histNewDCAspec->GetMeanError());
+
+                        if (j < 4)
                         {
-                            histSameNewDCAspec->Draw("HIST");
+                            c_overview_1->cd(j + 1);
+                        }
+                        else if (j > 3)
+                        {
+                            c_overview_2->cd(j - 4 + 1);
+                        }
+
+                        if (i == 0)
+                        {
+                            histNewDCAspec->GetYaxis()->SetTitle("count/total counts");
+                            histNewDCAspec->Draw("HIST");
+                        }
+                        else
+                        {
+                            histNewDCAspec->Draw("SAME HIST");
+                        }
+                        histRefDCAspec->Draw("SAME HIST");
+                        histRefDCAspec->SetLineColor(vLineColoursRef[i]);
+                        histNewDCAspec->SetLineColor(vLineColoursNew[i]);
+                        histRefDCAspec->SetLineStyle(vLineStylesRef[i]);
+                        histNewDCAspec->SetLineStyle(vLineStylesNew[i]);
+                        if (i == 0)
+                        {
+                            std::cout << "j = " << j << std::endl;
+                            std::cout << "DEBUG: setting title for minipads" << std::endl;
+                            histNewDCAspec->SetTitle(Form("DCA_%s for p_{T}^{#mu^{+}#mu^{-}} in [%.1f, %.1f]", vxy[k], ptBinFull.first, ptBinFull.second));
+                        }
+
+                        if (j == 0 && k == 0)
+                        {
+                            std::cout << "i = " << i << std::endl;
+                            std::cout << "hist name = " << histNameNewDCAspec.c_str() << std::endl;
+                            c_dummy_label->cd();
+                            if (i == 0)
+                            {
+                                l_dummy->AddEntry((TObject *)0, Form("%s", labelName.c_str()), "");
+                            }
+                            l_dummy->AddEntry(histRefDCAspec, Form("REFERENCE: %s", vDCAspecs[i].c_str()), "l");
+                            l_dummy->AddEntry(histNewDCAspec, Form("NEW: %s", vDCAspecs[i].c_str()), "l");
+                            if (i == vTreeNamesRefDimuons.size() - 1)
+                            {
+                                l_dummy->Draw();
+                                c_dummy_label->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
+                            }
+                        }
+
+                        if (i == vTreeNamesRefDimuons.size() - 1 && j == ptBinsFull.size() - 1)
+                        {
+                            std::cout << "SAVING CANVASES TO PDF" << std::endl;
+                            c_overview_1->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
+                            c_overview_2->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
                         }
                     }
-                    else
+                    cPeaks->cd();
+                    hRefPeaks->Draw("SAME");
+                    hNewPeaks->Draw("SAME");
+                    hRefPeaks->SetLineColor(vLineColoursRef[i]);
+                    hNewPeaks->SetLineColor(vLineColoursNew[i]);
+                    hRefPeaks->SetLineStyle(vLineStylesRef[i]);
+                    hNewPeaks->SetLineStyle(vLineStylesNew[i]);
+                    if (i == vTreeNamesRefDimuons.size() - 1)
                     {
-                        histSameNewDCAspec->Draw("SAME HIST");
-                    }
-                    histSameRefDCAspec->Draw("SAME HIST");
-                    histSameRefDCAspec->SetLineColor(vLineColoursRef[i]);
-                    histSameNewDCAspec->SetLineColor(vLineColoursNew[i]);
-                    histSameRefDCAspec->SetLineStyle(vLineStylesRef[i]);
-                    histSameNewDCAspec->SetLineStyle(vLineStylesNew[i]);
-                    if (i == 0)
-                    {
-                        histSameNewDCAspec->SetTitle(Form("DCA_%s for p_{T}^{#mu^{+}#mu^{-}} in [%.1f, %.1f]", vxy[k], ptBinFull.first, ptBinFull.second));
-                    }
-
-                    if (j == 0 && k == 0)
-                    {
-                        std::cout << "i = " << i << std::endl;
-                        std::cout << "hist name = " << histSameNameNewDCAspec.c_str() << std::endl;
-                        c_dummy_label->cd();
-                        if (i == 0) { l_dummy->AddEntry((TObject *)0, Form("%s", labelName.c_str()), ""); }
-                        l_dummy->AddEntry(histSameRefDCAspec, Form("REFERENCE: %s", vDCAspecs[i].c_str()), "l");
-                        l_dummy->AddEntry(histSameNewDCAspec, Form("NEW: %s", vDCAspecs[i].c_str()), "l");
-                        if (i == vTreeNamesRefDimuons.size() - 1) {
-                            l_dummy->Draw();
-                            c_dummy_label->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
-                        }
-                    }
-
-                    if (i == vTreeNamesRefDimuons.size() - 1 && j == ptBinsFull.size() - 1) 
-                    { 
-                        std::cout << "SAVING CANVASES TO PDF" << std::endl;
-                        c_overview_1->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
-                        c_overview_2->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str()));
+                        cPeaks->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
                     }
                 }
-                cPeaks->cd();
-                hRefPeaks->Draw("SAME");
-                hNewPeaks->Draw("SAME");
-                hRefPeaks->SetLineColor(vLineColoursRef[i]);
-                hNewPeaks->SetLineColor(vLineColoursNew[i]);
-                hRefPeaks->SetLineStyle(vLineStylesRef[i]);
-                hNewPeaks->SetLineStyle(vLineStylesNew[i]);
-                if (i == vTreeNamesRefDimuons.size() - 1) 
-                { 
-                    cPeaks->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf", fAnalysisResultsNew.c_str(), labelName.c_str())); 
-                    }
             }
+            c_dummy_save.SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf)", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
         }
-        c_dummy_save.SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s.pdf)", fAnalysisResultsNew.c_str(), labelName.c_str()));
     }
 }
 
