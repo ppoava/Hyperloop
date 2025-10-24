@@ -22,7 +22,7 @@
 #include "RooPlot.h"
 #include "RooAddPdf.h"
 #include "RooExponential.h"
-#include "RooChi2Var.h"
+// #include "RooChi2Var.h"
 #include "RooGaussian.h"
 #include "RooFormulaVar.h"
 #include "RooCrystalBall.h"
@@ -301,7 +301,8 @@ JpsiValues CalculateJpsiWidth(std::string fileName, std::string histName, std::s
 
     // TH1D *hist = getTree(treeName, ptMin, ptMax);
     std::cout << "Reading fileName = " << fileName << " and histName = " << histName << " and realignmentLabel = " << realignmentLabel << std::endl;
-    TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
+    // TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
+    TH1 *hist = GetTH1(fileName, histName);
     std::cout << "File read succesfully" << std::endl;
 
     // For Upsilon: 8, 12
@@ -376,7 +377,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
 
     if (strcmp(drawHalfOpt, "top-bottom") == 0)
     {
-        if (strcmp(drawOpt, "draw_generic") == 0)
+        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
         {
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef);
@@ -387,7 +388,8 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef + "_BB");
             // new geometry
-            vLegendEntries = {"reference int", "reference TT", "reference TB or BT", "reference BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"};
+            if (strcmp(drawOpt, "draw_generic") == 0 ) { vLegendEntries = {"reference int", "reference TT", "reference TB or BT", "reference BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
+            if (strcmp(drawOpt, "draw_scaledMFT") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT TT", "scaled MFT TB or BT", "scaled MFT BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
             vTreeNames.push_back(fAnalysisResultsNew);
             vHistNames.push_back(fMuonIdNew);
             vTreeNames.push_back(fAnalysisResultsNew);
@@ -420,7 +422,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
 
     if (strcmp(drawHalfOpt, "left-right") == 0)
     {
-        if (strcmp(drawOpt, "draw_generic") == 0)
+        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
         {
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef);
@@ -431,7 +433,8 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef + "_RR");
             // new geometry
-            vLegendEntries = {"reference int", "reference LL", "reference LR or RR", "reference RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"};
+            if (strcmp(drawOpt, "draw_generic") == 0) { vLegendEntries = {"reference int", "reference LL", "reference LR or RR", "reference RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
+            if (strcmp(drawOpt, "draw_scaledMFT") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT LL", "scaled MFT LR or RR", "scaled MFT RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
             vTreeNames.push_back(fAnalysisResultsNew);
             vHistNames.push_back(fMuonIdNew);
             vTreeNames.push_back(fAnalysisResultsNew);
@@ -460,551 +463,6 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
         }
     }
 
-    // BELOW IS LEGACY!!!!!
-
-    /*
-    // ======================[ Fill new geometry (using realignment) ]=====================
-    // Top-Bottom
-
-    if (strcmp(drawHalfOpt, "top-bottom") == 0)
-    {
-        if (strcmp(drawOpt, "draw_generic") == 0)
-        {
-            // labelName = "LHC24an_pass1_skimmed_no_realignment_top-bottom";
-            // std::vector<const char*> vLegendEntries = {"integrated", "top-top","top-bottom/bottom-top", "bottom-bottom"};
-            // fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-            vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew);
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_TT");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_TB");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_BB");
-        }
-        if (strcmp(drawOpt, "draw_specific") == 0)
-        {
-            // fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-            vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_TB");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_TPBN");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_TNBP");
-        }
-    }
-
-    // Left-Right
-
-    if (strcmp(drawHalfOpt, "left-right") == 0)
-    {
-        if (strcmp(drawOpt, "draw_specific") == 0)
-        {
-            // labelName = "LHC24an_pass1_skimmed_no_realignment_top-bottom";
-            // std::vector<const char*> vLegendEntries = {"integrated", "top-top","top-bottom/bottom-top", "bottom-bottom"};
-            // fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-            vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew);
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_LL");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_LR");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_RR");
-        }
-        if (strcmp(drawOpt, "draw_specific") == 0)
-        {
-            // fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-            vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_LR");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_LPRN");
-            vTreeNames.push_back(fAnalysisResultsNew);
-            vHistNames.push_back(fMuonIdNew + "_LNRP");
-        }
-    }
-    */
-
-    // BELOW IS LEGACY!!!!!!!!!!!!
-
-    // ======================[ GeometryAligned: Reference (no realignment) ]=====================
-    // Top-Bottom
-
-    /*
-    // labelName = "LHC24an_pass1_skimmed_no_realignment_top-bottom";
-    // std::vector<const char*> vLegendEntries = {"integrated", "top-top","top-bottom/bottom-top", "bottom-bottom"};
-    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    // labelName = "LHC24an_pass1_skimmed_no_realignment_left-right";
-    // std::vector<const char*> vLegendEntries = {"integrated", "left-left","left-right/right-left", "right-right"};
-    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    // std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    fMuonId = "muon-qa_id30697/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ GeometryAligned: Reference 2025 (no realignment) ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "LHC25ac_vs_LHC24an_no_realignment_pT_integrated_top-bottom";
-    std::vector<const char*> vLegendEntries = {"reference 2024 int", "reference 2024 TT","reference TB or BT 2024", "reference BB 2024", "reference 2025 int", "reference 2025 TT","reference 2025 TB or BT", "reference 2025 BB"};
-    fAnalysisResults = "AnalysisResults_LHC25ac_muon_qa_no_realignment_Hyperloop_24_06_2025.root";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-    /*
-    labelName = "LHC25ac_vs_LHC24an_no_realignment_pT_integrated_left-right";
-    std::vector<const char*> vLegendEntries = {"reference 2024 int", "reference 2024 LL","reference 2024 LR or RL", "reference 2024 RR", "reference 2025 int", "reference 2025 LL","reference LR or RL 2025", "reference RR 2025"};
-    fAnalysisResults = "AnalysisResults_LHC25ac_muon_qa_no_realignment_Hyperloop_24_06_2025.root";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ (***) GeometryAlignedFix110Fix15New2T5: Javier new2 ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5_top-bottom";
-    fMuonId = "muon-qa_id30992/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5_top-bottom";
-    fMuonId = "muon-qa_id30992/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5_left-right";
-    fMuonId = "muon-qa_id30992/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5_left-right";
-    fMuonId = "muon-qa_id30992/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ GeometryAlignedShiftY: globalShiftY ]=====================
-    // Top-Bottom
-    /*
-    labelName = "GeometryAlignedShiftY_top-bottom";
-    fMuonId = "muon-qa_id30991/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedShiftY_left-right";
-    fMuonId = "muon-qa_id30991/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ (***) GeometryAlignedFix110Fix15New2T5ShiftY: globalShiftY + javier new2 ]=====================
-    // Top-Bottom
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_top-bottom";
-    fMuonId = "muon-qa_id30993/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_top-bottom";
-    fMuonId = "muon-qa_id30993/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix110Fix15New2T5ShiftY_left-right";
-    fMuonId = "muon-qa_id30993/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ (***) GeometryAlignedFix10Fix15ShiftCh1BNew2: bottom only CH1 shift ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_top-bottom";
-    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_top-bottom";
-    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1BNew2_left-right";
-    fMuonId = "muon-qa_id30619/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ (***) GeometryAlignedFix10Fix15Shift04Ch1BNew2: bottom only CH1 shift with half the amount ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
-    fMuonId = "muon-qa_id31157/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT", "new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_top-bottom";
-    fMuonId = "muon-qa_id31157/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    // fAnalysisResults = "AnalysisResults_LHC24an_pass1_skimmed_Ch1BhalfShift_Hyperloop_24_06_2025.root";
-    labelName = "GeometryAlignedFix10Fix15Shift04Ch1BNew2_left-right";
-    fMuonId = "muon-qa_id31157/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ GeometryAlignedFix10Fix15ShiftCh1TBNew2: bottom and top CH1 1/2 shift ]=====================
-    // Top-Bottom
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_top-bottom";
-    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    labelName = "GeometryAlignedFix10Fix15ShiftCh1TBNew2_left-right";
-    fMuonId = "muon-qa_id30620/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
-
-    // ======================[ (***) GeometryAlignedFix110Fix19NewIST7: changes? ]=====================
-    // Top-Bottom
-
-    /*
-    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
-    labelName = "GeometryAlignedFix110Fix19NewIST7_top-bottom";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference TT","reference TB or BT", "reference BB", "new geometry int", "new geometry TT","new geometry TB or BT","new geometry BB"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TT");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_BB");
-    */
-    /*
-    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
-    labelName = "GeometryAlignedFix110Fix19NewIST7_top-bottom";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference TB or BT", "reference T+B-", "reference T-B+", "new geometry TB or BT", "new geometry T+B-", "new geometry T-B+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TB");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TPBN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_TNBP");
-    */
-
-    // Left-Right
-
-    /*
-    fAnalysisResults = "AnalysisResults-muonQA_LHC24am_pass1_skimmed_GeometryAlignedFix110Fix19NewIST7_Hyperloop_08_07_2025.root";
-    labelName = "GeometryAlignedFix110Fix19NewIST7_left-right";
-    fMuonId = "muon-qa/dimuon/same-event/invariantMass_pT_MuonKine_MuonCuts";
-    std::vector<const char*> vLegendEntries = {"reference int", "reference LL","reference LR or RR", "reference RR", "new geometry int", "new geometry LL","new geometry LR or RL","new geometry RR"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId);
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LL");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_RR");
-    */
-    /*
-    std::vector<const char*> vLegendEntries = {"reference LR or RL", "reference L+R-", "reference L-R+", "new geometry LR or RL", "new geometry L+R-", "new geometry L-R+"};
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LR");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LPRN");
-    vTreeNames.push_back(fAnalysisResults);
-    vHistNames.push_back(fMuonId + "_LNRP");
-    */
     std::cout << "are we crashing?" << std::endl;
     TFile *fOutput = new TFile(Form("Plots_MCH_Quadrants/JpsiPeakAndWidth_%s_%s_%s.root", labelName.c_str(), drawOpt, drawHalfOpt), "RECREATE");
     std::cout << "nope, not crashing (yet)" << std::endl;
@@ -1012,7 +470,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     std::vector<Int_t> vLineStyles;
     std::vector<Int_t> vLineColours;
 
-    if (strcmp(drawOpt, "draw_generic") == 0)
+    if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
     {
         vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1};
         vLineColours = {1, 1, 1, 1, 2, 8, 4, 7};
@@ -1045,12 +503,12 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // For muonQA: no pT stored, take just one bin
-    std::vector<std::pair<double, double>> ptBins = {
-        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
-    // For muonQA: no pT stored, take just one bin
     // std::vector<std::pair<double, double>> ptBins = {
-    //     {0, 20}
-    // };
+    //    {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
+    // For muonQA: no pT stored, take just one bin
+    std::vector<std::pair<double, double>> ptBins = {
+         {0, 20}
+    };
     // For Upsilon: {0,20}
 
     // Used for variable binning
