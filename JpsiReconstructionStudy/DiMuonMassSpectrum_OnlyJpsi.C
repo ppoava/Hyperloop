@@ -22,7 +22,7 @@
 #include "RooPlot.h"
 #include "RooAddPdf.h"
 #include "RooExponential.h"
-#include "RooChi2Var.h"
+// #include "RooChi2Var.h"
 #include "RooGaussian.h"
 #include "RooFormulaVar.h"
 #include "RooCrystalBall.h"
@@ -280,7 +280,8 @@ TGraphErrors* calculatePullHist(RooRealVar *observable, TH1 *data, RooAbsPdf *mo
 }
 
 
-TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax);
+TH1D* getTree(const char* fileName, const char *histName, Double_t ptMin, Double_t ptMax);
+TH1D* getTreeFromMuonQa(const char* fileName, const char *histName, Double_t ptMin, Double_t ptMax);
 void defSigModel(RooWorkspace &ws);
 void defBkgModel(RooWorkspace &ws, std::string BKG_model, Double_t ptMin, Double_t ptMax);
 void defCombinedModel(RooWorkspace &ws, Double_t ptMin, Double_t ptMax);
@@ -297,7 +298,7 @@ struct JpsiValues {
 
 
 // run macro with root -l 'DiMuonMassSpectrum.C(Double_t ptMin, Double_t ptMax)'
-JpsiValues CalculateJpsiWidth(const char* treeName, const char* realignmentLabel, Double_t ptMin, Double_t ptMax) {
+JpsiValues CalculateJpsiWidth(const char* treeName, const char *histName, const char* realignmentLabel, Double_t ptMin, Double_t ptMax) {
 
 
     // From tutorial to make output less crowded: why doesn't it work?
@@ -309,7 +310,7 @@ JpsiValues CalculateJpsiWidth(const char* treeName, const char* realignmentLabel
     RooWorkspace wspace{"myWS"};
 
 
-    TH1D *hist = getTree(treeName,ptMin,ptMax);
+    TH1D *hist = getTreeFromMuonQa(treeName, histName, ptMin, ptMax);
 
     // For Upsilon: 8, 12
     Double_t mMin = 2.5;
@@ -345,13 +346,25 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 
 
     std::vector<const char*> vTreeNames;
+    std::vector<const char*> vHistNames;
 
     // vTreeNames.push_back("AnalysisResults_LHC24am_pass1_skimmed_no_realignment_27_04_2025_Hyperloop.root");
 
+    vTreeNames.push_back("AnalysisResults_ref_MFT.root");
+    vHistNames.push_back("muon-qa/dimuon/same-event/invariantMass_MuonKine_GlobalMuonCuts");
+    vTreeNames.push_back("AnalysisResults_ref_MFT.root");
+    vHistNames.push_back("muon-qa/dimuon/same-event/invariantMass_GlobalMuonKine_GlobalMatchesCuts");
+    vTreeNames.push_back("AnalysisResults_new_MFT.root");
+    vHistNames.push_back("muon-qa/dimuon/same-event/invariantMass_MuonKine_GlobalMuonCuts");
+    vTreeNames.push_back("AnalysisResults_new_MFT.root");
+    vHistNames.push_back("muon-qa/dimuon/same-event/invariantMass_GlobalMuonKine_GlobalMatchesCuts");
+
+    /*
     vTreeNames.push_back("AnalysisResults_MUON_ref_MFT_one_run_Hyperloop_07_10_2025.root");
     vTreeNames.push_back("AnalysisResults_global_ref_MFT_one_run_Hyperloop_07_10_2025.root");
     vTreeNames.push_back("AnalysisResults_MUON_new_MFT_one_run_Hyperloop_07_10_2025.root");
     vTreeNames.push_back("AnalysisResults_global_new_MFT_one_run_Hyperloop_07_10_2025.root");
+    */
 
     // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_small_Hyperloop_27_09_2025.root");
     // vTreeNames.push_back("AnalysisResults_LHC24aq_pass1_muon_matching_QC1_Hyperloop_27_09_2025.root");
@@ -486,7 +499,10 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++) {
+        std::cout << "i = " << i << std::endl;
         const char *treeName = vTreeNames[i];
+        const char *histName = nullptr;
+        if (vHistNames.size() != 0) { histName = vHistNames[i]; }
         // hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
                               // nBins, 0, nBins);
         // hPeaks = new TH1D(Form("hPeaks_%s", treeName), "J/#psi peak vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}", 
@@ -498,7 +514,8 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 
         // Loop through bins and calculate Jpsi width
         for (int j = 0; j < nBins; j++) {
-            JpsiValues JpsiValues = CalculateJpsiWidth(treeName, vLegendEntries[i], ptBins[j].first, ptBins[j].second);
+            std::cout << "j = " << j << std::endl;
+            JpsiValues JpsiValues = CalculateJpsiWidth(treeName, histName, vLegendEntries[i], ptBins[j].first, ptBins[j].second);
             double width = JpsiValues.JpsiWidth;
             double peak = JpsiValues.JpsiPeak;
             double widthError = JpsiValues.JpsiWidthError;
@@ -538,7 +555,7 @@ int DiMuonMassSpectrum_OnlyJpsi() {
         legendPeaks->AddEntry(hPeaks, vLegendEntries[i], "l");
         std::cout << "vLegendEntries[i] = " << vLegendEntries[i] << std::endl;
 
-        CalculateJpsiWidth(treeName, vLegendEntries[i], 0, 30);
+        CalculateJpsiWidth(treeName, histName, vLegendEntries[i], 0, 30);
 
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
@@ -566,7 +583,7 @@ int DiMuonMassSpectrum_OnlyJpsi() {
 }
 
 
-TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
+TH1D* getTree(const char* fileName, const char *histName, Double_t ptMin, Double_t ptMax) {
 
 
     // **********************************************
@@ -604,6 +621,20 @@ TH1D* getTree(const char* fileName, Double_t ptMin, Double_t ptMax) {
 
 
     return hDiMuonMass_PtCut;
+
+
+} // void getTree()
+
+TH1D* getTreeFromMuonQa(const char* fileName, const char* histName, Double_t ptMin, Double_t ptMax) {
+
+
+    TH1D *hMass;
+    
+    TFile* fDiMuon = new TFile(fileName, "READ");
+    hMass = (TH1D*)fDiMuon->Get(histName);
+
+    std::cout << "histogram loaded successfully (?)" << std::endl;
+    return hMass;
 
 
 } // void getTree()
