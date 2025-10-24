@@ -987,6 +987,18 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         std::vector<std::string> vSameHistNamesRefDimuonDCAy;
         std::vector<std::string> vSameHistNamesNewDimuonDCAy;
 
+        // 'Same' events with mu+mu+ background
+        std::vector<std::string> vSamePPHistNamesRefDimuonDCAx;
+        std::vector<std::string> vSamePPHistNamesNewDimuonDCAx;
+        std::vector<std::string> vSamePPHistNamesRefDimuonDCAy;
+        std::vector<std::string> vSamePPHistNamesNewDimuonDCAy;
+
+        // 'Same' events with mu-mu- background
+        std::vector<std::string> vSameMMHistNamesRefDimuonDCAx;
+        std::vector<std::string> vSameMMHistNamesNewDimuonDCAx;
+        std::vector<std::string> vSameMMHistNamesRefDimuonDCAy;
+        std::vector<std::string> vSameMMHistNamesNewDimuonDCAy;
+
         // 'Mixed' events (for background reduction)
         std::vector<std::string> vMixedHistNamesRefDimuonDCAx;
         std::vector<std::string> vMixedHistNamesNewDimuonDCAx;
@@ -994,35 +1006,82 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         std::vector<std::string> vMixedHistNamesNewDimuonDCAy;
 
         // same events
+        // opposite sign +- or -+
         // --- reference geometry
         vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
-        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
         vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
-        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
         vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
-        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
         vTreeNamesRefDimuons.push_back(fAnalysisResultsRef);
-        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
 
-        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
-        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
-        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
-        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vSameHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/opposite-sign/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
 
         // --- new geometry
         vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
-        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosTDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
         vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
-        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosTDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
         vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
-        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosBDCAx_minus_MuNegTDCAx_MuonKine_MuonCuts");
         vTreeNamesNewDimuons.push_back(fAnalysisResultsNew);
-        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosBDCAx_minus_MuNegBDCAx_MuonKine_MuonCuts");
 
-        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
-        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
-        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
-        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosTDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosTDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosBDCAy_minus_MuNegTDCAy_MuonKine_MuonCuts");
+        vSameHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/opposite-sign/DCA/pT_MuPosBDCAy_minus_MuNegBDCAy_MuonKine_MuonCuts");
+
+        // same-sign ++
+        // --- reference geometry
+        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+
+        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+
+        // --- new geometry
+        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+
+        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+
+        // same-sign --
+        // --- reference geometry
+        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+
+        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+
+        // --- new geometry
+        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
+
+        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
 
         // mixed events
         // --- reference geometry
@@ -1069,33 +1128,49 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         TH1D *hTemplatePeaks = new TH1D("hTemplatePeaks", "hTemplatePeaks", ptBinsFull.size(), 0, ptBinsFull.size());
         hTemplatePeaks->SetStats(0);
         hTemplatePeaks->SetTitle("average DCA");
-        hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu+) - DCA(mu-)");
         hTemplatePeaks->GetYaxis()->SetRangeUser(-3, 3);
         for (int ibin = 0; ibin < ptBinsFull.size(); ibin++)
         {
             hTemplatePeaks->GetXaxis()->SetBinLabel(ibin + 1, Form("[%.1f, %.1f]", ptBinsFull[ibin].first, ptBinsFull[ibin].second));
         }
 
-        std::vector<std::string> eventTypes = {"same", "mixed"};
+        std::vector<std::string> eventTypes = {"same", "mixed", "plus-plus", "minus-minus"};
 
         for (const auto &eventType : eventTypes)
         {
             // Bash structure gives muon-qa_id30697/dimuon/
 
             bool isSame = (eventType == "same");
+            bool isMixed = (eventType == "mixed");
+            bool isSamePP = (eventType == "plus-plus");
+            bool isSameMM = (eventType == "minus-minus");
 
             std::vector<std::vector<std::string>> vHistNamesRefDimuonDCAxy;
             std::vector<std::vector<std::string>> vHistNamesNewDimuonDCAxy;
 
             if (isSame)
             {
+                hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu+) - DCA(mu-)");
                 vHistNamesRefDimuonDCAxy = {vSameHistNamesRefDimuonDCAx, vSameHistNamesRefDimuonDCAy};
                 vHistNamesNewDimuonDCAxy = {vSameHistNamesNewDimuonDCAx, vSameHistNamesNewDimuonDCAy};
             }
-            else
+            else if (isMixed)
             {
+                hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu+) - DCA(mu-)");
                 vHistNamesRefDimuonDCAxy = {vMixedHistNamesRefDimuonDCAx, vMixedHistNamesRefDimuonDCAy};
                 vHistNamesNewDimuonDCAxy = {vMixedHistNamesNewDimuonDCAx, vMixedHistNamesNewDimuonDCAy};
+            }
+            else if (isSamePP)
+            {
+                hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu_1) - DCA(mu_2)");
+                vHistNamesRefDimuonDCAxy = {vSamePPHistNamesRefDimuonDCAx, vSamePPHistNamesRefDimuonDCAy};
+                vHistNamesNewDimuonDCAxy = {vSamePPHistNamesNewDimuonDCAx, vSamePPHistNamesNewDimuonDCAy};
+            }
+            else if (isSameMM)
+            {
+                hTemplatePeaks->GetYaxis()->SetTitle("DCA(mu_1) - DCA(mu_2)");
+                vHistNamesRefDimuonDCAxy = {vSameMMHistNamesRefDimuonDCAx, vSameMMHistNamesRefDimuonDCAy};
+                vHistNamesNewDimuonDCAxy = {vSameMMHistNamesNewDimuonDCAx, vSameMMHistNamesNewDimuonDCAy};
             }
 
             // Print which event type is processed
@@ -1111,8 +1186,8 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                 std::vector<std::string> vHistNamesRefDimuonDCA = vHistNamesRefDimuonDCAxy[k];
                 std::vector<std::string> vHistNamesNewDimuonDCA = vHistNamesNewDimuonDCAxy[k];
 
-                TCanvas *c_overview_1 = new TCanvas(Form("c_overview_1_%s", vxy[k]), Form("c_overview_1_%s", vxy[k]), 800, 600);
-                TCanvas *c_overview_2 = new TCanvas(Form("c_overview_2_%s", vxy[k]), Form("c_overview_2_%s", vxy[k]), 800, 600);
+                TCanvas *c_overview_1 = new TCanvas(Form("c_overview_1_%s", eventType.c_str()), Form("c_overview_1_%s", eventType.c_str()), 800, 600);
+                TCanvas *c_overview_2 = new TCanvas(Form("c_overview_2_%s", eventType.c_str()), Form("c_overview_2_%s", eventType.c_str()), 800, 600);
                 c_overview_1->Divide(2, 2);
                 c_overview_2->Divide(2, 2);
 
@@ -1124,7 +1199,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                 l_dummy->SetTextSize(0.025);
 
                 // Plot with average DCAs
-                TCanvas *cPeaks = new TCanvas(Form("cPeaks_%s", vxy[k]), Form("cPeaks_%s", vxy[k]), 800, 600);
+                TCanvas *cPeaks = new TCanvas(Form("cPeaks_%s", eventType.c_str()), Form("cPeaks_%s", eventType.c_str()), 800, 600);
                 cPeaks->cd();
                 hTemplatePeaks->Draw();
 
