@@ -301,8 +301,8 @@ JpsiValues CalculateJpsiWidth(std::string fileName, std::string histName, std::s
 
     // TH1D *hist = getTree(treeName, ptMin, ptMax);
     std::cout << "Reading fileName = " << fileName << " and histName = " << histName << " and realignmentLabel = " << realignmentLabel << std::endl;
-    // TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
-    TH1 *hist = GetTH1(fileName, histName);
+    TH1 *hist = GetTH1FromTH2(fileName, histName, ptMin, ptMax);
+    // TH1 *hist = GetTH1(fileName, histName);
     std::cout << "File read succesfully" << std::endl;
 
     // For Upsilon: 8, 12
@@ -503,12 +503,13 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     // std::vector<const char*> vLegendEntries = {"reference", "global shift Y", "Javier", "Chi"};
 
     // For muonQA: no pT stored, take just one bin
-    // std::vector<std::pair<double, double>> ptBins = {
-    //    {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
-    // For muonQA: no pT stored, take just one bin
     std::vector<std::pair<double, double>> ptBins = {
-         {0, 20}
+        {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}
     };
+    // For muonQA: no pT stored, take just one bin
+    // std::vector<std::pair<double, double>> ptBins = {
+    //     {0, 20}
+    // };
     // For Upsilon: {0,20}
 
     // Used for variable binning

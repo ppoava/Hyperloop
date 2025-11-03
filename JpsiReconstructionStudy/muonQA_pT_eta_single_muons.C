@@ -1040,47 +1040,47 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         // same-sign ++
         // --- reference geometry
         vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
-        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
-        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_MuTDCAx_minus_MuBDCAx_MuonKine_MuonCuts");
+        // vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
         vSamePPHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
 
         vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
-        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
-        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_MuTDCAy_minus_MuBDCAy_MuonKine_MuonCuts");
+        // vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
         vSamePPHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
 
         // --- new geometry
         vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
-        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
-        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_MuTDCAx_minus_MuBDCAx_MuonKine_MuonCuts");
+        // vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
         vSamePPHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
 
         vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
-        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
-        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_MuTDCAy_minus_MuBDCAy_MuonKine_MuonCuts");
+        // vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
         vSamePPHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-PP/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
 
         // same-sign --
         // --- reference geometry
         vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
-        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
-        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_MuTDCAx_minus_MuBDCAx_MuonKine_MuonCuts");
+        // vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
         vSameMMHistNamesRefDimuonDCAx.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
 
         vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
-        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
-        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_MuTDCAy_minus_MuBDCAy_MuonKine_MuonCuts");
+        // vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
         vSameMMHistNamesRefDimuonDCAy.push_back(fMuonIdRef + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
 
         // --- new geometry
         vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
-        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
-        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_MuTDCAx_minus_MuBDCAx_MuonKine_MuonCuts");
+        // vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2TDCAx_MuonKine_MuonCuts");
         vSameMMHistNamesNewDimuonDCAx.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAx_minus_Mu2BDCAx_MuonKine_MuonCuts");
 
         vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
-        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1TDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
-        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
+        vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_MuTDCAy_minus_MuBDCAy_MuonKine_MuonCuts");
+        // vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2TDCAy_MuonKine_MuonCuts");
         vSameMMHistNamesNewDimuonDCAy.push_back(fMuonIdNew + "same-event/same-sign-MM/DCA/pT_Mu1BDCAy_minus_Mu2BDCAy_MuonKine_MuonCuts");
 
         // mixed events
@@ -1120,6 +1120,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         std::vector<int> vLineColoursRef = {1, 1, 1, 1};
         std::vector<int> vLineStylesNew = {1, 1, 1, 1};
         std::vector<int> vLineColoursNew = {8, 4, 6, 7};
+        std::vector<double> vYuppValues = {0.004, 0.004, 0.005, 0.006, 0.008, 0.02, 0.02, 0.02};
 
         std::vector<std::pair<double, double>> ptBinsFull = {
             {0, 30}, {0, 2}, {2, 4}, {4, 6}, {6, 8}, {8, 10}, {10, 12}, {12, 20}};
@@ -1135,6 +1136,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
         }
 
         std::vector<std::string> eventTypes = {"same", "mixed", "plus-plus", "minus-minus"};
+        // BE CAREFUL: SAME SIGN PAIRS DO NOT HAVE TB AND BT COMBINATIONS. ALL MIXED COMBINATIONS ARE T - B ALWAYS
 
         for (const auto &eventType : eventTypes)
         {
@@ -1203,7 +1205,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                 cPeaks->cd();
                 hTemplatePeaks->Draw();
 
-                for (int i = 0; i < vTreeNamesRefDimuons.size(); i++)
+                for (int i = 0; i < vHistNamesRefDimuonDCA.size(); i++)
                 {
                     std::cout << "i = " << i << std::endl;
                     std::string fNameRef = vTreeNamesRefDimuons[i];
@@ -1245,6 +1247,9 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                         {
                             histNewDCAspec->GetYaxis()->SetTitle("count/total counts");
                             histNewDCAspec->Draw("HIST");
+                            if (isSamePP || isSameMM) {
+                                histNewDCAspec->GetYaxis()->SetRangeUser(0, vYuppValues[j]);
+                            }
                         }
                         else
                         {
@@ -1255,6 +1260,10 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                         histNewDCAspec->SetLineColor(vLineColoursNew[i]);
                         histRefDCAspec->SetLineStyle(vLineStylesRef[i]);
                         histNewDCAspec->SetLineStyle(vLineStylesNew[i]);
+
+                        // ADD: if same-sign AND if i == 1 (T-B hists)
+                        // --- put histNewDCAspec->GetYaxis()->SetRangeUser(1.2 * histNewDCAspec->GetMaximum());
+                        
                         if (i == 0)
                         {
                             std::cout << "j = " << j << std::endl;
@@ -1273,14 +1282,14 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                             }
                             l_dummy->AddEntry(histRefDCAspec, Form("REFERENCE: %s", vDCAspecs[i].c_str()), "l");
                             l_dummy->AddEntry(histNewDCAspec, Form("NEW: %s", vDCAspecs[i].c_str()), "l");
-                            if (i == vTreeNamesRefDimuons.size() - 1)
+                            if (i == vHistNamesRefDimuonDCA.size() - 1)
                             {
                                 l_dummy->Draw();
                                 c_dummy_label->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
                             }
                         }
 
-                        if (i == vTreeNamesRefDimuons.size() - 1 && j == ptBinsFull.size() - 1)
+                        if (i == vHistNamesRefDimuonDCA.size() - 1 && j == ptBinsFull.size() - 1)
                         {
                             std::cout << "SAVING CANVASES TO PDF" << std::endl;
                             c_overview_1->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
@@ -1294,7 +1303,7 @@ void makePlots(std::string labelName, const char *drawHalfOpt, const char *drawO
                     hNewPeaks->SetLineColor(vLineColoursNew[i]);
                     hRefPeaks->SetLineStyle(vLineStylesRef[i]);
                     hNewPeaks->SetLineStyle(vLineStylesNew[i]);
-                    if (i == vTreeNamesRefDimuons.size() - 1)
+                    if (i == vHistNamesRefDimuonDCA.size() - 1)
                     {
                         cPeaks->SaveAs(Form("Plots_MCH_Quadrants/dimuonDCAs_%s_%s_%s.pdf", eventType.c_str(), fAnalysisResultsNew.c_str(), labelName.c_str()));
                     }
