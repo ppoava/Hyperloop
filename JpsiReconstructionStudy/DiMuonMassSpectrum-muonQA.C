@@ -548,6 +548,18 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     // TCanvas *dummy = new TCanvas("dummy","dummy for drawing", 800, 600);
     // dummy->SaveAs(Form("Plots_MCH_Quadrants/%s.pdf(", labelName)); // assumes the same data set is used for reference and for re-alignment
 
+    TLegend *legendWidths = new TLegend(0.4, 0.6, 0.6, 0.8);
+    legendWidths->SetBorderSize(0);
+    legendWidths->AddEntry((TObject *)0, legendTitle, "");
+    legendWidths->SetTextSize(0.02);
+    TLegend *legendPeaks = new TLegend(0.4, 0.6, 0.6, 0.8);
+    legendPeaks->SetBorderSize(0);
+    legendPeaks->AddEntry((TObject *)0, legendTitle, "");
+    legendPeaks->SetTextSize(0.02);
+
+    // std::vector<std::string> vTopBottom;
+    // vTopBottom.push_back{"TT", "TB", "BT", "BB"};
+
     TCanvas *globalCanvasJpsiWidths = new TCanvas(Form("globalJpsiWidths_%s", labelName.c_str()), Form("globalJpsiWidths_%s", labelName.c_str()), 800, 600);
     globalCanvasJpsiWidths->cd();
     hTemplateWidths->GetYaxis()->SetRangeUser(0.04, 0.15);
@@ -561,29 +573,19 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     // For Upsilon: change name here
     lineJpsiPDG->Draw("same");
 
-    TLegend *legendWidths = new TLegend(0.4, 0.6, 0.6, 0.8);
-    legendWidths->SetBorderSize(0);
-    legendWidths->AddEntry((TObject *)0, legendTitle, "");
-    legendWidths->SetTextSize(0.02);
-    TLegend *legendPeaks = new TLegend(0.4, 0.6, 0.6, 0.8);
-    legendPeaks->SetBorderSize(0);
-    legendPeaks->AddEntry((TObject *)0, legendTitle, "");
-    legendPeaks->SetTextSize(0.02);
-
-    // std::vector<std::string> vTopBottom;
-    // vTopBottom.push_back{"TT", "TB", "BT", "BB"};
+    TCanvas *cdummy = new TCanvas("cdummy", "cdummy");
 
     std::cout << "vTreeNames.size() = " << vTreeNames.size() << std::endl;
 
     // Loop through different geometries
     for (int i = 0; i < vTreeNames.size(); i++)
     {
-        std::cout << "crash again?" << std::endl;
+        if (i == 0) {
+            cdummy->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf(", labelName.c_str(), drawOpt, drawHalfOpt));
+        }
+
         std::string fileName = vTreeNames[i];
         std::string histName = vHistNames[i];
-        std::cout << "iteration i = " << i << std::endl;
-        std::cout << "fileName = " << fileName << std::endl;
-        std::cout << "histName = " << histName << std::endl;
         // TODO: add top/bottom here, easiest to loop over vector with the names...
         // std::string histName = std::string(vMuonIds[i]) + "/dimuon/same-event/invariantMass_MuonKine_MuonCuts";
         // hWidths = new TH1D(Form("hWidths_%s", treeName), "J/#psi width vs. p_{T} range; p_{T} range (GeV/c); GeV/c^{2}",
@@ -617,22 +619,15 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
         // Correct bin labels
         // hWidths->LabelsOption("h", "X");
         // hPeaks->LabelsOption("h", "X");
-std::cout << "the crash is here 1 " << std::endl;
         TCanvas *canvasJpsiWidths = new TCanvas(Form("cJpsiWidths_%s", fileName.c_str()), Form("cJpsiWidths_%s", fileName.c_str()), 800, 600);
         canvasJpsiWidths->cd();
         hWidths->SetStats(0);
         hWidths->Draw("PE");
-std::cout << "the crash is here 2" << std::endl;
         globalCanvasJpsiWidths->cd();
-    std::cout << "the crash is here 3" << std::endl;
         hWidths->SetLineColor(vLineColours[i]);
-        std::cout << "the crash is here 4" << std::endl;
         hWidths->SetLineStyle(vLineStyles[i]);
-        std::cout << "the crash is here 5" << std::endl;
         hWidths->Draw("SAME PE");
-        std::cout << "the crash is here 6" << std::endl;
         legendWidths->AddEntry(hWidths, vLegendEntries[i].c_str(), "l");
-        std::cout << "the crash is here 7" << std::endl;
 
         TCanvas *canvasJpsiPeaks = new TCanvas(Form("cJpsiPeaks_%s", fileName.c_str()), Form("cJpsiPeaks_%s", fileName.c_str()), 800, 600);
         canvasJpsiPeaks->cd();
@@ -643,13 +638,17 @@ std::cout << "the crash is here 2" << std::endl;
         hPeaks->SetLineColor(vLineColours[i]);
         hPeaks->SetLineStyle(vLineStyles[i]);
         hPeaks->Draw("SAME PE");
-
         legendPeaks->AddEntry(hPeaks, vLegendEntries[i].c_str(), "l");
 
-        std::cout << "vLegendEntries[i] = " << vLegendEntries[i] << std::endl;
+        globalCanvasJpsiWidths->cd();
+        legendWidths->Draw();
+        globalCanvasJpsiPeaks->cd();
+        legendPeaks->Draw();
 
         CalculateJpsiWidth(fileName, histName, vLegendEntries[i], 0, 30);
-        std::cout << "crashing maybe?" << std::endl;
+
+        globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
+        globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
 
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
@@ -662,7 +661,7 @@ std::cout << "the crash is here 2" << std::endl;
     globalCanvasJpsiPeaks->cd();
     legendPeaks->Draw();
 
-    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf(", labelName.c_str(), drawOpt, drawHalfOpt));
+    globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
     globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf)", labelName.c_str(), drawOpt, drawHalfOpt));
 
     fOutput->cd();
