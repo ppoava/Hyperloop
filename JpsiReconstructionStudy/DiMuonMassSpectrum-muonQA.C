@@ -377,7 +377,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
 
     if (strcmp(drawHalfOpt, "top-bottom") == 0)
     {
-        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
+        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_generic_detailed") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0)
         {
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef);
@@ -388,8 +388,8 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef + "_BB");
             // new geometry
-            if (strcmp(drawOpt, "draw_generic") == 0 ) { vLegendEntries = {"reference int", "reference TT", "reference TB or BT", "reference BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
-            if (strcmp(drawOpt, "draw_scaledMFT") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT TT", "scaled MFT TB or BT", "scaled MFT BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
+            if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_generic_detailed") == 0) { vLegendEntries = {"reference int", "reference TT", "reference TB or BT", "reference BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
+            if (strcmp(drawOpt, "draw_scaledMFT") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT TT", "scaled MFT TB or BT", "scaled MFT BB", "new geometry int", "new geometry TT", "new geometry TB or BT", "new geometry BB"}; }
             vTreeNames.push_back(fAnalysisResultsNew);
             vHistNames.push_back(fMuonIdNew);
             vTreeNames.push_back(fAnalysisResultsNew);
@@ -422,7 +422,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
 
     if (strcmp(drawHalfOpt, "left-right") == 0)
     {
-        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
+        if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_generic_detailed") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0)
         {
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef);
@@ -433,8 +433,8 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
             vTreeNames.push_back(fAnalysisResultsRef);
             vHistNames.push_back(fMuonIdRef + "_RR");
             // new geometry
-            if (strcmp(drawOpt, "draw_generic") == 0) { vLegendEntries = {"reference int", "reference LL", "reference LR or RR", "reference RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
-            if (strcmp(drawOpt, "draw_scaledMFT") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT LL", "scaled MFT LR or RR", "scaled MFT RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
+            if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_generic_detailed") == 0) { vLegendEntries = {"reference int", "reference LL", "reference LR or RR", "reference RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
+            if (strcmp(drawOpt, "draw_scaledMFT") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0) { vLegendEntries = {"scaled MFT int", "scaled MFT LL", "scaled MFT LR or RR", "scaled MFT RR", "new geometry int", "new geometry LL", "new geometry LR or RL", "new geometry RR"}; }
             vTreeNames.push_back(fAnalysisResultsNew);
             vHistNames.push_back(fMuonIdNew);
             vTreeNames.push_back(fAnalysisResultsNew);
@@ -470,7 +470,7 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
     std::vector<Int_t> vLineStyles;
     std::vector<Int_t> vLineColours;
 
-    if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0)
+    if (strcmp(drawOpt, "draw_generic") == 0 || strcmp(drawOpt, "draw_generic_detailed") == 0 || strcmp(drawOpt, "draw_scaledMFT") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0)
     {
         vLineStyles = {1, 2, 3, 6, 1, 1, 1, 1};
         vLineColours = {1, 1, 1, 1, 2, 8, 4, 7};
@@ -647,8 +647,10 @@ int DiMuonMassSpectrum_muonQA(std::string labelName, const char *drawHalfOpt, co
 
         CalculateJpsiWidth(fileName, histName, vLegendEntries[i], 0, 30);
 
-        globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
-        globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
+        if (strcmp(drawOpt, "draw_generic_detailed") == 0 || strcmp(drawOpt, "draw_scaledMFT_detailed") == 0) {
+            globalCanvasJpsiWidths->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
+            globalCanvasJpsiPeaks->SaveAs(Form("Plots_MCH_Quadrants/%s_%s_%s.pdf", labelName.c_str(), drawOpt, drawHalfOpt));
+        }
 
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.pdf", treeName));
         // canvasJpsiWidths->SaveAs(Form("Plots/%s_JpsiWidths.png", treeName));
